@@ -60,7 +60,7 @@ export default async function ConfirmationPage({
             </p>
             {(rsvp.donationCents || 0) > 0 && (
               <p className="text-red-700">
-                Thank you for your {formatCents(rsvp.donationCents!)} donation!
+                Thanks for covering {formatCents(rsvp.donationCents!)} in processing fees!
               </p>
             )}
           </div>

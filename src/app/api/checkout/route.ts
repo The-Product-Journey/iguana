@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
       lineItems.push({
         price_data: {
           currency: "usd",
-          product_data: { name: "Donation — Thank you!" },
+          product_data: { name: "Cover processing fees — Thank you!" },
           unit_amount: donationCents,
         },
         quantity: 1,

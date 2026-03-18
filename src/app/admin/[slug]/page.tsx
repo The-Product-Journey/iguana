@@ -47,7 +47,7 @@ export default async function AdminReunionPage({
     (sum, r) => sum + (r.amountPaidCents || 0),
     0
   );
-  const totalDonations = paidRsvps.reduce(
+  const totalFeesCovered = paidRsvps.reduce(
     (sum, r) => sum + (r.donationCents || 0),
     0
   );
@@ -84,8 +84,8 @@ export default async function AdminReunionPage({
           <p className="text-2xl font-bold">{formatCents(totalRevenue)}</p>
         </div>
         <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-          <p className="text-sm text-gray-500">Donations</p>
-          <p className="text-2xl font-bold">{formatCents(totalDonations)}</p>
+          <p className="text-sm text-gray-500">Fees Covered</p>
+          <p className="text-2xl font-bold">{formatCents(totalFeesCovered)}</p>
         </div>
       </div>
 
@@ -99,7 +99,7 @@ export default async function AdminReunionPage({
               <th className="px-4 py-3 font-medium text-gray-700">Email</th>
               <th className="px-4 py-3 font-medium text-gray-700">Guests</th>
               <th className="px-4 py-3 font-medium text-gray-700">Paid</th>
-              <th className="px-4 py-3 font-medium text-gray-700">Donation</th>
+              <th className="px-4 py-3 font-medium text-gray-700">Fees Covered</th>
               <th className="px-4 py-3 font-medium text-gray-700">Status</th>
               <th className="px-4 py-3 font-medium text-gray-700">Date</th>
             </tr>

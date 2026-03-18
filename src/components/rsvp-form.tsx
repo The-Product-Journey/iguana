@@ -3,6 +3,13 @@
 import { useState } from "react";
 import { formatCents } from "@/lib/utils";
 
+const FEE_PRESETS = [
+  { label: "No thanks", pct: 0 },
+  { label: "5%", pct: 5 },
+  { label: "10%", pct: 10 },
+  { label: "Custom", pct: -1 },
+];
+
 export function RsvpForm({
   reunionId,
   slug,
@@ -15,10 +22,18 @@ export function RsvpForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [guestCount, setGuestCount] = useState(1);
-  const [donationDollars, setDonationDollars] = useState("");
+  const [feePreset, setFeePreset] = useState(5); // default 5%
+  const [customDollars, setCustomDollars] = useState("");
 
   const registrationTotal = feeCents * guestCount;
-  const donationCents = Math.round(parseFloat(donationDollars || "0") * 100);
+
+  let donationCents: number;
+  if (feePreset === -1) {
+    donationCents = Math.round(parseFloat(customDollars || "0") * 100);
+  } else {
+    donationCents = Math.round(registrationTotal * (feePreset / 100));
+  }
+
   const grandTotal = registrationTotal + donationCents;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -165,27 +180,50 @@ export function RsvpForm({
         />
       </div>
 
-      {/* Donation */}
+      {/* Cover the fees */}
       <div className="rounded-lg border border-red-100 bg-red-50 p-4">
-        <label htmlFor="donation" className="mb-1 block text-sm font-medium text-red-900">
-          Optional Donation
-        </label>
-        <p className="mb-3 text-sm text-red-700">
-          Help us cover costs and make the reunion even better for all Trojans!
+        <p className="mb-1 text-sm font-medium text-red-900">
+          Help cover processing fees?
         </p>
-        <div className="relative">
-          <span className="absolute left-3 top-2 text-gray-500">$</span>
-          <input
-            id="donation"
-            type="number"
-            min="0"
-            step="1"
-            value={donationDollars}
-            onChange={(e) => setDonationDollars(e.target.value)}
-            placeholder="0"
-            className="w-full rounded-lg border border-red-200 py-2 pl-7 pr-3 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-          />
+        <p className="mb-3 text-sm text-red-700">
+          Payment processing costs eat into the reunion budget. Adding a little
+          extra ensures 100% of your registration goes toward the event.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {FEE_PRESETS.map((preset) => (
+            <button
+              key={preset.pct}
+              type="button"
+              onClick={() => setFeePreset(preset.pct)}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
+                feePreset === preset.pct
+                  ? "bg-red-700 text-white"
+                  : "bg-white text-red-700 border border-red-200 hover:bg-red-50"
+              }`}
+            >
+              {preset.label}
+              {preset.pct > 0 && (
+                <span className="ml-1 text-xs opacity-75">
+                  (+{formatCents(Math.round(registrationTotal * (preset.pct / 100)))})
+                </span>
+              )}
+            </button>
+          ))}
         </div>
+        {feePreset === -1 && (
+          <div className="relative mt-3">
+            <span className="absolute left-3 top-2 text-gray-500">$</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={customDollars}
+              onChange={(e) => setCustomDollars(e.target.value)}
+              placeholder="0.00"
+              className="w-full rounded-lg border border-red-200 py-2 pl-7 pr-3 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            />
+          </div>
+        )}
       </div>
 
       {/* Total */}
@@ -198,7 +236,7 @@ export function RsvpForm({
         </div>
         {donationCents > 0 && (
           <div className="mt-1 flex justify-between text-sm text-gray-600">
-            <span>Donation</span>
+            <span>Cover fees</span>
             <span>{formatCents(donationCents)}</span>
           </div>
         )}

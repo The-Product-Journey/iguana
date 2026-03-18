@@ -16,7 +16,7 @@ export default async function AdminDashboard() {
           totalRsvps: sql<number>`count(*)`,
           paidRsvps: sql<number>`sum(case when ${rsvps.paymentStatus} = 'paid' then 1 else 0 end)`,
           totalRevenue: sql<number>`sum(case when ${rsvps.paymentStatus} = 'paid' then ${rsvps.amountPaidCents} else 0 end)`,
-          totalDonations: sql<number>`sum(case when ${rsvps.paymentStatus} = 'paid' then ${rsvps.donationCents} else 0 end)`,
+          totalFeesCovered: sql<number>`sum(case when ${rsvps.paymentStatus} = 'paid' then ${rsvps.donationCents} else 0 end)`,
           totalGuests: sql<number>`sum(case when ${rsvps.paymentStatus} = 'paid' then ${rsvps.guestCount} else 0 end)`,
         })
         .from(rsvps)
@@ -60,9 +60,9 @@ export default async function AdminDashboard() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Donations</p>
+                  <p className="text-gray-500">Fees Covered</p>
                   <p className="text-xl font-semibold">
-                    {formatCents(s?.totalDonations || 0)}
+                    {formatCents(s?.totalFeesCovered || 0)}
                   </p>
                 </div>
               </div>
