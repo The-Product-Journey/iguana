@@ -1,10 +1,11 @@
 import { db } from "@/lib/db";
-import { reunions } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { reunions, events } from "@/lib/db/schema";
+import { eq, asc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { formatCents } from "@/lib/utils";
 import { HelpSection } from "@/components/help-section";
+import { TeaseLanding } from "@/components/tease-landing";
 
 export default async function ReunionPage({
   params,
@@ -19,6 +20,31 @@ export default async function ReunionPage({
     .get();
 
   if (!reunion) notFound();
+
+  // Tease mode — show the teaser landing
+  if (reunion.siteMode === "tease") {
+    const reunionEvents = await db
+      .select()
+      .from(events)
+      .where(eq(events.reunionId, reunion.id))
+      .orderBy(asc(events.sortOrder));
+
+    return (
+      <TeaseLanding
+        reunion={{
+          id: reunion.id,
+          slug: reunion.slug,
+          name: reunion.name,
+          description: reunion.description,
+          eventDate: reunion.eventDate,
+        }}
+        events={reunionEvents}
+      />
+    );
+  }
+
+  // pre_register or open mode — show the full landing page
+  const isOpen = reunion.siteMode === "open";
 
   return (
     <div className="min-h-screen">
@@ -41,7 +67,7 @@ export default async function ReunionPage({
             href={`/${slug}/rsvp`}
             className="inline-block rounded-full bg-white px-8 py-3 text-lg font-semibold text-red-700 shadow-lg transition hover:bg-red-50 hover:shadow-xl"
           >
-            {reunion.registrationOpen ? "Register Now" : "Pre-Register"}
+            {isOpen ? "Register Now" : "Pre-Register"}
           </Link>
         </div>
       </div>
@@ -69,23 +95,12 @@ export default async function ReunionPage({
             <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-500">
               Registration
             </h3>
-            {reunion.registrationOpen ? (
-              <>
-                <p className="text-lg font-medium">
-                  {formatCents(reunion.registrationFeeCents)} per person
-                </p>
-                <p className="mt-1 text-gray-600">Banquet &amp; festivities</p>
-              </>
-            ) : (
-              <>
-                <p className="text-lg font-medium">
-                  {formatCents(reunion.registrationFeeCents)} per person
-                </p>
-                <p className="mt-1 text-gray-600">
-                  Pre-register now, pay later
-                </p>
-              </>
-            )}
+            <p className="text-lg font-medium">
+              {formatCents(reunion.registrationFeeCents)} per person
+            </p>
+            <p className="mt-1 text-gray-600">
+              {isOpen ? "Banquet & festivities" : "Pre-register now, pay later"}
+            </p>
           </div>
         </div>
 
@@ -97,7 +112,7 @@ export default async function ReunionPage({
             href={`/${slug}/rsvp`}
             className="inline-block rounded-full bg-red-700 px-8 py-3 text-lg font-semibold text-white shadow transition hover:bg-red-800"
           >
-            {reunion.registrationOpen
+            {isOpen
               ? "Register & Pay"
               : "Pre-Register — Save Your Spot"}
           </Link>

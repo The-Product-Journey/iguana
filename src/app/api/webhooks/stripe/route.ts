@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
-import { rsvps } from "@/lib/db/schema";
+import { rsvps, sponsors } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
@@ -27,7 +27,11 @@ export async function POST(req: NextRequest) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     const rsvpId = session.metadata?.rsvp_id;
-    const donationCents = parseInt(session.metadata?.donation_cents || "0", 10);
+    const sponsorId = session.metadata?.sponsor_id;
+    const donationCents = parseInt(
+      session.metadata?.donation_cents || "0",
+      10
+    );
 
     if (rsvpId) {
       await db
@@ -40,11 +44,22 @@ export async function POST(req: NextRequest) {
         })
         .where(eq(rsvps.id, rsvpId));
     }
+
+    if (sponsorId) {
+      await db
+        .update(sponsors)
+        .set({
+          paymentStatus: "paid",
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(sponsors.id, sponsorId));
+    }
   }
 
   if (event.type === "checkout.session.expired") {
     const session = event.data.object;
     const rsvpId = session.metadata?.rsvp_id;
+    const sponsorId = session.metadata?.sponsor_id;
 
     if (rsvpId) {
       await db
@@ -54,6 +69,16 @@ export async function POST(req: NextRequest) {
           updatedAt: new Date().toISOString(),
         })
         .where(eq(rsvps.id, rsvpId));
+    }
+
+    if (sponsorId) {
+      await db
+        .update(sponsors)
+        .set({
+          paymentStatus: "failed",
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(sponsors.id, sponsorId));
     }
   }
 
