@@ -3,6 +3,7 @@ import { reunions, memorials } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import { getEffectiveSiteMode } from "@/lib/site-mode";
 import Image from "next/image";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +21,8 @@ export default async function MemorialPage({
     .get();
 
   if (!reunion) notFound();
-  if (reunion.siteMode === "tease") redirect(`/${slug}`);
+  const effectiveMode = await getEffectiveSiteMode(reunion);
+  if (effectiveMode === "tease") redirect(`/${slug}`);
 
   const published = await db
     .select()

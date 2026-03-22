@@ -6,6 +6,7 @@ import Link from "next/link";
 import { formatCents } from "@/lib/utils";
 import { HelpSection } from "@/components/help-section";
 import { TeaseLanding } from "@/components/tease-landing";
+import { getEffectiveSiteMode } from "@/lib/site-mode";
 
 export default async function ReunionPage({
   params,
@@ -21,8 +22,10 @@ export default async function ReunionPage({
 
   if (!reunion) notFound();
 
+  const effectiveMode = await getEffectiveSiteMode(reunion);
+
   // Tease mode — show the teaser landing
-  if (reunion.siteMode === "tease") {
+  if (effectiveMode === "tease") {
     const reunionEvents = await db
       .select()
       .from(events)
@@ -44,7 +47,7 @@ export default async function ReunionPage({
   }
 
   // pre_register or open mode — show the full landing page
-  const isOpen = reunion.siteMode === "open";
+  const isOpen = effectiveMode === "open";
 
   return (
     <div className="min-h-screen">

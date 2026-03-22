@@ -3,6 +3,7 @@ import { reunions, events } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import { getEffectiveSiteMode } from "@/lib/site-mode";
 import { formatCents } from "@/lib/utils";
 
 export default async function SchedulePage({
@@ -18,7 +19,8 @@ export default async function SchedulePage({
     .get();
 
   if (!reunion) notFound();
-  if (reunion.siteMode === "tease") redirect(`/${slug}`);
+  const effectiveMode = await getEffectiveSiteMode(reunion);
+  if (effectiveMode === "tease") redirect(`/${slug}`);
 
   const reunionEvents = await db
     .select()

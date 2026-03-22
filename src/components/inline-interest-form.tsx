@@ -141,7 +141,7 @@ export function InlineInterestForm({
                   type="checkbox"
                   checked={selectedEvents.includes(event.id)}
                   onChange={() => toggleEvent(event.id)}
-                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                  className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-red-700 focus:ring-red-500"
                 />
                 <div>
                   <div className="text-sm font-medium">{event.name}</div>

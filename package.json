@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "db:push": "drizzle-kit push",
-    "db:seed": "npx tsx --env-file=.env.local src/lib/db/seed.ts"
+    "db:seed": "npx tsx --env-file=.env.local src/lib/db/seed.ts",
+    "db:seed-events": "npx tsx --env-file=.env.local src/lib/db/seed-events.ts",
+    "db:seed-test": "npx tsx --env-file=.env.local src/lib/db/seed-test.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.17.0",

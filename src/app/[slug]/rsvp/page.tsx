@@ -5,6 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { RegistrationForm } from "@/components/registration-form";
 import { InlineInterestForm } from "@/components/inline-interest-form";
+import { getEffectiveSiteMode } from "@/lib/site-mode";
 
 export default async function RsvpPage({
   params,
@@ -20,8 +21,10 @@ export default async function RsvpPage({
 
   if (!reunion) notFound();
 
+  const effectiveMode = await getEffectiveSiteMode(reunion);
+
   // Tease mode — redirect to landing
-  if (reunion.siteMode === "tease") {
+  if (effectiveMode === "tease") {
     redirect(`/${slug}`);
   }
 
@@ -32,7 +35,7 @@ export default async function RsvpPage({
     .orderBy(asc(events.sortOrder));
 
   // Pre-register mode — show interest form inline
-  if (reunion.siteMode === "pre_register") {
+  if (effectiveMode === "pre_register") {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="mx-auto max-w-xl px-6">

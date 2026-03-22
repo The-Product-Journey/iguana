@@ -3,6 +3,7 @@ import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import { getEffectiveSiteMode } from "@/lib/site-mode";
 import { MemorialForm } from "@/components/memorial-form";
 
 export default async function MemorialSubmitPage({
@@ -18,7 +19,8 @@ export default async function MemorialSubmitPage({
     .get();
 
   if (!reunion) notFound();
-  if (reunion.siteMode === "tease") redirect(`/${slug}`);
+  const effectiveMode = await getEffectiveSiteMode(reunion);
+  if (effectiveMode === "tease") redirect(`/${slug}`);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">

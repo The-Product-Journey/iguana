@@ -3,6 +3,7 @@ import { reunions, profiles, rsvps } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import { getEffectiveSiteMode } from "@/lib/site-mode";
 import Image from "next/image";
 
 export default async function ProfileViewPage({
@@ -18,7 +19,8 @@ export default async function ProfileViewPage({
     .where(eq(reunions.slug, slug))
     .get();
   if (!reunion) notFound();
-  if (reunion.siteMode === "tease") redirect(`/${slug}`);
+  const effectiveMode = await getEffectiveSiteMode(reunion);
+  if (effectiveMode === "tease") redirect(`/${slug}`);
 
   const profile = await db
     .select()

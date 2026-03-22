@@ -3,6 +3,7 @@ import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/components/site-nav";
+import { getEffectiveSiteMode } from "@/lib/site-mode";
 
 export default async function ReunionLayout({
   children,
@@ -21,8 +22,10 @@ export default async function ReunionLayout({
 
   if (!reunion) notFound();
 
+  const effectiveMode = await getEffectiveSiteMode(reunion);
+
   // Don't show nav on tease mode landing (it has its own design)
-  const showNav = reunion.siteMode !== "tease";
+  const showNav = effectiveMode !== "tease";
 
   return (
     <>
@@ -30,7 +33,7 @@ export default async function ReunionLayout({
         <SiteNav
           slug={slug}
           reunionName={reunion.name}
-          siteMode={reunion.siteMode}
+          siteMode={effectiveMode}
         />
       )}
       {children}

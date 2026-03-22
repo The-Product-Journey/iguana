@@ -3,6 +3,7 @@ import { reunions, profiles, rsvps } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import { getEffectiveSiteMode } from "@/lib/site-mode";
 import Image from "next/image";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +21,8 @@ export default async function YearbookPage({
     .get();
 
   if (!reunion) notFound();
-  if (reunion.siteMode === "tease") redirect(`/${slug}`);
+  const effectiveMode = await getEffectiveSiteMode(reunion);
+  if (effectiveMode === "tease") redirect(`/${slug}`);
 
   // Get all published profiles with rsvp data
   const allProfiles = await db
