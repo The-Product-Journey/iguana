@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { formatCents } from "@/lib/utils";
-import { SPONSOR_TIER_THRESHOLD_CENTS } from "@/lib/constants";
+import { useRef, useState } from "react";
+import { getSponsorTier } from "@/lib/constants";
 
 export function SponsorForm({
   reunionId,
@@ -13,20 +12,23 @@ export function SponsorForm({
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
   const [amountDollars, setAmountDollars] = useState("");
-  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
+  const amountInputRef = useRef<HTMLInputElement>(null);
 
   const amountCents = Math.round(parseFloat(amountDollars || "0") * 100);
-  const tier =
-    amountCents >= SPONSOR_TIER_THRESHOLD_CENTS ? "top" : "community";
+  const belowMinimum = amountDollars !== "" && amountCents > 0 && amountCents < 1000;
+  const formReady = contactName.trim() !== "" && contactEmail.trim() !== "" && amountCents >= 1000;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    if (amountCents < 100) {
-      setError("Minimum sponsorship is $1.00");
+    if (amountCents < 1000) {
+      setError("Minimum sponsorship is $10.00");
       setLoading(false);
       return;
     }
@@ -36,10 +38,7 @@ export function SponsorForm({
     formData.set("reunionId", reunionId);
     formData.set("slug", slug);
     formData.set("amountCents", String(amountCents));
-    formData.set("tier", tier);
-    if (logoFile) {
-      formData.set("logo", logoFile);
-    }
+    formData.set("tier", getSponsorTier(amountCents));
 
     try {
       const res = await fetch("/api/sponsor-checkout", {
@@ -67,9 +66,9 @@ export function SponsorForm({
       onSubmit={handleSubmit}
       className="space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-sm"
     >
-      {error && (
+      {(error || belowMinimum) && (
         <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
-          {error}
+          {error || "Minimum sponsorship is $10.00"}
         </div>
       )}
 
@@ -85,6 +84,8 @@ export function SponsorForm({
             id="contactName"
             name="contactName"
             required
+            value={contactName}
+            onChange={(e) => setContactName(e.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
           />
         </div>
@@ -100,6 +101,8 @@ export function SponsorForm({
             name="contactEmail"
             type="email"
             required
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
           />
         </div>
@@ -126,12 +129,11 @@ export function SponsorForm({
             htmlFor="companyName"
             className="mb-1 block text-sm font-medium text-gray-700"
           >
-            Company / Business Name *
+            Company / Business Name
           </label>
           <input
             id="companyName"
             name="companyName"
-            required
             className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
           />
         </div>
@@ -154,63 +156,59 @@ export function SponsorForm({
 
       {/* Sponsorship amount */}
       <div>
-        <label
-          htmlFor="amount"
-          className="mb-1 block text-sm font-medium text-gray-700"
-        >
+        <label className="mb-2 block text-sm font-medium text-gray-700">
           Sponsorship Amount *
         </label>
-        <div className="relative">
-          <span className="absolute left-3 top-2.5 text-gray-500">$</span>
+        <div className="grid grid-cols-5 gap-2">
+          {[50, 100, 250, 500, 1000].map((amt) => (
+            <button
+              key={amt}
+              type="button"
+              onClick={() => {
+                setAmountDollars(amt.toFixed(2));
+                setSelectedPreset(amt);
+              }}
+              className={`rounded-lg border py-2.5 text-sm font-semibold transition ${
+                selectedPreset === amt
+                  ? "border-red-700 bg-red-700 text-white"
+                  : "border-gray-300 bg-white text-gray-700 hover:border-red-300 hover:bg-red-50"
+              }`}
+            >
+              ${amt.toLocaleString()}
+            </button>
+          ))}
+        </div>
+        <div className="relative mt-3 rounded-lg border border-gray-300 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2">
+            <span className="block text-lg font-semibold text-gray-800">$</span>
+            <span className="block text-xs text-gray-400">USD</span>
+          </div>
           <input
+            ref={amountInputRef}
             id="amount"
             type="number"
             min="1"
             step="0.01"
-            required
             value={amountDollars}
-            onChange={(e) => setAmountDollars(e.target.value)}
+            onChange={(e) => {
+              setAmountDollars(e.target.value);
+              const val = parseFloat(e.target.value);
+              if ([50, 100, 250, 500, 1000].includes(val)) {
+                setSelectedPreset(val);
+              } else {
+                setSelectedPreset(null);
+              }
+            }}
+            onBlur={() => {
+              const val = parseFloat(amountDollars);
+              if (!isNaN(val) && val > 0) {
+                setAmountDollars(val.toFixed(2));
+              }
+            }}
             placeholder="0.00"
-            className="w-full rounded-lg border border-gray-300 py-2 pl-7 pr-3 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg bg-transparent py-5 pl-14 pr-4 text-right text-3xl font-bold text-gray-900 focus:outline-none"
           />
         </div>
-        {amountCents > 0 && (
-          <p className="mt-2 text-sm font-medium">
-            {tier === "top" ? (
-              <span className="text-red-700">
-                Top Sponsor — {formatCents(amountCents)}
-              </span>
-            ) : (
-              <span className="text-gray-600">
-                Community Service Sponsor — {formatCents(amountCents)}
-                <span className="ml-1 text-gray-400">
-                  ({formatCents(SPONSOR_TIER_THRESHOLD_CENTS)}+ for Top
-                  Sponsor)
-                </span>
-              </span>
-            )}
-          </p>
-        )}
-      </div>
-
-      {/* Logo upload */}
-      <div>
-        <label
-          htmlFor="logo"
-          className="mb-1 block text-sm font-medium text-gray-700"
-        >
-          Company Logo
-        </label>
-        <input
-          id="logo"
-          type="file"
-          accept="image/*"
-          onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
-          className="w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-red-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-red-700 hover:file:bg-red-100"
-        />
-        <p className="mt-1 text-xs text-gray-400">
-          JPG, PNG, or SVG. Max 2MB. Will be displayed on the sponsors page.
-        </p>
       </div>
 
       {/* Message */}
@@ -232,13 +230,13 @@ export function SponsorForm({
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || !formReady}
         className="w-full rounded-lg bg-red-700 px-4 py-3 text-lg font-semibold text-white shadow transition hover:bg-red-800 disabled:opacity-50"
       >
         {loading
           ? "Redirecting to payment..."
           : amountCents > 0
-            ? `Sponsor — ${formatCents(amountCents)}`
+            ? `Sponsor — $${(amountCents / 100).toFixed(2)}`
             : "Sponsor"}
       </button>
     </form>

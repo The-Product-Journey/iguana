@@ -202,7 +202,7 @@ export const sponsors = sqliteTable("sponsors", {
   contactName: text("contact_name").notNull(),
   contactEmail: text("contact_email").notNull(),
   contactPhone: text("contact_phone"),
-  companyName: text("company_name").notNull(),
+  companyName: text("company_name"),
   logoUrl: text("logo_url"),
   websiteUrl: text("website_url"),
   amountCents: integer("amount_cents").notNull(),

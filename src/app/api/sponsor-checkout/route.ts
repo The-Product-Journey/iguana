@@ -15,22 +15,22 @@ export async function POST(req: NextRequest) {
     const contactName = formData.get("contactName") as string;
     const contactEmail = formData.get("contactEmail") as string;
     const contactPhone = (formData.get("contactPhone") as string) || null;
-    const companyName = formData.get("companyName") as string;
+    const companyName = (formData.get("companyName") as string) || null;
     const websiteUrl = (formData.get("websiteUrl") as string) || null;
     const amountCents = parseInt(formData.get("amountCents") as string, 10);
     const message = (formData.get("message") as string) || null;
     const logoFile = formData.get("logo") as File | null;
 
-    if (!reunionId || !contactName || !contactEmail || !companyName || !amountCents) {
+    if (!reunionId || !contactName || !contactEmail || !amountCents) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    if (amountCents < 100) {
+    if (amountCents < 1000) {
       return NextResponse.json(
-        { error: "Minimum sponsorship is $1.00" },
+        { error: "Minimum sponsorship is $10.00" },
         { status: 400 }
       );
     }
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `${tier === "top" ? "Top" : "Community Service"} Sponsorship — ${companyName}`,
+              name: `${tier === "top" ? "Top" : "Community Service"} Sponsorship${companyName ? ` — ${companyName}` : ""}`,
               description: `PHHS Class of 1996 Reunion Sponsorship`,
             },
             unit_amount: amountCents,
