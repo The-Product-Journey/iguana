@@ -242,7 +242,7 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
           ) : (
             sponsors.map((s) => (
               <tr key={s.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium">{s.companyName}</td>
+                <td className="px-4 py-3 font-medium">{s.companyName || "—"}</td>
                 <td className="px-4 py-3 text-gray-600">
                   {s.contactName}
                   <br />

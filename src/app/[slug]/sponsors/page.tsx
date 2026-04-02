@@ -83,7 +83,7 @@ export default async function SponsorsPage({
                         <div className="mb-4 flex h-24 items-center justify-center">
                           <Image
                             src={sponsor.logoUrl}
-                            alt={sponsor.companyName}
+                            alt={sponsor.companyName || "Sponsor"}
                             width={200}
                             height={96}
                             className="max-h-24 w-auto object-contain"
@@ -98,10 +98,10 @@ export default async function SponsorsPage({
                             rel="noopener noreferrer"
                             className="hover:text-red-700"
                           >
-                            {sponsor.companyName}
+                            {sponsor.companyName || sponsor.contactName}
                           </a>
                         ) : (
-                          sponsor.companyName
+                          sponsor.companyName || sponsor.contactName
                         )}
                       </h3>
                       {sponsor.message && (
@@ -131,7 +131,7 @@ export default async function SponsorsPage({
                         <div className="mb-3 flex h-16 items-center justify-center">
                           <Image
                             src={sponsor.logoUrl}
-                            alt={sponsor.companyName}
+                            alt={sponsor.companyName || "Sponsor"}
                             width={120}
                             height={64}
                             className="max-h-16 w-auto object-contain"
@@ -146,10 +146,10 @@ export default async function SponsorsPage({
                             rel="noopener noreferrer"
                             className="hover:text-red-700"
                           >
-                            {sponsor.companyName}
+                            {sponsor.companyName || sponsor.contactName}
                           </a>
                         ) : (
-                          sponsor.companyName
+                          sponsor.companyName || sponsor.contactName
                         )}
                       </h3>
                     </div>
