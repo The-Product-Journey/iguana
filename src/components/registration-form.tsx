@@ -15,10 +15,12 @@ export function RegistrationForm({
   reunionId,
   slug,
   events,
+  chargesEnabled = true,
 }: {
   reunionId: string;
   slug: string;
   events: Event[];
+  chargesEnabled?: boolean;
 }) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -35,7 +37,7 @@ export function RegistrationForm({
 
   // Step 2 fields
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
-  const [payNow, setPayNow] = useState(true);
+  const [payNow, setPayNow] = useState(chargesEnabled);
 
   // Step 2 fee coverage
   const [feePreset, setFeePreset] = useState(5);
@@ -331,25 +333,33 @@ export function RegistrationForm({
                 Saturday Banquet Payment
               </h3>
 
+              {!chargesEnabled && (
+                <div className="mb-3 rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">
+                  Online payment will be available soon. You can register now and pay at the door.
+                </div>
+              )}
+
               <div className="space-y-2">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    checked={payNow}
-                    onChange={() => setPayNow(true)}
-                    className="h-4 w-4 text-red-600 focus:ring-red-500"
-                  />
-                  <div>
-                    <span className="font-medium text-gray-900">
-                      Pay now — {formatCents(unitPrice)}/person
-                    </span>
-                    {isEarlyBird && (
-                      <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                        Early bird saves {formatCents(standardPrice - unitPrice)}
+                {chargesEnabled && (
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={payNow}
+                      onChange={() => setPayNow(true)}
+                      className="h-4 w-4 text-red-600 focus:ring-red-500"
+                    />
+                    <div>
+                      <span className="font-medium text-gray-900">
+                        Pay now — {formatCents(unitPrice)}/person
                       </span>
-                    )}
-                  </div>
-                </label>
+                      {isEarlyBird && (
+                        <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                          Early bird saves {formatCents(standardPrice - unitPrice)}
+                        </span>
+                      )}
+                    </div>
+                  </label>
+                )}
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="radio"

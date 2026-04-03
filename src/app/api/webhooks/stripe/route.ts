@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
-import { rsvps, sponsors } from "@/lib/db/schema";
+import { reunions, rsvps, sponsors } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
@@ -12,9 +12,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No signature" }, { status: 400 });
   }
 
+  const stripe = getStripe();
+
   let event;
   try {
-    event = getStripe().webhooks.constructEvent(
+    event = stripe.webhooks.constructEvent(
       body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET!
@@ -80,6 +82,32 @@ export async function POST(req: NextRequest) {
         })
         .where(eq(sponsors.id, sponsorId));
     }
+  }
+
+  if (event.type === "account.updated") {
+    const accountId = (event.data.object as { id: string }).id;
+
+    // Treat webhook as a hint — retrieve live account state
+    let account;
+    try {
+      account = await stripe.accounts.retrieve(accountId);
+    } catch (err) {
+      console.error("Failed to retrieve connected account:", err);
+      return NextResponse.json(
+        { error: "Failed to retrieve account" },
+        { status: 500 }
+      );
+    }
+
+    await db
+      .update(reunions)
+      .set({
+        stripeConnectOnboardingComplete: account.details_submitted ?? false,
+        stripeConnectChargesEnabled: account.charges_enabled ?? false,
+        stripeConnectPayoutsEnabled: account.payouts_enabled ?? false,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(reunions.stripeConnectedAccountId, accountId));
   }
 
   return NextResponse.json({ received: true });

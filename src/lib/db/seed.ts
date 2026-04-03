@@ -25,6 +25,13 @@ async function seed() {
       registrationOpen: false,
       siteMode: "tease",
       maxAttendees: 300,
+      // Stripe Connect: set stripeConnectedAccountId to a test Express account ID
+      // to skip onboarding in dev. Create one with: stripe.accounts.create({ type: 'express' })
+      // Note: test account IDs are ephemeral — they won't survive Stripe account resets.
+      // stripeConnectedAccountId: "acct_xxx",
+      // stripeConnectOnboardingComplete: true,
+      // stripeConnectChargesEnabled: true,
+      // stripeConnectPayoutsEnabled: true,
     })
     .returning();
 

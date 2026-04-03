@@ -71,12 +71,22 @@ export default async function SponsorPage({
 
         <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
           <strong>Note:</strong> This is not a tax-deductible donation. Sponsor
-          contributions are processed through a personal business entity and
-          relayed to the reunion organizers. You will receive a receipt from
-          Stripe for your records.
+          contributions are sent directly to the reunion organizers via
+          Stripe. You will receive a receipt from Stripe for your records.
         </div>
 
-        <SponsorForm reunionId={reunion.id} slug={slug} />
+        {reunion.stripeConnectedAccountId && reunion.stripeConnectChargesEnabled ? (
+          <SponsorForm reunionId={reunion.id} slug={slug} />
+        ) : (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-8 text-center">
+            <p className="text-lg font-semibold text-amber-900">
+              Sponsorships coming soon
+            </p>
+            <p className="mt-2 text-sm text-amber-700">
+              Online payments are being set up. Check back shortly to submit your sponsorship.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
