@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { sponsors } from "@/lib/db/schema";
+import { reunions, sponsors } from "@/lib/db/schema";
 import { getStripe } from "@/lib/stripe";
 import { getSponsorTier } from "@/lib/constants";
 import { uploadImage } from "@/lib/upload";
@@ -31,6 +31,20 @@ export async function POST(req: NextRequest) {
     if (amountCents < 1000) {
       return NextResponse.json(
         { error: "Minimum sponsorship is $10.00" },
+        { status: 400 }
+      );
+    }
+
+    // Validate Stripe Connect is configured before creating any records
+    const reunion = await db
+      .select()
+      .from(reunions)
+      .where(eq(reunions.id, reunionId))
+      .get();
+
+    if (!reunion || !reunion.stripeConnectedAccountId || !reunion.stripeConnectChargesEnabled) {
+      return NextResponse.json(
+        { error: "Payouts not configured — organizer needs to complete Stripe setup" },
         { status: 400 }
       );
     }
@@ -78,9 +92,15 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         },
       ],
+      payment_intent_data: {
+        transfer_data: {
+          destination: reunion.stripeConnectedAccountId!,
+        },
+        on_behalf_of: reunion.stripeConnectedAccountId!,
+      },
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/${slug}/sponsor/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/${slug}/sponsor`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/${reunion.slug}/sponsor/confirmation?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/${reunion.slug}/sponsor`,
       customer_email: contactEmail,
       metadata: {
         sponsor_id: sponsor.id,

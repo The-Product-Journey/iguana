@@ -49,6 +49,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Validate Stripe Connect is configured before creating any records
+    if (!reunion.stripeConnectedAccountId || !reunion.stripeConnectChargesEnabled) {
+      return NextResponse.json(
+        { error: "Payouts not configured — organizer needs to complete Stripe setup" },
+        { status: 400 }
+      );
+    }
+
     // Validate eventIds
     let reunionEvents: { id: string; type: string; priceCents: number | null; earlyPriceCents: number | null; earlyPriceDeadline: string | null }[] = [];
     if (Array.isArray(eventIds) && eventIds.length > 0) {
@@ -154,8 +162,14 @@ export async function POST(req: NextRequest) {
     const session = await getStripe().checkout.sessions.create({
       mode: "payment",
       line_items: lineItems,
-      success_url: `${baseUrl}/${slug}/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/${slug}/rsvp?cancelled=true`,
+      payment_intent_data: {
+        transfer_data: {
+          destination: reunion.stripeConnectedAccountId!,
+        },
+        on_behalf_of: reunion.stripeConnectedAccountId!,
+      },
+      success_url: `${baseUrl}/${reunion.slug}/confirmation?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/${reunion.slug}/rsvp?cancelled=true`,
       customer_email: email,
       metadata: {
         rsvp_id: rsvpId,

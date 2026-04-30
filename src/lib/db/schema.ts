@@ -34,6 +34,17 @@ export const reunions = sqliteTable("reunions", {
   })
     .notNull()
     .default("tease"),
+  stripeConnectedAccountId: text("stripe_connected_account_id"),
+  stripeConnectOnboardingComplete: integer(
+    "stripe_connect_onboarding_complete",
+    { mode: "boolean" }
+  ).default(false),
+  stripeConnectChargesEnabled: integer("stripe_connect_charges_enabled", {
+    mode: "boolean",
+  }).default(false),
+  stripeConnectPayoutsEnabled: integer("stripe_connect_payouts_enabled", {
+    mode: "boolean",
+  }).default(false),
   isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
   createdAt: text("created_at")
     .notNull()

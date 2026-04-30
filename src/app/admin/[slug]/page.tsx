@@ -17,6 +17,7 @@ import Link from "next/link";
 import { formatCents } from "@/lib/utils";
 import { SiteModeToggle } from "@/components/site-mode-toggle";
 import { AdminTabs } from "./admin-tabs";
+import { ConnectStatus } from "@/components/connect-status";
 
 export const dynamic = "force-dynamic";
 
@@ -156,6 +157,16 @@ export default async function AdminReunionPage({
       <SiteModeToggle
         reunionId={reunion.id}
         initialMode={reunion.siteMode}
+      />
+
+      <ConnectStatus
+        reunionId={reunion.id}
+        slug={slug}
+        connectedAccountId={reunion.stripeConnectedAccountId}
+        initialHasAccount={!!reunion.stripeConnectedAccountId}
+        initialOnboardingComplete={!!reunion.stripeConnectOnboardingComplete}
+        initialChargesEnabled={!!reunion.stripeConnectChargesEnabled}
+        initialPayoutsEnabled={!!reunion.stripeConnectPayoutsEnabled}
       />
 
       {/* Summary stats */}

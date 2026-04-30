@@ -82,6 +82,7 @@ export default async function RsvpPage({
           reunionId={reunion.id}
           slug={slug}
           events={reunionEvents}
+          chargesEnabled={!!reunion.stripeConnectChargesEnabled && !!reunion.stripeConnectedAccountId}
         />
       </div>
     </div>
