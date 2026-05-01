@@ -29,31 +29,42 @@ export default async function ConfirmationPage({
   let rsvp = null;
   let editToken: string | null = null;
 
-  // Paid registration — look up via Stripe session
+  // Paid registration — look up via Stripe session.
+  // Cross-tenant scope: drop the rsvp if it belongs to a different reunion
+  // than the URL slug. Mismatch is treated like "not found" — same UX,
+  // doesn't leak existence-in-other-tenant via response timing.
   if (session_id) {
     try {
       const session = await getStripe().checkout.sessions.retrieve(session_id);
       if (session.metadata?.rsvp_id) {
-        rsvp = await db
+        const candidate = await db
           .select()
           .from(rsvps)
           .where(eq(rsvps.id, session.metadata.rsvp_id))
           .get();
-        editToken = rsvp?.editToken || null;
+        if (candidate && candidate.reunionId === reunion.id) {
+          rsvp = candidate;
+          editToken = candidate.editToken ?? null;
+        }
       }
     } catch {
       // Session not found or invalid
     }
   }
 
-  // Pay-later registration — look up via edit token
+  // Pay-later registration — look up via edit token. Same cross-tenant
+  // scope: an editToken from reunion B must not surface confirmation
+  // under reunion A's URL.
   if (!rsvp && token) {
-    rsvp = await db
+    const candidate = await db
       .select()
       .from(rsvps)
       .where(eq(rsvps.editToken, token))
       .get();
-    editToken = token;
+    if (candidate && candidate.reunionId === reunion.id) {
+      rsvp = candidate;
+      editToken = token;
+    }
   }
 
   // Get selected events

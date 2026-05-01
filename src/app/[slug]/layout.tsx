@@ -7,6 +7,7 @@ import { AdminPreviewBanner } from "@/components/admin-preview-banner";
 import { TenantBrandStyle } from "@/components/tenant-brand-style";
 import { getAdminPreviewState } from "@/lib/site-mode";
 import { getTenantConfig } from "@/lib/tenant-config";
+import { getCurrentAdminContext } from "@/lib/admin-auth";
 
 export default async function ReunionLayout({
   children,
@@ -24,6 +25,18 @@ export default async function ReunionLayout({
     .get();
 
   if (!reunion) notFound();
+
+  // Soft-delete gate. Inactive reunions render as 404 to the public so
+  // their slug effectively "disappears", but admins for that reunion (or
+  // any super admin) keep access so they can flip isActive back on or
+  // verify the soft-delete worked. This makes `isActive=false` a usable
+  // takedown lever without losing the data.
+  if (!reunion.isActive) {
+    const ctx = await getCurrentAdminContext();
+    const adminBypass =
+      ctx && (ctx.isSuper || ctx.reunionIds.includes(reunion.id));
+    if (!adminBypass) notFound();
+  }
 
   const previewState = await getAdminPreviewState(reunion);
   const effectiveMode = previewState.effectiveMode;

@@ -37,7 +37,11 @@ export default async function ProfileViewPage({
     .where(eq(rsvps.id, profile.rsvpId))
     .get();
 
-  if (!rsvp) notFound();
+  // Cross-tenant scope check: profiles has no reunionId column, so the
+  // profile id alone isn't enough — confirm via the parent rsvp's
+  // reunionId. Without this, a profile from reunion B would render
+  // publicly under reunion A's URL.
+  if (!rsvp || rsvp.reunionId !== reunion.id) notFound();
 
   const tenantConfig = getTenantConfig(reunion);
   const sinceLabel = tenantConfig.classYear

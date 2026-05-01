@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { sponsors } from "@/lib/db/schema";
+import { reunions, sponsors } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { REFUND_POLICY_TEXT } from "@/lib/constants";
 import { SponsorRecognitionForm } from "@/components/sponsor-recognition-form";
+import { getTenantConfig } from "@/lib/tenant-config";
 
 export default async function SponsorConfirmationPage({
   params,
@@ -15,19 +17,34 @@ export default async function SponsorConfirmationPage({
   const { slug } = await params;
   const { session_id } = await searchParams;
 
+  const reunion = await db
+    .select()
+    .from(reunions)
+    .where(eq(reunions.slug, slug))
+    .get();
+  if (!reunion) notFound();
+
   // Look up the sponsor for this checkout session so we can show the
   // recognition form pre-filled. If the session_id isn't on the URL or
   // the sponsor row hasn't landed yet (webhook delay), we fall back to
   // the simple thank-you message without the customization form.
+  // Cross-tenant scope: a sponsor row created against reunion B must
+  // not show its recognition form under reunion A's URL.
   let sponsor = null;
   if (session_id) {
-    sponsor =
-      (await db
-        .select()
-        .from(sponsors)
-        .where(eq(sponsors.stripeCheckoutSessionId, session_id))
-        .get()) ?? null;
+    const candidate = await db
+      .select()
+      .from(sponsors)
+      .where(eq(sponsors.stripeCheckoutSessionId, session_id))
+      .get();
+    if (candidate && candidate.reunionId === reunion.id) {
+      sponsor = candidate;
+    }
   }
+  const tenantConfig = getTenantConfig(reunion);
+  const milestonePhrase = tenantConfig.reunionMilestoneLabel
+    ? tenantConfig.reunionMilestoneLabel.toLowerCase()
+    : "reunion";
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-12">
@@ -38,9 +55,9 @@ export default async function SponsorConfirmationPage({
             Thank You for Your Sponsorship!
           </h1>
           <p className="mb-6 text-gray-600">
-            Your generous contribution helps make our 30-year reunion possible.
-            Your sponsorship will be featured on our sponsors page once
-            reviewed by the reunion committee.
+            Your generous contribution helps make our {milestonePhrase}{" "}
+            possible. Your sponsorship will be featured on our sponsors page
+            once reviewed by the reunion committee.
           </p>
           <div className="flex flex-col gap-3">
             <Link
