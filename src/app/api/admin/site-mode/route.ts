@@ -1,23 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { requireReunionAdmin } from "@/lib/admin-auth";
 
 const VALID_MODES = ["tease", "pre_register", "open"] as const;
 
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies();
-  const auth = cookieStore.get("admin_auth");
-  if (auth?.value !== process.env.ADMIN_PASSWORD) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { reunionId, mode } = await req.json();
 
   if (!reunionId || !VALID_MODES.includes(mode)) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
+
+  const guard = await requireReunionAdmin(reunionId);
+  if (guard instanceof NextResponse) return guard;
 
   await db
     .update(reunions)

@@ -1,37 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { db } from "@/lib/db";
-import { profiles } from "@/lib/db/schema";
+import { profiles, rsvps } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { requireReunionAdmin } from "@/lib/admin-auth";
 
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies();
-  const auth = cookieStore.get("admin_auth");
-  if (auth?.value !== process.env.ADMIN_PASSWORD) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { profileId, action } = await req.json();
 
   if (!profileId || !action) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
+  // profiles has no reunionId column — derive it via the rsvp link.
+  // (profiles.rsvpId → rsvps.id → rsvps.reunionId)
+  const row = await db
+    .select({
+      profile: profiles,
+      reunionId: rsvps.reunionId,
+    })
+    .from(profiles)
+    .innerJoin(rsvps, eq(profiles.rsvpId, rsvps.id))
+    .where(eq(profiles.id, profileId))
+    .get();
+
+  if (!row) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  const guard = await requireReunionAdmin(row.reunionId);
+  if (guard instanceof NextResponse) return guard;
+
   if (action === "togglePublished") {
-    const profile = await db
-      .select()
-      .from(profiles)
-      .where(eq(profiles.id, profileId))
-      .get();
-
-    if (!profile) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
-
     await db
       .update(profiles)
       .set({
-        isPublished: !profile.isPublished,
+        isPublished: !row.profile.isPublished,
         updatedAt: new Date().toISOString(),
       })
       .where(eq(profiles.id, profileId));
