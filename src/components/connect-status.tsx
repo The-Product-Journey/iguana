@@ -30,17 +30,37 @@ export function ConnectStatus({
 }) {
   const searchParams = useSearchParams();
   const [state, setState] = useState<ConnectState>(() => {
-    if (!initialHasAccount) return "not_connected";
-    if (!initialOnboardingComplete) return "onboarding_incomplete";
-    if (!initialChargesEnabled) return "verification_pending";
-    if (!initialPayoutsEnabled) return "bank_verification_pending";
-    return "active";
+    const initialState = !initialHasAccount
+      ? "not_connected"
+      : !initialOnboardingComplete
+        ? "onboarding_incomplete"
+        : !initialChargesEnabled
+          ? "verification_pending"
+          : !initialPayoutsEnabled
+            ? "bank_verification_pending"
+            : "active";
+    if (typeof window !== "undefined") {
+      console.log("[ConnectStatus] mount", {
+        reunionId,
+        slug,
+        connectedAccountId,
+        initialProps: {
+          initialHasAccount,
+          initialOnboardingComplete,
+          initialChargesEnabled,
+          initialPayoutsEnabled,
+        },
+        derivedInitialState: initialState,
+      });
+    }
+    return initialState;
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const connectParam = searchParams.get("connect");
+    console.log("[ConnectStatus] useEffect — URL connect param:", connectParam);
 
     if (connectParam === "complete") {
       refreshStatus();
@@ -51,30 +71,52 @@ export function ConnectStatus({
   }, []);
 
   async function refreshStatus() {
+    console.log("[ConnectStatus] refreshStatus — calling /api/admin/connect/status");
     try {
       const res = await fetch(
         `/api/admin/connect/status?reunionId=${reunionId}`
       );
       const data = await res.json();
+      console.log("[ConnectStatus] refreshStatus — response", {
+        ok: res.ok,
+        httpStatus: res.status,
+        data,
+      });
+
+      if (!res.ok) {
+        setError(data.error || "Failed to check status");
+        return;
+      }
 
       if (data.status === null) {
         setState("not_connected");
+        console.log("[ConnectStatus] state -> not_connected");
       } else {
         const { detailsSubmitted, chargesEnabled, payoutsEnabled } =
           data.status;
-        if (!detailsSubmitted) {
-          setState("onboarding_incomplete");
-        } else if (!chargesEnabled) {
-          setState("verification_pending");
-        } else if (!payoutsEnabled) {
-          setState("bank_verification_pending");
-        } else {
-          setState("active");
-        }
+        let next: ConnectState;
+        if (!detailsSubmitted) next = "onboarding_incomplete";
+        else if (!chargesEnabled) next = "verification_pending";
+        else if (!payoutsEnabled) next = "bank_verification_pending";
+        else next = "active";
+        setState(next);
+        console.log("[ConnectStatus] state ->", next, {
+          detailsSubmitted,
+          chargesEnabled,
+          payoutsEnabled,
+        });
       }
-    } catch {
+    } catch (e) {
+      console.error("[ConnectStatus] refreshStatus — fetch threw", e);
       setError("Failed to check status");
     }
+  }
+
+  async function handleManualRefresh() {
+    setLoading(true);
+    setError("");
+    await refreshStatus();
+    setLoading(false);
   }
 
   async function handleSetupPayouts() {
@@ -130,9 +172,21 @@ export function ConnectStatus({
 
   return (
     <div className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-      <h3 className="mb-3 text-sm font-semibold text-gray-700">
-        Stripe Connect — Payouts
-      </h3>
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h3 className="text-sm font-semibold text-gray-700">
+          Stripe Connect — Payouts
+        </h3>
+        {state !== "not_connected" && state !== "loading" && (
+          <button
+            onClick={handleManualRefresh}
+            disabled={loading}
+            className="rounded border border-gray-300 px-2 py-1 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-50"
+            title="Pull live status from Stripe and update the database"
+          >
+            {loading ? "Refreshing…" : "Refresh status"}
+          </button>
+        )}
+      </div>
 
       {error && (
         <div className="mb-3 rounded-lg bg-red-50 p-2 text-sm text-red-700">
