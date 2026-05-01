@@ -30,10 +30,34 @@ export const PLATFORM_FIXED_FEE_CENTS = 100; // $1.00
 export const PLATFORM_PERCENT_FEE = 1; // 1%
 
 /**
+ * Hard cap on the platform application fee, as a percent of the charge.
+ * **Permanent safety floor.** Whatever the fixed + percent components
+ * compute to, the platform fee will never exceed this percentage of the
+ * charge. Prevents misconfigurations (e.g. someone bumps PLATFORM_PERCENT_FEE
+ * to 50 by accident, or the fixed fee being a huge fraction of a small
+ * charge) from sending negative net to the connected account.
+ *
+ * On the smallest plausible charge ($10 sponsor minimum) with this cap at
+ * 10%, the platform takes at most $1 and Stripe takes ~$0.59 — connected
+ * account always gets ≥ $8.41. Never goes negative.
+ */
+export const PLATFORM_MAX_FEE_PERCENT = 10;
+
+/**
  * Total platform application fee for a given charge amount, in cents.
  * `application_fee_amount` parameter on the Stripe Checkout Session.
  */
 export function computePlatformFeeCents(chargeAmountCents: number): number {
   const percent = Math.round((chargeAmountCents * PLATFORM_PERCENT_FEE) / 100);
-  return PLATFORM_FIXED_FEE_CENTS + percent;
+  const computed = PLATFORM_FIXED_FEE_CENTS + percent;
+  const cap = Math.floor(
+    (chargeAmountCents * PLATFORM_MAX_FEE_PERCENT) / 100
+  );
+  if (computed > cap) {
+    console.warn(
+      `[platform-fee] Computed fee ${computed}¢ exceeded ${PLATFORM_MAX_FEE_PERCENT}% cap ${cap}¢ on charge ${chargeAmountCents}¢ — capping.`
+    );
+    return cap;
+  }
+  return computed;
 }

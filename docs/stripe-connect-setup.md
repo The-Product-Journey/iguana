@@ -64,13 +64,21 @@ One endpoint, one signing secret (`STRIPE_WEBHOOK_SECRET`), handles both platfor
 Two components, both billable on every charge:
 
 ```ts
-PLATFORM_FIXED_FEE_CENTS = 100   // $1.00 flat
-PLATFORM_PERCENT_FEE = 1         // 1% of charge
-// total fee = PLATFORM_FIXED_FEE_CENTS + round(charge * PLATFORM_PERCENT_FEE / 100)
+PLATFORM_FIXED_FEE_CENTS = 100      // $1.00 flat
+PLATFORM_PERCENT_FEE = 1            // 1% of charge
+PLATFORM_MAX_FEE_PERCENT = 10       // permanent cap as % of charge
+// fee = min(fixed + round(charge * percent / 100), floor(charge * max% / 100))
 ```
 
-Set either to 0 to disable that component. In production you'll likely
-pick one or the other; both are wired so we can experiment.
+Set fixed or percent to 0 to disable that component. In production you'll
+likely pick one or the other; both are wired so we can experiment.
+
+`PLATFORM_MAX_FEE_PERCENT` is a permanent safety floor — whatever the
+fixed + percent components compute to, the platform fee will never exceed
+this percentage of the charge. Prevents misconfigurations from sending a
+negative net to the connected account. On the smallest plausible charge
+($10 sponsor minimum) with the cap at 10%, the platform takes at most $1
+and Stripe takes ~$0.59 — connected account always receives ≥ $8.41.
 
 ### Example: $25 sponsor donation (with $1 fixed + 1% percent)
 
