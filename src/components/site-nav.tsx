@@ -16,6 +16,7 @@ export function SiteNav({ slug, reunionName, siteMode }: NavProps) {
     { label: "Schedule", href: `/${slug}/schedule`, modes: ["pre_register", "open"] },
     { label: "Sponsors", href: `/${slug}/sponsors`, modes: ["tease", "pre_register", "open"] },
     { label: "Yearbook", href: `/${slug}/yearbook`, modes: ["pre_register", "open"] },
+    { label: "Community Service", href: `/${slug}/community-service`, modes: ["pre_register", "open"] },
     { label: "Memorial", href: `/${slug}/memorial`, modes: ["pre_register", "open"] },
     { label: "Sponsor Us", href: `/${slug}/sponsor`, modes: ["tease", "pre_register", "open"] },
   ];

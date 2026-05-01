@@ -110,6 +110,26 @@ export default async function ReunionPage({
         {/* Help / Contact section */}
         <HelpSection reunionId={reunion.id} />
 
+        {/* Community Service Project */}
+        <div className="mt-12 rounded-2xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-white p-8 shadow-sm">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-red-700">
+            Community Service Project
+          </p>
+          <h3 className="mb-2 text-2xl font-bold text-gray-900">
+            96 Backpacks
+          </h3>
+          <p className="mb-4 text-gray-700">
+            Saturday morning, we&apos;re assembling 96 backpacks of school
+            supplies for Park Hill students — partnering with Replenish KC.
+          </p>
+          <Link
+            href={`/${slug}/community-service`}
+            className="inline-block text-sm font-semibold text-red-700 hover:text-red-800"
+          >
+            Learn about 96 Backpacks &rarr;
+          </Link>
+        </div>
+
         <div className="mt-12 text-center">
           <Link
             href={`/${slug}/rsvp`}
