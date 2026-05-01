@@ -11,7 +11,7 @@ import {
   interestSignups,
   eventInterests,
 } from "./schema";
-import { wipeTestTenant, TEST_REUNION_SLUG } from "./test-tenant";
+import { wipeTestTenant, loadProdShell, TEST_REUNION_SLUG } from "./test-tenant";
 
 async function seedTest() {
   const client = createClient({
@@ -25,27 +25,22 @@ async function seedTest() {
   console.log(`Wiping any existing test tenant data…`);
   await wipeTestTenant(db);
 
-  // Create test reunion (siteMode: open so everything is browsable; admin can
-  // toggle to tease/pre_register from /admin/{slug} just like prod)
+  // Test reunion mirrors prod's shell (name, description, event metadata) so
+  // the public site renders identically — no "TEST" labels visible. Only the
+  // siteMode/registrationOpen state and the sample data below are
+  // test-specific.
+  const shell = await loadProdShell(db);
   const [reunion] = await db
     .insert(reunions)
     .values({
       slug: TEST_REUNION_SLUG,
-      name: "Park Hill High School — Class of 1996 (TEST)",
-      description:
-        "This is a TEST environment with sample data. Join us for our 30-year reunion! Reconnect with fellow Trojans, share stories, and celebrate three decades since graduation.",
-      eventDate: "2026-08-28",
-      eventTime: "August 28–29, 2026",
-      eventLocation: "The Olde Mill",
-      eventAddress: "Parkville, MO",
-      registrationFeeCents: 9876,
+      ...shell,
       registrationOpen: true,
       siteMode: "open",
-      maxAttendees: 300,
     })
     .returning();
 
-  console.log("Created test reunion");
+  console.log("Created test reunion (mirroring prod shell)");
 
   // Create events (same as production)
   const eventValues = [

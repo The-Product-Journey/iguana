@@ -1,6 +1,11 @@
 // Shared helpers for the test tenant (`phhs-1996-test`).
 // Used by both `seed-test.ts` (wipe + seed sample data) and `wipe-test.ts`
 // (wipe + leave a bare empty reunion record for onboarding tests).
+//
+// The test tenant's "shell" (name, description, event metadata) mirrors the
+// production reunion (`phhs-1996`) so the public site renders identically.
+// Only siteMode, registrationOpen, Stripe Connect state, and the sample
+// data (RSVPs/sponsors/profiles/etc.) are test-specific.
 import { drizzle } from "drizzle-orm/libsql";
 import { eq, inArray } from "drizzle-orm";
 import {
@@ -17,8 +22,57 @@ import {
 } from "./schema";
 
 export const TEST_REUNION_SLUG = "phhs-1996-test";
+const PROD_REUNION_SLUG = "phhs-1996";
 
 type Db = ReturnType<typeof drizzle>;
+
+type Shell = {
+  name: string;
+  description: string | null;
+  eventDate: string;
+  eventTime: string | null;
+  eventLocation: string | null;
+  eventAddress: string | null;
+  registrationFeeCents: number;
+  maxAttendees: number | null;
+};
+
+/**
+ * Read the production reunion's shell (name, description, event metadata).
+ * Falls back to reasonable defaults if the prod reunion doesn't exist yet
+ * (e.g., a fresh dev environment that's never been seeded).
+ */
+async function loadProdShell(db: Db): Promise<Shell> {
+  const prod = await db
+    .select()
+    .from(reunions)
+    .where(eq(reunions.slug, PROD_REUNION_SLUG))
+    .get();
+
+  if (prod) {
+    return {
+      name: prod.name,
+      description: prod.description,
+      eventDate: prod.eventDate,
+      eventTime: prod.eventTime,
+      eventLocation: prod.eventLocation,
+      eventAddress: prod.eventAddress,
+      registrationFeeCents: prod.registrationFeeCents,
+      maxAttendees: prod.maxAttendees,
+    };
+  }
+
+  return {
+    name: "Park Hill High School — Class of 1996",
+    description: null,
+    eventDate: "2026-08-28",
+    eventTime: null,
+    eventLocation: null,
+    eventAddress: null,
+    registrationFeeCents: 9876,
+    maxAttendees: 300,
+  };
+}
 
 /**
  * Wipe everything for the test tenant — all dependent rows and the reunion
@@ -77,24 +131,21 @@ export async function wipeTestTenant(db: Db): Promise<void> {
  * creating a fresh tenant. No events, no Stripe Connect, siteMode=tease.
  * The admin can then walk through onboarding (toggle modes, add events,
  * connect Stripe, etc.) to test that flow end-to-end.
+ *
+ * The shell mirrors prod so the public site renders identically.
  */
 export async function createBareTestReunion(db: Db) {
+  const shell = await loadProdShell(db);
   const [reunion] = await db
     .insert(reunions)
     .values({
       slug: TEST_REUNION_SLUG,
-      name: "Park Hill High School — Class of 1996 (TEST)",
-      description:
-        "This is a TEST environment. Use it to walk through the onboarding flow or to play with sample data.",
-      eventDate: "2026-08-28",
-      eventTime: "August 28–29, 2026",
-      eventLocation: null,
-      eventAddress: null,
-      registrationFeeCents: 9876,
+      ...shell,
       registrationOpen: false,
       siteMode: "tease",
-      maxAttendees: 300,
     })
     .returning();
   return reunion;
 }
+
+export { loadProdShell };
