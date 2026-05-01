@@ -10,6 +10,7 @@
     "db:seed": "npx tsx --env-file=.env.local src/lib/db/seed.ts",
     "db:seed-events": "npx tsx --env-file=.env.local src/lib/db/seed-events.ts",
     "db:seed-test": "npx tsx --env-file=.env.local src/lib/db/seed-test.ts",
+    "db:seed-demo": "npx tsx --env-file=.env.local src/lib/db/seed-demo-cli.ts",
     "db:seed-admins": "npx tsx --env-file=.env.local src/lib/db/seed-admins.ts",
     "db:seed-super-admins": "npx tsx --env-file=.env.local src/lib/db/seed-super-admins.ts",
     "db:wipe-test": "npx tsx --env-file=.env.local src/lib/db/wipe-test.ts"

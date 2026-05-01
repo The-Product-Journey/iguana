@@ -7,7 +7,7 @@ import {
   registrationEvents,
   eventInterests,
 } from "./schema";
-import { CANONICAL_EVENTS, ITINERARY_SLUGS } from "./canonical-events";
+import { CANONICAL_EVENTS, ITINERARY_SLUGS } from "./canonical-events-phhs";
 
 const REUNION_SLUG = "phhs-1996";
 

@@ -2,10 +2,14 @@
 // Used by both `seed-test.ts` (wipe + seed sample data) and `wipe-test.ts`
 // (wipe + leave a bare empty reunion record for onboarding tests).
 //
-// The test tenant's "shell" (name, description, event metadata) mirrors the
-// production reunion (`phhs-1996`) so the public site renders identically.
-// Only siteMode, registrationOpen, Stripe Connect state, and the sample
-// data (RSVPs/sponsors/profiles/etc.) are test-specific.
+// **Phase 2 multi-tenant change:** the test tenant's "shell" (name,
+// description, event date) used to mirror the live PHHS reunion. With
+// multi-tenancy, that's wrong — fresh demo tenants should look generic,
+// not like Park Hill. `loadGenericShell` returns a generic shell
+// unconditionally; the previous `loadProdShell` PHHS fallback is gone.
+// The slug `phhs-1996-test` is preserved purely for backward compat
+// with bookmarks and ops scripts; the data laid down on it is now
+// generic-demo, not PHHS-mirroring.
 import { drizzle } from "drizzle-orm/libsql";
 import { eq, inArray } from "drizzle-orm";
 import {
@@ -22,7 +26,6 @@ import {
 } from "./schema";
 
 export const TEST_REUNION_SLUG = "phhs-1996-test";
-const PROD_REUNION_SLUG = "phhs-1996";
 
 type Db = ReturnType<typeof drizzle>;
 
@@ -38,38 +41,28 @@ type Shell = {
 };
 
 /**
- * Read the production reunion's shell (name, description, event metadata).
- * Falls back to reasonable defaults if the prod reunion doesn't exist yet
- * (e.g., a fresh dev environment that's never been seeded).
+ * Generic reunion shell used when creating a fresh test/demo tenant.
+ *
+ * Was `loadProdShell` — read PHHS values to make the test tenant mirror
+ * prod. With multi-tenancy that's the wrong default; demo tenants now
+ * stand on their own. Generic values are intentionally upbeat-but-empty
+ * so a freshly-seeded demo looks like an upcoming reunion ready to be
+ * customized by the new tenant's admin.
  */
-async function loadProdShell(db: Db): Promise<Shell> {
-  const prod = await db
-    .select()
-    .from(reunions)
-    .where(eq(reunions.slug, PROD_REUNION_SLUG))
-    .get();
-
-  if (prod) {
-    return {
-      name: prod.name,
-      description: prod.description,
-      eventDate: prod.eventDate,
-      eventTime: prod.eventTime,
-      eventLocation: prod.eventLocation,
-      eventAddress: prod.eventAddress,
-      registrationFeeCents: prod.registrationFeeCents,
-      maxAttendees: prod.maxAttendees,
-    };
-  }
-
+function loadGenericShell(): Shell {
+  // Reunion date defaults to ~9 months out so the tease/pre-register/open
+  // progression has runway and any countdown UI shows positive time. Date
+  // string is fixed (not "now + 9 months") so the demo dataset is
+  // deterministic across reseeds.
   return {
-    name: "Park Hill High School — Class of 1996",
-    description: null,
-    eventDate: "2026-08-28",
+    name: "Riverside High School — Class of 2010",
+    description:
+      "Join us for our 15-year reunion! Reconnect with classmates, share stories, and see where everyone landed.",
+    eventDate: "2026-09-19",
     eventTime: null,
     eventLocation: null,
     eventAddress: null,
-    registrationFeeCents: 9876,
+    registrationFeeCents: 9500,
     maxAttendees: 300,
   };
 }
@@ -168,7 +161,7 @@ export async function createBareTestReunion(
   db: Db,
   stripeLinkage?: StripeLinkage | null
 ) {
-  const shell = await loadProdShell(db);
+  const shell = loadGenericShell();
   const [reunion] = await db
     .insert(reunions)
     .values({
@@ -188,4 +181,4 @@ export async function createBareTestReunion(
   return reunion;
 }
 
-export { loadProdShell };
+export { loadGenericShell };
