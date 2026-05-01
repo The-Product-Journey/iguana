@@ -119,6 +119,13 @@ export function ConnectStatus({
     setLoading(false);
   }
 
+  function currentReturnPath(): string {
+    // Capture the path + query the user is on right now so Stripe brings
+    // them back to the same spot (with `?connect=complete` merged in).
+    if (typeof window === "undefined") return `/admin/${slug}`;
+    return window.location.pathname + window.location.search;
+  }
+
   async function handleSetupPayouts() {
     setLoading(true);
     setError("");
@@ -126,7 +133,11 @@ export function ConnectStatus({
       const res = await fetch("/api/admin/connect/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reunionId, slug }),
+        body: JSON.stringify({
+          reunionId,
+          slug,
+          returnPath: currentReturnPath(),
+        }),
       });
       // Stale UI: server already has an account. Refresh status from server truth
       // and let the user resume onboarding instead of dead-ending on the error.
@@ -155,7 +166,11 @@ export function ConnectStatus({
       const res = await fetch("/api/admin/connect/onboarding-link", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reunionId, slug }),
+        body: JSON.stringify({
+          reunionId,
+          slug,
+          returnPath: currentReturnPath(),
+        }),
       });
       const data = await res.json();
       if (!res.ok) {

@@ -33,4 +33,35 @@ export function getBaseUrl(req: NextRequest): string {
   return req.nextUrl.origin;
 }
 
+/**
+ * Build a same-origin Stripe return URL with a `connect` query param appended.
+ *
+ * `clientReturnPath` is a path supplied by the client (e.g.
+ * `window.location.pathname + window.location.search`) so the user lands back
+ * exactly where they were when they clicked "Set up payouts". The path is
+ * validated to be same-origin (must start with "/", must not start with "//"
+ * to block protocol-relative URL hijacks). If invalid or missing, we fall
+ * back to `fallbackPath`.
+ *
+ * The connect status (`complete` or `refresh`) is merged as a query param
+ * — preserving any other params that were already on the path.
+ */
+export function buildConnectReturnUrl(
+  req: NextRequest,
+  clientReturnPath: unknown,
+  fallbackPath: string,
+  connectStatus: "complete" | "refresh"
+): string {
+  const baseUrl = getBaseUrl(req);
+  const safePath =
+    typeof clientReturnPath === "string" &&
+    clientReturnPath.startsWith("/") &&
+    !clientReturnPath.startsWith("//")
+      ? clientReturnPath
+      : fallbackPath;
+  const url = new URL(safePath, baseUrl);
+  url.searchParams.set("connect", connectStatus);
+  return url.toString();
+}
+
 export { Stripe };

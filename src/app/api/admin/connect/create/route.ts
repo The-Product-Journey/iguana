@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { getStripe, getBaseUrl } from "@/lib/stripe";
+import { getStripe, getBaseUrl, buildConnectReturnUrl } from "@/lib/stripe";
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { reunionId, slug } = await req.json();
+    const { reunionId, slug, returnPath } = await req.json();
 
     if (!reunionId || !slug) {
       return NextResponse.json(
@@ -72,10 +72,11 @@ export async function POST(req: NextRequest) {
       })
       .where(eq(reunions.id, reunionId));
 
+    const fallbackPath = `/admin/${reunion.slug}`;
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
-      refresh_url: `${baseUrl}/admin/${reunion.slug}?connect=refresh`,
-      return_url: `${baseUrl}/admin/${reunion.slug}?connect=complete`,
+      refresh_url: buildConnectReturnUrl(req, returnPath, fallbackPath, "refresh"),
+      return_url: buildConnectReturnUrl(req, returnPath, fallbackPath, "complete"),
       type: "account_onboarding",
     });
 
