@@ -308,7 +308,13 @@ export const profiles = sqliteTable("profiles", {
   currentCity: text("current_city"),
   occupation: text("occupation"),
   family: text("family"),
+  // Legacy PHHS-flavored column. New writes go to `favoriteSchoolMemory`
+  // (Phase 3 of multi-tenant work). Reads fall back through this column
+  // until Phase 6 backfill mirrors old → new for every existing row.
+  // Drop is queued for a follow-up plan once both columns proven equal
+  // in prod for one full reunion cycle.
   favoritePHMemory: text("favorite_ph_memory"),
+  favoriteSchoolMemory: text("favorite_school_memory"),
   beenUpTo: text("been_up_to"),
   funFact: text("fun_fact"),
   photoUrl: text("photo_url"),

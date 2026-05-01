@@ -51,7 +51,7 @@ export default async function YearbookPage({
               Digital Yearbook
             </h1>
             <p className="text-gray-600">
-              See what your classmates have been up to since &apos;96.
+              See what your classmates have been up to.
             </p>
           </div>
           <Link

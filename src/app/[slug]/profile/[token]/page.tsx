@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ProfileForm } from "@/components/profile-form";
+import { getTenantConfig } from "@/lib/tenant-config";
 
 export default async function ProfileEditPage({
   params,
@@ -34,6 +35,11 @@ export default async function ProfileEditPage({
     .where(eq(profiles.rsvpId, rsvp.id))
     .get();
 
+  const tenantConfig = getTenantConfig(reunion);
+  const sinceLabel = tenantConfig.classYear
+    ? `since '${tenantConfig.classYear.slice(-2)}`
+    : "lately";
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="mx-auto max-w-xl px-6">
@@ -50,7 +56,7 @@ export default async function ProfileEditPage({
           </h1>
           <p className="mt-2 text-gray-600">
             Hey {rsvp.firstName}! Tell your classmates what you&apos;ve been up
-            to since &apos;96. All fields are optional — fill in as much or as
+            to {sinceLabel}. All fields are optional — fill in as much or as
             little as you&apos;d like.
           </p>
         </div>
@@ -58,12 +64,14 @@ export default async function ProfileEditPage({
         <ProfileForm
           rsvpId={rsvp.id}
           editToken={token}
+          favoriteMemoryLabel={tenantConfig.favoriteMemoryLabel}
           existingProfile={
             existingProfile
               ? {
                   currentCity: existingProfile.currentCity,
                   occupation: existingProfile.occupation,
                   family: existingProfile.family,
+                  favoriteSchoolMemory: existingProfile.favoriteSchoolMemory,
                   favoritePHMemory: existingProfile.favoritePHMemory,
                   beenUpTo: existingProfile.beenUpTo,
                   funFact: existingProfile.funFact,

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { formatCents } from "@/lib/utils";
 import { getStripe } from "@/lib/stripe";
 import { REFUND_POLICY_TEXT } from "@/lib/constants";
+import { getTenantConfig } from "@/lib/tenant-config";
 
 export default async function ConfirmationPage({
   params,
@@ -74,20 +75,28 @@ export default async function ConfirmationPage({
   }
 
   const isPaid = rsvp?.paymentMethod === "online";
+  const tenantConfig = getTenantConfig(reunion);
+  // Heading: keep mascot reference when the tenant has one configured (it's
+  // a nice flourish for PHHS-style "You're All Set, Trojan!"), otherwise
+  // fall back to a clean generic.
+  const headingTail = tenantConfig.mascot ? `, ${tenantConfig.mascot}!` : "!";
+  const reunionFullName = tenantConfig.reunionMilestoneLabel
+    ? `${tenantConfig.orgName} ${tenantConfig.reunionMilestoneLabel}`
+    : `${tenantConfig.orgName} reunion`;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-6 py-12">
       <div className="mx-auto max-w-md text-center">
         <div className="mb-6 text-6xl">🎉</div>
         <h1 className="mb-4 text-3xl font-bold text-gray-900">
-          You&apos;re All Set, Trojan!
+          You&apos;re All Set{headingTail}
         </h1>
 
         {rsvp ? (
           <div className="mb-8 space-y-2 text-gray-600">
             <p>
-              Thanks, <strong>{rsvp.firstName}</strong>! Your registration for the
-              PHHS Class of &apos;96 reunion has been confirmed.
+              Thanks, <strong>{rsvp.firstName}</strong>! Your registration for{" "}
+              {reunionFullName} has been confirmed.
             </p>
             {isPaid && (rsvp.amountPaidCents || 0) > 0 && (
               <p>
@@ -142,8 +151,8 @@ export default async function ConfirmationPage({
               Be in the Digital Yearbook!
             </h3>
             <p className="mb-3 text-sm text-red-800">
-              Share what you&apos;ve been up to since &apos;96. Your classmates
-              would love to hear from you.
+              Share what you&apos;ve been up to. Your classmates would love
+              to hear from you.
             </p>
             <Link
               href={`/${slug}/profile/${editToken}`}

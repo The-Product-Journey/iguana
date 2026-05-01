@@ -36,11 +36,19 @@ export async function POST(req: NextRequest) {
       photoUrl = await uploadImage(photoFile, "profiles");
     }
 
+    // Form field name was renamed in Phase 3 (favoritePHMemory →
+    // favoriteSchoolMemory). Read the new field with a fallback to the
+    // old field name so any in-flight form (page already loaded before
+    // this deploy) still saves correctly.
+    const favoriteSchoolMemory =
+      (formData.get("favoriteSchoolMemory") as string) ||
+      (formData.get("favoritePHMemory") as string) ||
+      null;
     const profileData = {
       currentCity: (formData.get("currentCity") as string) || null,
       occupation: (formData.get("occupation") as string) || null,
       family: (formData.get("family") as string) || null,
-      favoritePHMemory: (formData.get("favoritePHMemory") as string) || null,
+      favoriteSchoolMemory,
       beenUpTo: (formData.get("beenUpTo") as string) || null,
       funFact: (formData.get("funFact") as string) || null,
       ...(photoUrl ? { photoUrl } : {}),

@@ -6,6 +6,9 @@ type ProfileData = {
   currentCity: string | null;
   occupation: string | null;
   family: string | null;
+  favoriteSchoolMemory: string | null;
+  // Legacy column — kept for backward-compat reads while the column-rename
+  // copy-then-drop is in flight.
   favoritePHMemory: string | null;
   beenUpTo: string | null;
   funFact: string | null;
@@ -16,10 +19,14 @@ export function ProfileForm({
   rsvpId,
   editToken,
   existingProfile,
+  favoriteMemoryLabel,
 }: {
   rsvpId: string;
   editToken: string;
   existingProfile: ProfileData | null;
+  /** Tenant-config label, e.g. "Favorite Park Hill Memory" or just
+   * "Favorite School Memory" — see getTenantConfig(). */
+  favoriteMemoryLabel: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -161,16 +168,20 @@ export function ProfileForm({
 
       <div>
         <label
-          htmlFor="favoritePHMemory"
+          htmlFor="favoriteSchoolMemory"
           className="mb-1 block text-sm font-medium text-gray-700"
         >
-          Favorite Park Hill Memory
+          {favoriteMemoryLabel}
         </label>
         <textarea
-          id="favoritePHMemory"
-          name="favoritePHMemory"
+          id="favoriteSchoolMemory"
+          name="favoriteSchoolMemory"
           rows={3}
-          defaultValue={existingProfile?.favoritePHMemory || ""}
+          defaultValue={
+            existingProfile?.favoriteSchoolMemory ??
+            existingProfile?.favoritePHMemory ??
+            ""
+          }
           placeholder="That time in Mr. Johnson's class when..."
           className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
         />
@@ -181,7 +192,7 @@ export function ProfileForm({
           htmlFor="beenUpTo"
           className="mb-1 block text-sm font-medium text-gray-700"
         >
-          What have you been up to since &apos;96?
+          What have you been up to?
         </label>
         <textarea
           id="beenUpTo"

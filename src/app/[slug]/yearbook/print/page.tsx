@@ -101,15 +101,16 @@ export default async function YearbookPrintPage({
                     <strong>Family:</strong> {profile.family}
                   </p>
                 )}
-                {profile.favoritePHMemory && (
+                {(profile.favoriteSchoolMemory ||
+                  profile.favoritePHMemory) && (
                   <p className="mt-1 text-sm text-gray-700">
                     <strong>Favorite Memory:</strong>{" "}
-                    {profile.favoritePHMemory}
+                    {profile.favoriteSchoolMemory ?? profile.favoritePHMemory}
                   </p>
                 )}
                 {profile.beenUpTo && (
                   <p className="mt-1 text-sm text-gray-700">
-                    <strong>Since &apos;96:</strong> {profile.beenUpTo}
+                    <strong>Since high school:</strong> {profile.beenUpTo}
                   </p>
                 )}
                 {profile.funFact && (

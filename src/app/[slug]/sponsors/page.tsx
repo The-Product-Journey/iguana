@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { resolveSponsorDisplayName } from "@/lib/utils";
+import { getTenantConfig } from "@/lib/tenant-config";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,8 @@ export default async function SponsorsPage({
     .get();
 
   if (!reunion) notFound();
+
+  const tenantConfig = getTenantConfig(reunion);
 
   const allSponsors = await db
     .select()
@@ -68,11 +71,11 @@ export default async function SponsorsPage({
           </div>
         ) : (
           <>
-            {/* Trojan Sponsors */}
+            {/* Top tier sponsors */}
             {topSponsors.length > 0 && (
               <div className="mb-10">
                 <h2 className="mb-4 text-lg font-semibold text-red-800 uppercase tracking-wide">
-                  Trojan Sponsors
+                  {tenantConfig.sponsorTopTierLabel} Sponsors
                 </h2>
                 <div className="grid gap-6 sm:grid-cols-2">
                   {topSponsors.map((sponsor) => {
@@ -122,11 +125,11 @@ export default async function SponsorsPage({
               </div>
             )}
 
-            {/* Community Service Project Sponsors */}
+            {/* Community tier sponsors */}
             {communitySponsors.length > 0 && (
               <div>
                 <h2 className="mb-4 text-lg font-semibold text-gray-700 uppercase tracking-wide">
-                  Community Service Project Sponsors
+                  {tenantConfig.sponsorCommunityTierLabel} Sponsors
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-3">
                   {communitySponsors.map((sponsor) => {

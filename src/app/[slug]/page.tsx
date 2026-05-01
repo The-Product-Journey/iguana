@@ -7,6 +7,39 @@ import { formatCents } from "@/lib/utils";
 import { HelpSection } from "@/components/help-section";
 import { TeaseLanding } from "@/components/tease-landing";
 import { getAdminPreviewState } from "@/lib/site-mode";
+import { getTenantConfig } from "@/lib/tenant-config";
+
+// Format an ISO date (YYYY-MM-DD) into a human-friendly "When" card line
+// without dragging in a date library. SSR-only — no locale negotiation.
+function formatReunionDate(eventDate: string): { when: string; days: string } {
+  // The schema stores eventDate as a YYYY-MM-DD string. We treat it as the
+  // first day of a one- or two-day reunion and format both parts.
+  const start = new Date(`${eventDate}T00:00:00Z`);
+  if (isNaN(start.getTime())) {
+    return { when: eventDate, days: "" };
+  }
+  const monthFmt = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    timeZone: "UTC",
+  });
+  const dayFmt = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    timeZone: "UTC",
+  });
+  const dayNumFmt = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    timeZone: "UTC",
+  });
+  const yearFmt = new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    timeZone: "UTC",
+  });
+  const next = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+  return {
+    when: `${monthFmt.format(start)} ${dayNumFmt.format(start)}–${dayNumFmt.format(next)}, ${yearFmt.format(start)}`,
+    days: `${dayFmt.format(start)} & ${dayFmt.format(next)}`,
+  };
+}
 
 export default async function ReunionPage({
   params,
@@ -62,6 +95,8 @@ export default async function ReunionPage({
 
   // pre_register or open mode — show the full landing page
   const isOpen = effectiveMode === "open";
+  const tenantConfig = getTenantConfig(reunion);
+  const { when, days } = formatReunionDate(reunion.eventDate);
 
   return (
     <div className="min-h-screen">
@@ -74,9 +109,11 @@ export default async function ReunionPage({
           <h1 className="mb-2 text-4xl font-bold tracking-tight sm:text-5xl">
             {reunion.name}
           </h1>
-          <p className="mb-6 text-2xl font-semibold text-red-100">
-            30 Year Reunion
-          </p>
+          {tenantConfig.reunionMilestoneLabel && (
+            <p className="mb-6 text-2xl font-semibold text-red-100">
+              {tenantConfig.reunionMilestoneLabel}
+            </p>
+          )}
           <p className="mx-auto mb-10 max-w-xl text-lg text-red-100">
             {reunion.description}
           </p>
@@ -96,12 +133,12 @@ export default async function ReunionPage({
             <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-500">
               When
             </h3>
-            <p className="text-lg font-medium">August 28–29, 2026</p>
-            <p className="mt-1 text-gray-600">Friday &amp; Saturday</p>
+            <p className="text-lg font-medium">{when}</p>
+            {days && <p className="mt-1 text-gray-600">{days}</p>}
           </div>
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-500">
-              Saturday Banquet
+              {tenantConfig.banquetLabel}
             </h3>
             <p className="text-lg font-medium">{reunion.eventLocation}</p>
             {reunion.eventAddress && (
@@ -124,25 +161,28 @@ export default async function ReunionPage({
         {/* Help / Contact section */}
         <HelpSection reunionId={reunion.id} />
 
-        {/* Community Service Project */}
-        <div className="mt-12 rounded-2xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-white p-8 shadow-sm">
-          <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-red-700">
-            Community Service Project
-          </p>
-          <h3 className="mb-2 text-2xl font-bold text-gray-900">
-            96 Backpacks
-          </h3>
-          <p className="mb-4 text-gray-700">
-            Saturday morning, we&apos;re assembling 96 backpacks of school
-            supplies for Park Hill students — partnering with Replenish KC.
-          </p>
-          <Link
-            href={`/${slug}/community-service`}
-            className="inline-block text-sm font-semibold text-red-700 hover:text-red-800"
-          >
-            Learn about 96 Backpacks &rarr;
-          </Link>
-        </div>
+        {/* Community Service Project — only when configured */}
+        {tenantConfig.hasCommunityServiceProject && (
+          <div className="mt-12 rounded-2xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-white p-8 shadow-sm">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-red-700">
+              Community Service Project
+            </p>
+            <h3 className="mb-2 text-2xl font-bold text-gray-900">
+              {tenantConfig.communityServiceProjectName}
+            </h3>
+            {tenantConfig.communityServiceTeaserCopy && (
+              <p className="mb-4 text-gray-700 whitespace-pre-line">
+                {tenantConfig.communityServiceTeaserCopy}
+              </p>
+            )}
+            <Link
+              href={`/${slug}/community-service`}
+              className="inline-block text-sm font-semibold text-red-700 hover:text-red-800"
+            >
+              Learn about {tenantConfig.communityServiceProjectName} &rarr;
+            </Link>
+          </div>
+        )}
 
         <div className="mt-12 text-center">
           <Link

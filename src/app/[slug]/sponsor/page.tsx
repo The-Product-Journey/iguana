@@ -6,6 +6,7 @@ import Link from "next/link";
 import { SponsorForm } from "@/components/sponsor-form";
 import { formatCents } from "@/lib/utils";
 import { SPONSOR_TIER_THRESHOLD_CENTS } from "@/lib/constants";
+import { getTenantConfig } from "@/lib/tenant-config";
 
 export default async function SponsorPage({
   params,
@@ -20,6 +21,16 @@ export default async function SponsorPage({
     .get();
 
   if (!reunion) notFound();
+
+  const tenantConfig = getTenantConfig(reunion);
+  const topTierLabel = tenantConfig.sponsorTopTierLabel;
+  const communityTierLabel = tenantConfig.sponsorCommunityTierLabel;
+  const milestoneSubtitle = tenantConfig.reunionMilestoneLabel
+    ? `Help make our ${tenantConfig.reunionMilestoneLabel.toLowerCase()} unforgettable.`
+    : "Help make our reunion unforgettable.";
+  const communityCopy = tenantConfig.hasCommunityServiceProject
+    ? `Recognized online. Funds the ${tenantConfig.communityServiceProjectName} community service project.`
+    : "Recognized online. Helps cover reunion logistics and keep ticket prices accessible.";
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -36,8 +47,8 @@ export default async function SponsorPage({
             Sponsor the Reunion
           </h1>
           <p className="text-gray-600">
-            Help make our 30-year reunion unforgettable. Your sponsorship
-            directly supports the event and our classmates.
+            {milestoneSubtitle} Your sponsorship directly supports the event
+            and our classmates.
           </p>
         </div>
 
@@ -45,7 +56,7 @@ export default async function SponsorPage({
         <div className="mb-8 grid gap-4 sm:grid-cols-2">
           <div className="rounded-xl border-2 border-red-200 bg-red-50 p-6">
             <h3 className="mb-1 text-lg font-bold text-red-900">
-              Trojan Sponsor
+              {topTierLabel} Sponsor
             </h3>
             <p className="mb-2 text-sm font-medium text-red-700">
               {formatCents(SPONSOR_TIER_THRESHOLD_CENTS)} and above
@@ -57,20 +68,24 @@ export default async function SponsorPage({
           </div>
           <div className="rounded-xl border border-gray-200 bg-white p-6">
             <h3 className="mb-1 text-lg font-bold text-gray-900">
-              Community Service Project Sponsor
+              {communityTierLabel} Sponsor
             </h3>
             <p className="mb-2 text-sm font-medium text-gray-500">
               Under {formatCents(SPONSOR_TIER_THRESHOLD_CENTS)}
             </p>
             <p className="text-sm text-gray-600">
-              Recognized online. Funds the 96 Backpacks community service
-              project — giving back to Park Hill schools.{" "}
-              <Link
-                href={`/${slug}/community-service`}
-                className="font-medium text-red-700 hover:text-red-800"
-              >
-                Learn more &rarr;
-              </Link>
+              {communityCopy}
+              {tenantConfig.hasCommunityServiceProject && (
+                <>
+                  {" "}
+                  <Link
+                    href={`/${slug}/community-service`}
+                    className="font-medium text-red-700 hover:text-red-800"
+                  >
+                    Learn more &rarr;
+                  </Link>
+                </>
+              )}
             </p>
           </div>
         </div>

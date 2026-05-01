@@ -5,6 +5,7 @@ import { reunions, sponsors } from "@/lib/db/schema";
 import { getStripe, getBaseUrl } from "@/lib/stripe";
 import { getSponsorTier, computeApplicationFeeCents } from "@/lib/constants";
 import { uploadImage } from "@/lib/upload";
+import { getTenantConfig } from "@/lib/tenant-config";
 
 export async function POST(req: NextRequest) {
   try {
@@ -50,6 +51,15 @@ export async function POST(req: NextRequest) {
     }
 
     const tier = getSponsorTier(amountCents);
+    const tenantConfig = getTenantConfig(reunion);
+    const tierLabel =
+      tier === "top"
+        ? tenantConfig.sponsorTopTierLabel
+        : tenantConfig.sponsorCommunityTierLabel;
+    const stripeProductDescription =
+      tenantConfig.reunionMilestoneLabel
+        ? `${tenantConfig.orgName} ${tenantConfig.reunionMilestoneLabel} sponsorship`
+        : `${tenantConfig.orgName} reunion sponsorship`;
 
     // Upload logo if provided
     let logoUrl: string | null = null;
@@ -84,8 +94,8 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `${tier === "top" ? "Trojan" : "Community Service Project"} Sponsorship${companyName ? ` — ${companyName}` : ""}`,
-              description: `PHHS Class of 1996 Reunion Sponsorship`,
+              name: `${tierLabel} Sponsorship${companyName ? ` — ${companyName}` : ""}`,
+              description: stripeProductDescription,
             },
             unit_amount: amountCents,
           },

@@ -19,6 +19,7 @@ import { SiteModeToggle } from "@/components/site-mode-toggle";
 import { AdminTabs } from "./admin-tabs";
 import { ConnectStatus } from "@/components/connect-status";
 import { LaunchIcon } from "@/components/launch-icon";
+import { getTenantConfig } from "@/lib/tenant-config";
 import { requireReunionAdminPage } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
@@ -232,6 +233,10 @@ export default async function AdminReunionPage({
         profiles={allProfiles}
         events={allEvents}
         messages={messages}
+        sponsorTopTierLabel={getTenantConfig(reunion).sponsorTopTierLabel}
+        sponsorCommunityTierLabel={
+          getTenantConfig(reunion).sponsorCommunityTierLabel
+        }
         interestEventCounts={interestEventCounts}
         regEventCounts={regEventCounts}
         categoryLabels={CATEGORY_LABELS}

@@ -4,7 +4,9 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/components/site-nav";
 import { AdminPreviewBanner } from "@/components/admin-preview-banner";
+import { TenantBrandStyle } from "@/components/tenant-brand-style";
 import { getAdminPreviewState } from "@/lib/site-mode";
+import { getTenantConfig } from "@/lib/tenant-config";
 
 export default async function ReunionLayout({
   children,
@@ -40,24 +42,30 @@ export default async function ReunionLayout({
 
   return (
     <>
+      <TenantBrandStyle reunion={reunion} />
       {showPreviewBanner && (
         <AdminPreviewBanner
           previewMode={previewState.previewMode!}
           actualMode={previewState.actualMode}
         />
       )}
-      {showNav && (
-        <SiteNav
-          slug={slug}
-          reunionName={reunion.name}
-          siteMode={effectiveMode}
-          isAdmin={previewState.isAdmin}
-          previewMode={previewState.previewMode}
-          actualMode={previewState.actualMode}
-          showAdminMenu={previewState.isAdmin && !showPreviewBanner}
-        />
-      )}
-      {children}
+      <div className="tenant-brand">
+        {showNav && (
+          <SiteNav
+            slug={slug}
+            orgShortName={getTenantConfig(reunion).orgShortName}
+            hasCommunityServiceProject={
+              getTenantConfig(reunion).hasCommunityServiceProject
+            }
+            siteMode={effectiveMode}
+            isAdmin={previewState.isAdmin}
+            previewMode={previewState.previewMode}
+            actualMode={previewState.actualMode}
+            showAdminMenu={previewState.isAdmin && !showPreviewBanner}
+          />
+        )}
+        {children}
+      </div>
     </>
   );
 }
