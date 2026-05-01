@@ -1,6 +1,5 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
-import { eq } from "drizzle-orm";
 import {
   reunions,
   events,
@@ -12,6 +11,7 @@ import {
   interestSignups,
   eventInterests,
 } from "./schema";
+import { wipeTestTenant, TEST_REUNION_SLUG } from "./test-tenant";
 
 async function seedTest() {
   const client = createClient({
@@ -20,23 +20,17 @@ async function seedTest() {
   });
   const db = drizzle(client);
 
-  // Check if test reunion already exists
-  const existing = await db
-    .select()
-    .from(reunions)
-    .where(eq(reunions.slug, "phhs-1996-test"))
-    .get();
+  // Wipe-and-re-seed: re-running this script gives a clean baseline. No
+  // --force flag — this is the test tenant; that's the whole point.
+  console.log(`Wiping any existing test tenant data…`);
+  await wipeTestTenant(db);
 
-  if (existing) {
-    console.log("Test reunion already exists. Delete it first to re-seed.");
-    process.exit(0);
-  }
-
-  // Create test reunion (siteMode: open so everything is browsable)
+  // Create test reunion (siteMode: open so everything is browsable; admin can
+  // toggle to tease/pre_register from /admin/{slug} just like prod)
   const [reunion] = await db
     .insert(reunions)
     .values({
-      slug: "phhs-1996-test",
+      slug: TEST_REUNION_SLUG,
       name: "Park Hill High School — Class of 1996 (TEST)",
       description:
         "This is a TEST environment with sample data. Join us for our 30-year reunion! Reconnect with fellow Trojans, share stories, and celebrate three decades since graduation.",
@@ -83,13 +77,15 @@ async function seedTest() {
     },
     {
       reunionId: reunion.id,
-      name: "Saturday Community Service",
+      name: "Saturday Community Service — 96 Backpacks",
       slug: "saturday-service",
       description:
-        "Give back to the Park Hill community. We're partnering with a local charity for a morning of community service — likely school supply backpack stuffing.",
+        "Give back to the Park Hill community. We're partnering with Replenish KC to fill 96 backpacks of school supplies for Park Hill students.",
       eventDate: "2026-08-29",
-      eventTime: "9:00 AM",
-      eventLocation: "TBD",
+      // null fields trigger the "details finalizing" banner — keep in sync with seed-events.ts
+      eventTime: null,
+      eventLocation: null,
+      eventAddress: null,
       type: "interest_only" as const,
       sortOrder: 3,
     },
@@ -282,12 +278,17 @@ async function seedTest() {
   console.log("Created 5 sample interest signups");
 
   console.log("\n--- Test environment ready! ---");
-  console.log(`Browse: http://localhost:3000/phhs-1996-test`);
-  console.log(`Admin:  http://localhost:3000/admin/phhs-1996-test`);
-  process.exit(0);
+  console.log(`Browse: http://localhost:3000/${TEST_REUNION_SLUG}`);
+  console.log(`Admin:  http://localhost:3000/admin/${TEST_REUNION_SLUG}`);
+  console.log("");
+  console.log(`To reset to an empty tenant (onboarding test), run: npm run db:wipe-test`);
+  client.close();
+  return 0;
 }
 
-seedTest().catch((e) => {
-  console.error("Test seed failed:", e);
-  process.exit(1);
-});
+seedTest()
+  .then((code) => process.exit(code))
+  .catch((e) => {
+    console.error("Test seed failed:", e);
+    process.exit(1);
+  });
