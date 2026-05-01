@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import type { Reunion } from "@/lib/db/schema";
+import { getCurrentAdminContext } from "@/lib/admin-auth";
 
 type SiteMode = Reunion["siteMode"];
 
@@ -27,18 +28,29 @@ export type AdminPreviewState = {
 /**
  * Resolve admin auth + preview-mode override + actual DB mode in one shot.
  *
- * **Default behavior change (May 2026):** admins now see the public view by
- * default. Previously, any admin auth cookie auto-promoted the rendered mode
- * to "open" — that was confusing because admins couldn't actually see what
- * the public was seeing. Now admins must opt in to preview a different mode
- * by setting the `admin_preview_mode` cookie via /api/admin/preview-mode.
+ * **Auth migration (May 2026):** admin auth moved from a single-password
+ * cookie (`admin_auth` === ADMIN_PASSWORD) to Clerk-based auth with a
+ * two-tier role model (super admins via env var; reunion admins via DB
+ * table). `isAdmin` here means "is super OR is a reunion admin for THIS
+ * reunion."
+ *
+ * **Default behavior (unchanged):** admins see the public view by default.
+ * Setting the `admin_preview_mode` cookie via /api/admin/preview-mode opts
+ * an admin into previewing a different mode.
+ *
+ * **Performance:** this function runs on every public reunion page render.
+ * `getCurrentAdminContext()` short-circuits to null for signed-out visitors
+ * (zero DB / Backend API calls) and reads email from `sessionClaims.email`
+ * for signed-in users (no Clerk Backend API call). Do NOT switch this to
+ * `currentUser()` — that would burn rate limits on public traffic.
  */
 export async function getAdminPreviewState(
   reunion: Reunion
 ): Promise<AdminPreviewState> {
   const cookieStore = await cookies();
-  const auth = cookieStore.get("admin_auth");
-  const isAdmin = auth?.value === process.env.ADMIN_PASSWORD;
+  const ctx = await getCurrentAdminContext();
+  const isAdmin =
+    !!ctx && (ctx.isSuper || ctx.reunionIds.includes(reunion.id));
 
   let previewMode: SiteMode | null = null;
   if (isAdmin) {

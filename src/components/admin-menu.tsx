@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useClerk } from "@clerk/nextjs";
 
 type SiteMode = "tease" | "pre_register" | "open";
 
@@ -35,6 +36,7 @@ export function AdminMenu({
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const { signOut } = useClerk();
   const effectiveMode = previewMode ?? actualMode;
 
   // Close dropdown on outside click or Esc
@@ -160,15 +162,31 @@ export function AdminMenu({
             >
               Admin panel
             </Link>
-            <form action="/api/admin/logout" method="POST">
-              <button
-                type="submit"
-                role="menuitem"
-                className="block w-full px-3 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-50"
-              >
-                Sign out
-              </button>
-            </form>
+            <button
+              type="button"
+              role="menuitem"
+              disabled={busy}
+              onClick={async () => {
+                if (busy) return;
+                setBusy(true);
+                // The admin_preview_mode cookie is httpOnly, so we can't clear
+                // it from JS. Hit the server route to delete it BEFORE
+                // signing out (request must be authed). signOut() then drops
+                // the user back at `/`.
+                try {
+                  await fetch("/api/admin/preview-mode", { method: "DELETE" });
+                } catch {
+                  // Best-effort — if this fails the cookie persists but
+                  // becomes inert once the user is signed out (the value
+                  // stays in their browser; getAdminPreviewState only reads
+                  // it when isAdmin is true).
+                }
+                await signOut({ redirectUrl: "/" });
+              }}
+              className="block w-full px-3 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            >
+              Sign out
+            </button>
           </div>
         </div>
       )}

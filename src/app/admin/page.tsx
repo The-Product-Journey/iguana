@@ -1,94 +1,67 @@
 import { db } from "@/lib/db";
-import { reunions, rsvps } from "@/lib/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { reunions } from "@/lib/db/schema";
+import { inArray } from "drizzle-orm";
+import { redirect } from "next/navigation";
 import Link from "next/link";
-import { formatCents } from "@/lib/utils";
-import { LaunchIcon } from "@/components/launch-icon";
+import { requireAnyAdminPage } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminDashboard() {
-  const allReunions = await db.select().from(reunions);
+/**
+ * Top-level /admin landing — a router that sends each user to the right place
+ * based on their role:
+ *   - Super admin → /admin/super
+ *   - Reunion admin with one reunion → /admin/<slug>
+ *   - Reunion admin with multiple → small picker page
+ *   - Anything else → /admin/forbidden (proxy already filters, this is
+ *     defense in depth)
+ */
+export default async function AdminIndexPage() {
+  const ctx = await requireAnyAdminPage();
 
-  const stats = await Promise.all(
-    allReunions.map(async (reunion) => {
-      const result = await db
-        .select({
-          totalRsvps: sql<number>`count(*)`,
-          paidRsvps: sql<number>`sum(case when ${rsvps.paymentStatus} = 'paid' then 1 else 0 end)`,
-          totalRevenue: sql<number>`sum(case when ${rsvps.paymentStatus} = 'paid' then ${rsvps.amountPaidCents} else 0 end)`,
-          totalFeesCovered: sql<number>`sum(case when ${rsvps.paymentStatus} = 'paid' then ${rsvps.donationCents} else 0 end)`,
-          totalGuests: sql<number>`sum(case when ${rsvps.paymentStatus} = 'paid' then ${rsvps.guestCount} else 0 end)`,
-        })
-        .from(rsvps)
-        .where(eq(rsvps.reunionId, reunion.id))
-        .get();
+  if (ctx.isSuper) {
+    redirect("/admin/super");
+  }
 
-      return { reunion, stats: result };
-    })
-  );
+  // Reunion admin
+  if (ctx.reunionIds.length === 1) {
+    const reunion = await db
+      .select({ slug: reunions.slug })
+      .from(reunions)
+      .where(inArray(reunions.id, ctx.reunionIds))
+      .get();
+    if (reunion) redirect(`/admin/${reunion.slug}`);
+  }
+
+  // Multiple reunions — picker
+  const myReunions =
+    ctx.reunionIds.length > 0
+      ? await db
+          .select()
+          .from(reunions)
+          .where(inArray(reunions.id, ctx.reunionIds))
+          .all()
+      : [];
 
   return (
     <div>
-      <h2 className="mb-6 text-2xl font-bold">Dashboard</h2>
-
-      {stats.length === 0 ? (
-        <p className="text-gray-500">No reunions yet.</p>
+      <h2 className="mb-6 text-2xl font-bold">Choose a reunion</h2>
+      {myReunions.length === 0 ? (
+        <p className="text-gray-500">No reunions assigned yet.</p>
       ) : (
-        <div className="space-y-4">
-          {stats.map(({ reunion, stats: s }) => (
-            <div
-              key={reunion.id}
-              className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md"
-            >
-              {/* Title row: link-to-admin text + inline launch icon.
-                  Two separate <a>s side-by-side — no nested links. */}
-              <div className="flex items-center gap-2">
-                <Link
-                  href={`/admin/${reunion.slug}`}
-                  className="text-lg font-semibold text-gray-900 hover:text-red-700"
-                >
-                  {reunion.name}
-                </Link>
-                <a
-                  href={`/${reunion.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Open public site in new tab"
-                  aria-label={`Open ${reunion.name} public site in new tab`}
-                  className="inline-flex h-6 w-6 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
-                >
-                  <LaunchIcon />
-                </a>
-              </div>
+        <ul className="space-y-2">
+          {myReunions.map((r) => (
+            <li key={r.id}>
               <Link
-                href={`/admin/${reunion.slug}`}
-                className="mt-3 grid grid-cols-2 gap-4 text-sm sm:grid-cols-4"
+                href={`/admin/${r.slug}`}
+                className="block rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:bg-gray-50"
               >
-                <div>
-                  <p className="text-gray-500">Confirmed RSVPs</p>
-                  <p className="text-xl font-semibold">{s?.paidRsvps || 0}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Total Guests</p>
-                  <p className="text-xl font-semibold">{s?.totalGuests || 0}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Revenue</p>
-                  <p className="text-xl font-semibold">
-                    {formatCents(s?.totalRevenue || 0)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Fees Covered</p>
-                  <p className="text-xl font-semibold">
-                    {formatCents(s?.totalFeesCovered || 0)}
-                  </p>
-                </div>
+                <div className="font-medium">{r.name}</div>
+                <div className="text-sm text-gray-500">{r.eventDate}</div>
               </Link>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
