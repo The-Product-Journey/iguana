@@ -56,6 +56,7 @@ export function ConnectStatus({
     return initialState;
   });
   const [loading, setLoading] = useState(false);
+  const [busyDashboard, setBusyDashboard] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -156,6 +157,31 @@ export function ConnectStatus({
     } catch {
       setError("Something went wrong");
       setLoading(false);
+    }
+  }
+
+  async function handleOpenStripeDashboard() {
+    if (busyDashboard) return;
+    setBusyDashboard(true);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/connect/login-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reunionId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Failed to open Stripe dashboard");
+        setBusyDashboard(false);
+        return;
+      }
+      window.open(data.url, "_blank", "noopener");
+      setBusyDashboard(false);
+    } catch (e) {
+      console.error("[ConnectStatus] handleOpenStripeDashboard threw", e);
+      setError("Something went wrong");
+      setBusyDashboard(false);
     }
   }
 
@@ -263,16 +289,15 @@ export function ConnectStatus({
               once verified.
             </span>
           </div>
-          <div className="mt-3 flex gap-2">
+          <div className="mt-3 flex gap-3">
             {connectedAccountId && (
-              <a
-                href={`https://dashboard.stripe.com/connect/accounts/${connectedAccountId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-red-700 hover:text-red-800 underline"
+              <button
+                onClick={handleOpenStripeDashboard}
+                disabled={busyDashboard}
+                className="text-sm text-red-700 hover:text-red-800 underline disabled:opacity-50"
               >
-                View in Stripe →
-              </a>
+                {busyDashboard ? "Opening..." : "Open Stripe Dashboard →"}
+              </button>
             )}
             <button
               onClick={handleResumeOnboarding}
@@ -298,14 +323,13 @@ export function ConnectStatus({
             </span>
           </div>
           {connectedAccountId && (
-            <a
-              href={`https://dashboard.stripe.com/connect/accounts/${connectedAccountId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-block text-sm text-red-700 hover:text-red-800 underline"
+            <button
+              onClick={handleOpenStripeDashboard}
+              disabled={busyDashboard}
+              className="mt-3 inline-block text-sm text-red-700 hover:text-red-800 underline disabled:opacity-50"
             >
-              View in Stripe →
-            </a>
+              {busyDashboard ? "Opening..." : "Open Stripe Dashboard →"}
+            </button>
           )}
         </div>
       )}
@@ -323,14 +347,13 @@ export function ConnectStatus({
             </span>
           </div>
           {connectedAccountId && (
-            <a
-              href={`https://dashboard.stripe.com/connect/accounts/${connectedAccountId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-block text-sm text-red-700 hover:text-red-800 underline"
+            <button
+              onClick={handleOpenStripeDashboard}
+              disabled={busyDashboard}
+              className="mt-3 inline-block text-sm text-red-700 hover:text-red-800 underline disabled:opacity-50"
             >
-              View in Stripe →
-            </a>
+              {busyDashboard ? "Opening..." : "Open Stripe Dashboard →"}
+            </button>
           )}
         </div>
       )}
