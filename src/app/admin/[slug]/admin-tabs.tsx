@@ -189,17 +189,28 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
               </td>
             </tr>
           ) : (
-            interests.map((i) => (
-              <tr key={i.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 text-gray-600">{i.email}</td>
-                <td className="px-4 py-3 font-medium">
-                  {i.firstName || ""} {i.lastName || ""}
-                </td>
-                <td className="px-4 py-3 text-gray-500">
-                  {new Date(i.createdAt).toLocaleDateString()}
-                </td>
-              </tr>
-            ))
+            interests.map((i) => {
+              const displayName =
+                i.name ||
+                [i.firstName, i.lastName].filter(Boolean).join(" ") ||
+                "—";
+              return (
+                <tr key={i.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 text-gray-600">{i.email}</td>
+                  <td className="px-4 py-3 font-medium">
+                    {displayName}
+                    {i.maidenName && (
+                      <span className="ml-1 text-xs text-gray-500">
+                        (née {i.maidenName})
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-gray-500">
+                    {new Date(i.createdAt).toLocaleDateString()}
+                  </td>
+                </tr>
+              );
+            })
           )}
         </tbody>
       </table>

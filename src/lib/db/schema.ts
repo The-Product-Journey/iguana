@@ -165,6 +165,13 @@ export const interestSignups = sqliteTable(
       .notNull()
       .references(() => reunions.id),
     email: text("email").notNull(),
+    // Full name as entered by the user (preferred for new signups)
+    name: text("name"),
+    // Optional maiden name / previous last name — useful at reunions where
+    // classmates remember each other by their pre-marriage surname
+    maidenName: text("maiden_name"),
+    // Legacy split name fields — kept for backward compat with older signups
+    // and admin views; new signups write to `name` instead
     firstName: text("first_name"),
     lastName: text("last_name"),
     createdAt: text("created_at")

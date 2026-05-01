@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Event } from "@/lib/db/schema";
+import { formatTentativeWhen } from "@/lib/utils";
 
 export function InlineInterestForm({
   reunionId,
@@ -38,8 +39,8 @@ export function InlineInterestForm({
           reunionId,
           slug,
           email: form.get("email"),
-          firstName: form.get("firstName") || null,
-          lastName: form.get("lastName") || null,
+          name: form.get("name") || null,
+          maidenName: form.get("maidenName") || null,
           eventIds: selectedEvents,
         }),
       });
@@ -90,27 +91,27 @@ export function InlineInterestForm({
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="firstName" className="mb-1 block text-sm font-medium text-gray-700">
-            First Name
-          </label>
-          <input
-            id="firstName"
-            name="firstName"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-          />
-        </div>
-        <div>
-          <label htmlFor="lastName" className="mb-1 block text-sm font-medium text-gray-700">
-            Last Name
-          </label>
-          <input
-            id="lastName"
-            name="lastName"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-          />
-        </div>
+      <div>
+        <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
+          Full Name
+        </label>
+        <input
+          id="name"
+          name="name"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="maidenName" className="mb-1 block text-sm font-medium text-gray-700">
+          Maiden / Previous Last Name <span className="text-gray-400">(optional)</span>
+        </label>
+        <input
+          id="maidenName"
+          name="maidenName"
+          placeholder="So classmates can find you"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+        />
       </div>
 
       <div>
@@ -146,7 +147,7 @@ export function InlineInterestForm({
                 <div>
                   <div className="text-sm font-medium">{event.name}</div>
                   <div className="text-xs text-gray-500">
-                    {event.eventDate} {event.eventTime && `· ${event.eventTime}`}
+                    {formatTentativeWhen(event.eventDate, event.eventTime)}
                   </div>
                 </div>
               </label>

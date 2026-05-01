@@ -6,7 +6,7 @@ import { eq, and } from "drizzle-orm";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { reunionId, email, firstName, lastName, eventIds } = body;
+    const { reunionId, email, name, maidenName, eventIds } = body;
 
     if (!reunionId || !email) {
       return NextResponse.json(
@@ -30,14 +30,14 @@ export async function POST(req: NextRequest) {
     let signupId: string;
 
     if (existing) {
-      // Update name fields if provided
-      if (firstName || lastName) {
+      // Update name fields if any provided
+      const updates: { name?: string | null; maidenName?: string | null } = {};
+      if (name !== undefined) updates.name = name || null;
+      if (maidenName !== undefined) updates.maidenName = maidenName || null;
+      if (Object.keys(updates).length > 0) {
         await db
           .update(interestSignups)
-          .set({
-            ...(firstName !== undefined ? { firstName } : {}),
-            ...(lastName !== undefined ? { lastName } : {}),
-          })
+          .set(updates)
           .where(eq(interestSignups.id, existing.id));
       }
       signupId = existing.id;
@@ -52,8 +52,8 @@ export async function POST(req: NextRequest) {
         .values({
           reunionId,
           email,
-          firstName: firstName || null,
-          lastName: lastName || null,
+          name: name || null,
+          maidenName: maidenName || null,
         })
         .returning();
       signupId = signup.id;
