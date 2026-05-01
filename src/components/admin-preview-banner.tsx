@@ -27,7 +27,7 @@ export function AdminPreviewBanner({
 }) {
   return (
     <div className="border-b border-amber-300 bg-amber-50 text-amber-900">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-6 py-2 text-sm">
+      <div className="flex items-center justify-between gap-3 px-4 py-2 text-sm">
         <div className="flex items-center gap-2">
           <span className="rounded bg-amber-200 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-amber-900">
             Admin
