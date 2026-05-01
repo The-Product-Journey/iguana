@@ -203,6 +203,11 @@ export const eventInterests = sqliteTable(
     eventId: text("event_id")
       .notNull()
       .references(() => events.id),
+    // "yes" / "maybe" / "no" — the level of interest the signer expressed.
+    // Nullable for backward compat with rows created before this column
+    // existed (those should be read as implicit "yes"). Enum not enforced
+    // at the DB layer because libsql/sqlite doesn't have native enums.
+    response: text("response", { enum: ["yes", "maybe", "no"] }),
   },
   (table) => [
     uniqueIndex("idx_event_interest_signup_event").on(

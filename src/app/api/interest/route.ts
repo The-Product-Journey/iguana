@@ -3,16 +3,31 @@ import { db } from "@/lib/db";
 import { interestSignups, eventInterests, events } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 
+const VALID_RESPONSES = new Set(["yes", "maybe", "no"]);
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { reunionId, email, name, maidenName, eventIds } = body;
+    const { reunionId, email, name, maidenName, eventResponses } = body;
 
     if (!reunionId || !email) {
       return NextResponse.json(
         { error: "Reunion ID and email are required" },
         { status: 400 }
       );
+    }
+
+    // eventResponses is { [eventId]: "yes" | "maybe" | "no" }
+    const responsesMap: Record<string, "yes" | "maybe" | "no"> = {};
+    if (eventResponses && typeof eventResponses === "object") {
+      for (const [eventId, response] of Object.entries(eventResponses)) {
+        if (
+          typeof response === "string" &&
+          VALID_RESPONSES.has(response)
+        ) {
+          responsesMap[eventId] = response as "yes" | "maybe" | "no";
+        }
+      }
     }
 
     // Upsert: check for existing signup with same reunion + email
@@ -30,7 +45,6 @@ export async function POST(req: NextRequest) {
     let signupId: string;
 
     if (existing) {
-      // Update name fields if any provided
       const updates: { name?: string | null; maidenName?: string | null } = {};
       if (name !== undefined) updates.name = name || null;
       if (maidenName !== undefined) updates.maidenName = maidenName || null;
@@ -59,25 +73,25 @@ export async function POST(req: NextRequest) {
       signupId = signup.id;
     }
 
-    // Insert event interests (validate eventIds belong to this reunion)
-    if (Array.isArray(eventIds) && eventIds.length > 0) {
+    // Insert event interests with response (validate eventIds belong to this reunion)
+    const eventIds = Object.keys(responsesMap);
+    if (eventIds.length > 0) {
       const reunionEvents = await db
         .select({ id: events.id })
         .from(events)
         .where(eq(events.reunionId, reunionId));
 
       const validEventIds = new Set(reunionEvents.map((e) => e.id));
-      const filteredIds = eventIds.filter((id: string) =>
-        validEventIds.has(id)
-      );
+      const rows = eventIds
+        .filter((id) => validEventIds.has(id))
+        .map((eventId) => ({
+          interestSignupId: signupId,
+          eventId,
+          response: responsesMap[eventId],
+        }));
 
-      if (filteredIds.length > 0) {
-        await db.insert(eventInterests).values(
-          filteredIds.map((eventId: string) => ({
-            interestSignupId: signupId,
-            eventId,
-          }))
-        );
+      if (rows.length > 0) {
+        await db.insert(eventInterests).values(rows);
       }
     }
 

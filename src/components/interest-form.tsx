@@ -4,6 +4,14 @@ import { useState } from "react";
 import type { Event } from "@/lib/db/schema";
 import { formatTentativeWhen } from "@/lib/utils";
 
+type Response = "yes" | "maybe" | "no";
+
+const RESPONSE_OPTIONS: { value: Response; label: string }[] = [
+  { value: "yes", label: "Yes" },
+  { value: "maybe", label: "Maybe" },
+  { value: "no", label: "No" },
+];
+
 export function InterestForm({
   reunionId,
   slug,
@@ -18,20 +26,24 @@ export function InterestForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [maidenName, setMaidenName] = useState("");
+  const [responses, setResponses] = useState<Record<string, Response>>({});
 
-  function toggleEvent(eventId: string) {
-    setSelectedEvents((prev) =>
-      prev.includes(eventId) ? prev.filter((id) => id !== eventId) : [...prev, eventId]
-    );
+  function setResponse(eventId: string, value: Response) {
+    setResponses((prev) => ({ ...prev, [eventId]: value }));
   }
+
+  const allEventsAnswered = events.every((e) => responses[e.id] !== undefined);
+  const formReady =
+    email.trim() !== "" && name.trim() !== "" && allEventsAnswered;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!formReady) return;
     setLoading(true);
     setError("");
-
-    const form = new FormData(e.currentTarget);
 
     try {
       const res = await fetch("/api/interest", {
@@ -40,10 +52,10 @@ export function InterestForm({
         body: JSON.stringify({
           reunionId,
           slug,
-          email: form.get("email"),
-          name: form.get("name") || null,
-          maidenName: form.get("maidenName") || null,
-          eventIds: selectedEvents,
+          email,
+          name,
+          maidenName: maidenName || null,
+          eventResponses: responses,
         }),
       });
 
@@ -110,17 +122,22 @@ export function InterestForm({
                   name="email"
                   type="email"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                 />
               </div>
 
               <div>
                 <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
-                  Full Name
+                  Full Name *
                 </label>
                 <input
                   id="name"
                   name="name"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                 />
               </div>
@@ -132,6 +149,8 @@ export function InterestForm({
                 <input
                   id="maidenName"
                   name="maidenName"
+                  value={maidenName}
+                  onChange={(e) => setMaidenName(e.target.value)}
                   placeholder="So classmates can find you"
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                 />
@@ -140,39 +159,59 @@ export function InterestForm({
               {events.length > 0 && (
                 <div>
                   <p className="mb-2 text-sm font-medium text-gray-700">
-                    Which events interest you?
+                    Which events are you in for?
                   </p>
                   <div className="space-y-2">
-                    {events.map((event) => (
-                      <label
-                        key={event.id}
-                        className="flex items-start gap-3 rounded-lg border border-gray-200 p-3 transition hover:bg-gray-50 cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedEvents.includes(event.id)}
-                          onChange={() => toggleEvent(event.id)}
-                          className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-red-700 focus:ring-red-500"
-                        />
-                        <div>
+                    {events.map((event) => {
+                      const current = responses[event.id];
+                      return (
+                        <div
+                          key={event.id}
+                          className="rounded-lg border border-gray-200 p-3"
+                        >
                           <div className="text-sm font-medium">{event.name}</div>
-                          <div className="text-xs text-gray-500">
+                          <div className="whitespace-pre-line text-xs italic text-gray-500">
                             {event.tentativeLabel ||
                               formatTentativeWhen(event.eventDate, event.eventTime)}
                           </div>
+                          <div
+                            role="radiogroup"
+                            aria-label={`${event.name} response`}
+                            className="mt-2 inline-flex overflow-hidden rounded-md border border-gray-300"
+                          >
+                            {RESPONSE_OPTIONS.map((opt) => {
+                              const active = current === opt.value;
+                              return (
+                                <button
+                                  key={opt.value}
+                                  type="button"
+                                  role="radio"
+                                  aria-checked={active}
+                                  onClick={() => setResponse(event.id, opt.value)}
+                                  className={`px-3 py-1 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                                    active
+                                      ? "bg-red-700 text-white"
+                                      : "bg-white text-gray-700 hover:bg-gray-50"
+                                  } ${opt.value !== "yes" ? "border-l border-gray-300" : ""}`}
+                                >
+                                  {opt.label}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </label>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full rounded-lg bg-red-700 px-4 py-3 font-semibold text-white shadow transition hover:bg-red-800 disabled:opacity-50"
+                disabled={loading || !formReady}
+                className="w-full rounded-lg bg-red-700 px-4 py-3 font-semibold text-white shadow transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {loading ? "Saving..." : "Count Me In"}
+                {loading ? "Saving..." : "Submit"}
               </button>
             </form>
           </>
