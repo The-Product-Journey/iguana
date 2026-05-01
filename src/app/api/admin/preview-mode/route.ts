@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { ADMIN_PREVIEW_COOKIE, SITE_MODES } from "@/lib/site-mode";
+import { requireAnyAdmin } from "@/lib/admin-auth";
 
+/**
+ * POST: set the preview cookie to a SiteMode (or null/empty/undefined to clear).
+ * DELETE: clear the preview cookie. Used by admin-menu.tsx before sign-out
+ *         since the cookie is httpOnly and can't be cleared from JS.
+ *
+ * Both routes require an admin (super OR any-reunion); per-reunion enforcement
+ * happens at the page render layer (the cookie is just a UI signal).
+ */
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies();
-  const auth = cookieStore.get("admin_auth");
-  if (auth?.value !== process.env.ADMIN_PASSWORD) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const guard = await requireAnyAdmin();
+  if (guard instanceof NextResponse) return guard;
 
   let body: { mode?: unknown };
   try {
@@ -42,5 +47,14 @@ export async function POST(req: NextRequest) {
     path: "/",
     // Session-scoped — preview shouldn't outlive the browser session
   });
+  return res;
+}
+
+export async function DELETE() {
+  const guard = await requireAnyAdmin();
+  if (guard instanceof NextResponse) return guard;
+
+  const res = NextResponse.json({ ok: true });
+  res.cookies.delete(ADMIN_PREVIEW_COOKIE);
   return res;
 }

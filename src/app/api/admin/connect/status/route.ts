@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getStripe } from "@/lib/stripe";
+import { requireReunionAdmin } from "@/lib/admin-auth";
 
 export async function GET(req: NextRequest) {
-  const cookieStore = await cookies();
-  const auth = cookieStore.get("admin_auth");
-  if (auth?.value !== process.env.ADMIN_PASSWORD) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+  // Note: connect/status reads reunionId from QUERY STRING, not body.
   const reunionId = req.nextUrl.searchParams.get("reunionId");
   if (!reunionId) {
     return NextResponse.json(
@@ -19,6 +14,9 @@ export async function GET(req: NextRequest) {
       { status: 400 }
     );
   }
+
+  const guard = await requireReunionAdmin(reunionId);
+  if (guard instanceof NextResponse) return guard;
 
   const reunion = await db
     .select()

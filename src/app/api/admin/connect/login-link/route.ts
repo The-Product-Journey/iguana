@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getStripe } from "@/lib/stripe";
+import { requireReunionAdmin } from "@/lib/admin-auth";
 
 /**
  * Mint a short-lived (~5 min) auto-login URL for the reunion's connected
@@ -16,12 +16,6 @@ import { getStripe } from "@/lib/stripe";
  * from Stripe, which we surface as a clear error.
  */
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies();
-  const auth = cookieStore.get("admin_auth");
-  if (auth?.value !== process.env.ADMIN_PASSWORD) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     const { reunionId } = await req.json();
 
@@ -31,6 +25,9 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const guard = await requireReunionAdmin(reunionId);
+    if (guard instanceof NextResponse) return guard;
 
     const reunion = await db
       .select()
