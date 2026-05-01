@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { formatCents } from "@/lib/utils";
 import { getStripe } from "@/lib/stripe";
+import { REFUND_POLICY_TEXT } from "@/lib/constants";
 
 export default async function ConfirmationPage({
   params,
@@ -184,6 +185,10 @@ export default async function ConfirmationPage({
         >
           &larr; Back to event page
         </Link>
+
+        {isPaid && (
+          <p className="mt-6 text-xs text-gray-400">{REFUND_POLICY_TEXT}</p>
+        )}
       </div>
     </div>
   );

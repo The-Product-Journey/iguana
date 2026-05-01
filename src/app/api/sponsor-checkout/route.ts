@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `${tier === "top" ? "Top" : "Community Service"} Sponsorship${companyName ? ` — ${companyName}` : ""}`,
+              name: `${tier === "top" ? "Trojan" : "Community Service Project"} Sponsorship${companyName ? ` — ${companyName}` : ""}`,
               description: `PHHS Class of 1996 Reunion Sponsorship`,
             },
             unit_amount: amountCents,

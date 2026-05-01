@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { REFUND_POLICY_TEXT } from "@/lib/constants";
 
 export default async function SponsorConfirmationPage({
   params,
@@ -33,6 +34,7 @@ export default async function SponsorConfirmationPage({
             &larr; Back to event page
           </Link>
         </div>
+        <p className="mt-6 text-xs text-gray-400">{REFUND_POLICY_TEXT}</p>
       </div>
     </div>
   );

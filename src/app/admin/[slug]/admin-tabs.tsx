@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { formatCents } from "@/lib/utils";
+import { getSponsorTierLabel } from "@/lib/constants";
 import type {
   Rsvp,
   InterestSignup,
@@ -257,7 +258,7 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                         : "bg-gray-100 text-gray-700"
                     }`}
                   >
-                    {s.tier === "top" ? "Top" : "Community"}
+                    {getSponsorTierLabel(s.tier)}
                   </span>
                 </td>
                 <td className="px-4 py-3">

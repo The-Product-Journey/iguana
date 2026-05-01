@@ -45,26 +45,32 @@ export default async function SponsorPage({
         <div className="mb-8 grid gap-4 sm:grid-cols-2">
           <div className="rounded-xl border-2 border-red-200 bg-red-50 p-6">
             <h3 className="mb-1 text-lg font-bold text-red-900">
-              Top Sponsor
+              Trojan Sponsor
             </h3>
             <p className="mb-2 text-sm font-medium text-red-700">
               {formatCents(SPONSOR_TIER_THRESHOLD_CENTS)} and above
             </p>
             <p className="text-sm text-red-800">
-              Your contribution offsets event costs — helping keep ticket prices
-              low for everyone. Featured prominently on our sponsors page.
+              Recognized online and on signage at select reunion events. Helps
+              offset event costs to keep ticket prices low for everyone.
             </p>
           </div>
           <div className="rounded-xl border border-gray-200 bg-white p-6">
             <h3 className="mb-1 text-lg font-bold text-gray-900">
-              Community Service Sponsor
+              Community Service Project Sponsor
             </h3>
             <p className="mb-2 text-sm font-medium text-gray-500">
               Under {formatCents(SPONSOR_TIER_THRESHOLD_CENTS)}
             </p>
             <p className="text-sm text-gray-600">
-              Your contribution funds our community service efforts — giving
-              back to the Park Hill community that shaped us.
+              Recognized online. Funds the 96 Backpacks community service
+              project — giving back to Park Hill schools.{" "}
+              <Link
+                href={`/${slug}/community-service`}
+                className="font-medium text-red-700 hover:text-red-800"
+              >
+                Learn more &rarr;
+              </Link>
             </p>
           </div>
         </div>

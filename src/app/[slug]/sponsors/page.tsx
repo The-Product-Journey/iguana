@@ -67,11 +67,11 @@ export default async function SponsorsPage({
           </div>
         ) : (
           <>
-            {/* Top Sponsors */}
+            {/* Trojan Sponsors */}
             {topSponsors.length > 0 && (
               <div className="mb-10">
                 <h2 className="mb-4 text-lg font-semibold text-red-800 uppercase tracking-wide">
-                  Top Sponsors
+                  Trojan Sponsors
                 </h2>
                 <div className="grid gap-6 sm:grid-cols-2">
                   {topSponsors.map((sponsor) => (
@@ -115,11 +115,11 @@ export default async function SponsorsPage({
               </div>
             )}
 
-            {/* Community Sponsors */}
+            {/* Community Service Project Sponsors */}
             {communitySponsors.length > 0 && (
               <div>
                 <h2 className="mb-4 text-lg font-semibold text-gray-700 uppercase tracking-wide">
-                  Community Service Sponsors
+                  Community Service Project Sponsors
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-3">
                   {communitySponsors.map((sponsor) => (
