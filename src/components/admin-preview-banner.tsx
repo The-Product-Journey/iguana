@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 type SiteMode = "tease" | "pre_register" | "open";
@@ -95,6 +96,23 @@ export function AdminPreviewBanner({
               Revert to public view
             </button>
           )}
+
+          <span className="mx-1 hidden text-amber-300 sm:inline" aria-hidden="true">|</span>
+
+          <Link
+            href="/admin"
+            className="text-xs text-amber-900 underline-offset-2 hover:underline"
+          >
+            Admin panel
+          </Link>
+          <form action="/api/admin/logout" method="POST" className="leading-none">
+            <button
+              type="submit"
+              className="text-xs text-amber-900 underline-offset-2 hover:underline"
+            >
+              Sign out
+            </button>
+          </form>
         </div>
       </div>
     </div>

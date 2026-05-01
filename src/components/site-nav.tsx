@@ -7,9 +7,10 @@ type NavProps = {
   slug: string;
   reunionName: string;
   siteMode: string;
+  isAdmin?: boolean;
 };
 
-export function SiteNav({ slug, reunionName, siteMode }: NavProps) {
+export function SiteNav({ slug, reunionName, siteMode, isAdmin }: NavProps) {
   const [open, setOpen] = useState(false);
 
   const links: { label: string; href: string; modes: string[] }[] = [
@@ -50,6 +51,14 @@ export function SiteNav({ slug, reunionName, siteMode }: NavProps) {
               className="rounded-full bg-red-700 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-red-800"
             >
               Register
+            </Link>
+          )}
+          {!isAdmin && (
+            <Link
+              href="/admin"
+              className="text-xs text-gray-400 hover:text-gray-600"
+            >
+              Admin login
             </Link>
           )}
         </div>

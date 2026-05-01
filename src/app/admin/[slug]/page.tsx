@@ -18,6 +18,7 @@ import { formatCents } from "@/lib/utils";
 import { SiteModeToggle } from "@/components/site-mode-toggle";
 import { AdminTabs } from "./admin-tabs";
 import { ConnectStatus } from "@/components/connect-status";
+import { LaunchIcon } from "@/components/launch-icon";
 
 export const dynamic = "force-dynamic";
 
@@ -152,7 +153,19 @@ export default async function AdminReunionPage({
         &larr; Back to dashboard
       </Link>
 
-      <h2 className="mb-4 text-2xl font-bold">{reunion.name}</h2>
+      <div className="mb-4 flex items-center gap-2">
+        <h2 className="text-2xl font-bold">{reunion.name}</h2>
+        <a
+          href={`/${slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Open public site in new tab"
+          aria-label={`Open ${reunion.name} public site in new tab`}
+          className="inline-flex h-7 w-7 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+        >
+          <LaunchIcon className="h-5 w-5" />
+        </a>
+      </div>
 
       <SiteModeToggle
         reunionId={reunion.id}

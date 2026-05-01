@@ -6,7 +6,7 @@ import Link from "next/link";
 import { formatCents } from "@/lib/utils";
 import { HelpSection } from "@/components/help-section";
 import { TeaseLanding } from "@/components/tease-landing";
-import { getEffectiveSiteMode } from "@/lib/site-mode";
+import { getAdminPreviewState } from "@/lib/site-mode";
 
 export default async function ReunionPage({
   params,
@@ -22,7 +22,8 @@ export default async function ReunionPage({
 
   if (!reunion) notFound();
 
-  const effectiveMode = await getEffectiveSiteMode(reunion);
+  const previewState = await getAdminPreviewState(reunion);
+  const effectiveMode = previewState.effectiveMode;
 
   // Tease mode — show the teaser landing
   if (effectiveMode === "tease") {
@@ -42,6 +43,7 @@ export default async function ReunionPage({
           eventDate: reunion.eventDate,
         }}
         events={reunionEvents}
+        isAdmin={previewState.isAdmin}
       />
     );
   }

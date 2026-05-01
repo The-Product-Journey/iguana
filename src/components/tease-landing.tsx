@@ -29,15 +29,25 @@ function useCountdown(targetDate: string) {
 export function TeaseLanding({
   reunion,
   events,
+  isAdmin,
 }: {
   reunion: { id: string; slug: string; name: string; description: string | null; eventDate: string };
   events: Event[];
+  isAdmin?: boolean;
 }) {
   const [showInterest, setShowInterest] = useState(false);
   const countdown = useCountdown(reunion.eventDate);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-800 via-red-900 to-red-950 text-white">
+    <div className="relative min-h-screen bg-gradient-to-br from-red-800 via-red-900 to-red-950 text-white">
+      {!isAdmin && (
+        <a
+          href="/admin"
+          className="absolute right-4 top-3 text-xs text-red-300 hover:text-white"
+        >
+          Admin login
+        </a>
+      )}
       <div className="mx-auto max-w-3xl px-6 py-20 text-center">
         {/* Header */}
         <p className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-red-300">
