@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { formatCents } from "@/lib/utils";
 import { getSponsorTierLabel } from "@/lib/constants";
 import type {
@@ -219,6 +220,7 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
 }
 
 function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
+  const router = useRouter();
   const [toggling, setToggling] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<string | null>(null);
 
@@ -229,7 +231,8 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sponsorId, action: "toggleDisplay" }),
     });
-    window.location.reload();
+    router.refresh();
+    setToggling(null);
   }
 
   async function refreshFromStripe(sponsorId: string) {
@@ -246,7 +249,8 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
         setRefreshing(null);
         return;
       }
-      window.location.reload();
+      router.refresh();
+      setRefreshing(null);
     } catch {
       alert("Something went wrong syncing from Stripe");
       setRefreshing(null);
@@ -423,6 +427,7 @@ function ProfilesTab({
   profiles: ProfileWithRsvp[];
   slug: string;
 }) {
+  const router = useRouter();
   const [toggling, setToggling] = useState<string | null>(null);
 
   async function togglePublished(profileId: string) {
@@ -432,7 +437,8 @@ function ProfilesTab({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ profileId, action: "togglePublished" }),
     });
-    window.location.reload();
+    router.refresh();
+    setToggling(null);
   }
 
   return (
