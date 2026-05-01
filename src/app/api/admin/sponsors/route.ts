@@ -59,17 +59,26 @@ export async function POST(req: NextRequest) {
     }
 
     // Save the admin's recognition edits and flip isDisplayed=true atomically.
-    await db
-      .update(sponsors)
-      .set({
-        displayName: strOrNull(body.displayName),
-        isAnonymous: !!body.isAnonymous,
-        message: strOrNull(body.message),
-        websiteUrl: strOrNull(body.websiteUrl),
-        isDisplayed: true,
-        updatedAt: new Date().toISOString(),
-      })
-      .where(eq(sponsors.id, sponsorId));
+    const updates: {
+      displayName: string | null;
+      isAnonymous: boolean;
+      message: string | null;
+      websiteUrl: string | null;
+      logoUrl?: string | null;
+      isDisplayed: boolean;
+      updatedAt: string;
+    } = {
+      displayName: strOrNull(body.displayName),
+      isAnonymous: !!body.isAnonymous,
+      message: strOrNull(body.message),
+      websiteUrl: strOrNull(body.websiteUrl),
+      isDisplayed: true,
+      updatedAt: new Date().toISOString(),
+    };
+    if (body.removeLogo === true) {
+      updates.logoUrl = null;
+    }
+    await db.update(sponsors).set(updates).where(eq(sponsors.id, sponsorId));
 
     return NextResponse.json({ success: true });
   }

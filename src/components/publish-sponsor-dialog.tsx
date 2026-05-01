@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { resolveSponsorDisplayName } from "@/lib/utils";
 import type { Sponsor } from "@/lib/db/schema";
 
@@ -26,6 +27,7 @@ export function PublishSponsorDialog({
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [message, setMessage] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
+  const [removeLogo, setRemoveLogo] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -36,6 +38,7 @@ export function PublishSponsorDialog({
       setIsAnonymous(!!sponsor.isAnonymous);
       setMessage(sponsor.message ?? "");
       setWebsiteUrl(sponsor.websiteUrl ?? "");
+      setRemoveLogo(false);
       setError("");
     }
   }, [sponsor]);
@@ -74,6 +77,7 @@ export function PublishSponsorDialog({
           isAnonymous,
           message: message.trim() || null,
           websiteUrl: websiteUrl.trim() || null,
+          removeLogo,
         }),
       });
       const data = await res.json();
@@ -181,11 +185,48 @@ export function PublishSponsorDialog({
           </div>
         </div>
 
+        {sponsor.logoUrl && !isAnonymous && (
+          <div className="mt-4">
+            <p className="mb-1 text-xs font-medium text-gray-700">Logo</p>
+            {removeLogo ? (
+              <p className="text-xs text-amber-700">
+                Logo will be removed on save.{" "}
+                <button
+                  type="button"
+                  onClick={() => setRemoveLogo(false)}
+                  className="underline-offset-2 hover:underline"
+                >
+                  Undo
+                </button>
+              </p>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setRemoveLogo(true)}
+                className="text-xs text-gray-500 underline-offset-2 hover:text-gray-700 hover:underline"
+              >
+                Remove logo
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3">
           <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500">
             Preview
           </p>
           <div className="rounded border border-gray-200 bg-white p-3">
+            {!isAnonymous && !removeLogo && sponsor.logoUrl && (
+              <div className="mb-2 flex h-16 items-center justify-center">
+                <Image
+                  src={sponsor.logoUrl}
+                  alt={previewName}
+                  width={120}
+                  height={64}
+                  className="max-h-16 w-auto object-contain"
+                />
+              </div>
+            )}
             <p className="text-sm font-bold text-gray-900">{previewName}</p>
             {!isAnonymous && message.trim() && (
               <p className="mt-1 text-xs text-gray-600">{message.trim()}</p>

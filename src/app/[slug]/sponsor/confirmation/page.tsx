@@ -69,6 +69,7 @@ export default async function SponsorConfirmationPage({
               isAnonymous: sponsor.isAnonymous,
               message: sponsor.message,
               websiteUrl: sponsor.websiteUrl,
+              logoUrl: sponsor.logoUrl,
             }}
           />
         )}

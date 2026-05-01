@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { resolveSponsorDisplayName } from "@/lib/utils";
 
 type SponsorInitial = {
@@ -10,12 +11,13 @@ type SponsorInitial = {
   isAnonymous: boolean | null;
   message: string | null;
   websiteUrl: string | null;
+  logoUrl: string | null;
 };
 
 /**
  * Post-payment "How would you like to be credited?" form. Optional —
  * sponsor can leave it blank and accept the defaults. Submits via
- * /api/sponsor/recognition keyed by Stripe Checkout session_id.
+ * /api/sponsor/recognition (multipart/form-data, keyed by session_id).
  */
 export function SponsorRecognitionForm({
   sessionId,
@@ -28,33 +30,81 @@ export function SponsorRecognitionForm({
   const [isAnonymous, setIsAnonymous] = useState(!!initial.isAnonymous);
   const [message, setMessage] = useState(initial.message ?? "");
   const [websiteUrl, setWebsiteUrl] = useState(initial.websiteUrl ?? "");
+  // Logo state: keep the existing URL until the user picks a new file or
+  // explicitly removes. New file shows a local preview before save.
+  const [savedLogoUrl, setSavedLogoUrl] = useState(initial.logoUrl);
+  const [pendingLogoFile, setPendingLogoFile] = useState<File | null>(null);
+  const [pendingLogoPreview, setPendingLogoPreview] = useState<string | null>(
+    null
+  );
+  const [removeLogo, setRemoveLogo] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [error, setError] = useState("");
 
-  // Live preview uses the same resolution rules as the public page
-  const preview = resolveSponsorDisplayName({
+  const previewName = resolveSponsorDisplayName({
     contactName: initial.contactName,
     companyName: initial.companyName,
     displayName: displayName.trim() || null,
     isAnonymous,
   });
 
+  // What logo URL to show in the preview right now
+  const previewLogoUrl =
+    !isAnonymous && !removeLogo
+      ? pendingLogoPreview ?? savedLogoUrl
+      : null;
+
+  function onLogoSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setPendingLogoFile(null);
+      setPendingLogoPreview(null);
+      return;
+    }
+    setError("");
+    setRemoveLogo(false);
+    setPendingLogoFile(file);
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setPendingLogoPreview(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearPendingLogo() {
+    setPendingLogoFile(null);
+    setPendingLogoPreview(null);
+  }
+
+  function requestRemoveLogo() {
+    setRemoveLogo(true);
+    setPendingLogoFile(null);
+    setPendingLogoPreview(null);
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSaving(true);
     setError("");
     try {
+      const fd = new FormData();
+      fd.set("sessionId", sessionId);
+      fd.set("displayName", displayName.trim());
+      fd.set("isAnonymous", isAnonymous ? "true" : "false");
+      fd.set("message", message.trim());
+      fd.set("websiteUrl", websiteUrl.trim());
+      if (removeLogo) {
+        fd.set("removeLogo", "true");
+      } else if (pendingLogoFile) {
+        fd.set("logoFile", pendingLogoFile);
+      }
+
       const res = await fetch("/api/sponsor/recognition", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId,
-          displayName: displayName.trim() || null,
-          isAnonymous,
-          message: message.trim() || null,
-          websiteUrl: websiteUrl.trim() || null,
-        }),
+        body: fd,
       });
       const data = await res.json();
       if (!res.ok) {
@@ -62,6 +112,15 @@ export function SponsorRecognitionForm({
         setSaving(false);
         return;
       }
+      // After save, fold the new state into "saved" baseline
+      if (removeLogo) {
+        setSavedLogoUrl(null);
+      } else if (data.logoUrl) {
+        setSavedLogoUrl(data.logoUrl);
+      }
+      setRemoveLogo(false);
+      setPendingLogoFile(null);
+      setPendingLogoPreview(null);
       setSavedAt(Date.now());
     } catch {
       setError("Something went wrong");
@@ -70,8 +129,13 @@ export function SponsorRecognitionForm({
     }
   }
 
+  const canRemove = !!(savedLogoUrl || pendingLogoPreview) && !removeLogo;
+
   return (
-    <form onSubmit={handleSubmit} className="mt-8 rounded-xl border border-gray-200 bg-white p-6 text-left shadow-sm">
+    <form
+      onSubmit={handleSubmit}
+      className="mt-8 rounded-xl border border-gray-200 bg-white p-6 text-left shadow-sm"
+    >
       <h2 className="mb-1 text-lg font-semibold text-gray-900">
         How would you like to be credited?
       </h2>
@@ -140,9 +204,6 @@ export function SponsorRecognitionForm({
             disabled={isAnonymous}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
           />
-          <p className="mt-1 text-xs text-gray-500">
-            Your name on the sponsors page links here.
-          </p>
         </div>
 
         <div className={isAnonymous ? "pointer-events-none opacity-50" : ""}>
@@ -162,6 +223,75 @@ export function SponsorRecognitionForm({
             className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
           />
         </div>
+
+        <div className={isAnonymous ? "pointer-events-none opacity-50" : ""}>
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+            Logo <span className="text-gray-400">(optional)</span>
+          </label>
+          <div className="flex items-start gap-3">
+            {previewLogoUrl ? (
+              <div className="flex h-16 w-24 shrink-0 items-center justify-center rounded border border-gray-200 bg-white p-1">
+                <Image
+                  src={previewLogoUrl}
+                  alt="Logo preview"
+                  width={96}
+                  height={64}
+                  className="max-h-14 w-auto object-contain"
+                  unoptimized={previewLogoUrl.startsWith("data:")}
+                />
+              </div>
+            ) : (
+              <div className="flex h-16 w-24 shrink-0 items-center justify-center rounded border border-dashed border-gray-300 text-xs text-gray-400">
+                No logo
+              </div>
+            )}
+            <div className="flex-1">
+              <input
+                id="logoFile"
+                type="file"
+                accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
+                onChange={onLogoSelected}
+                disabled={isAnonymous}
+                className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-md file:border-0 file:bg-red-700 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-red-800 disabled:opacity-50"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                PNG, JPG, GIF, WebP, or SVG. Max 2MB.
+              </p>
+              <div className="mt-1 flex gap-3 text-xs">
+                {pendingLogoFile && !removeLogo && (
+                  <button
+                    type="button"
+                    onClick={clearPendingLogo}
+                    className="text-gray-500 underline-offset-2 hover:text-gray-700 hover:underline"
+                  >
+                    Cancel selection
+                  </button>
+                )}
+                {canRemove && (
+                  <button
+                    type="button"
+                    onClick={requestRemoveLogo}
+                    className="text-gray-500 underline-offset-2 hover:text-gray-700 hover:underline"
+                  >
+                    Remove logo
+                  </button>
+                )}
+                {removeLogo && (
+                  <span className="text-amber-700">
+                    Logo will be removed on save.{" "}
+                    <button
+                      type="button"
+                      onClick={() => setRemoveLogo(false)}
+                      className="underline-offset-2 hover:underline"
+                    >
+                      Undo
+                    </button>
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Live preview */}
@@ -170,14 +300,24 @@ export function SponsorRecognitionForm({
           Preview
         </p>
         <div className="rounded border border-gray-200 bg-white p-4">
-          <p className="text-base font-bold text-gray-900">{preview}</p>
+          {previewLogoUrl && (
+            <div className="mb-3 flex h-20 items-center justify-center">
+              <Image
+                src={previewLogoUrl}
+                alt={previewName}
+                width={160}
+                height={80}
+                className="max-h-20 w-auto object-contain"
+                unoptimized={previewLogoUrl.startsWith("data:")}
+              />
+            </div>
+          )}
+          <p className="text-base font-bold text-gray-900">{previewName}</p>
           {!isAnonymous && message.trim() && (
             <p className="mt-1 text-sm text-gray-600">{message.trim()}</p>
           )}
           {!isAnonymous && websiteUrl.trim() && (
-            <p className="mt-1 text-xs text-gray-400">
-              {websiteUrl.trim()}
-            </p>
+            <p className="mt-1 text-xs text-gray-400">{websiteUrl.trim()}</p>
           )}
         </div>
       </div>
