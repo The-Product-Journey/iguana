@@ -354,7 +354,30 @@ export const contactMessages = sqliteTable("contact_messages", {
 });
 
 // ---------------------------------------------------------------------------
-// Reunion admins (per-tenant admin allowlist; super admins live in env var)
+// Super admins (global; can do anything in any reunion, can invite other
+// super admins). Bootstrap row is inserted via `db:seed-super-admins`.
+// ---------------------------------------------------------------------------
+// Email is stored lowercased on insert; unique on email so the same person
+// can't be added twice. clerkUserId is backfilled on first sign-in by that
+// email. invitedByEmail is null only for the system bootstrap row.
+export const superAdmins = sqliteTable(
+  "super_admins",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    email: text("email").notNull(),
+    clerkUserId: text("clerk_user_id"),
+    invitedByEmail: text("invited_by_email"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(datetime('now'))`),
+  },
+  (table) => [uniqueIndex("idx_super_admins_email").on(table.email)]
+);
+
+// ---------------------------------------------------------------------------
+// Reunion admins (per-tenant admin allowlist)
 // ---------------------------------------------------------------------------
 // Email is stored lowercased on insert; (reunionId, email) is unique so the
 // same person can admin multiple reunions via separate rows.
@@ -406,3 +429,5 @@ export type Memorial = typeof memorials.$inferSelect;
 export type NewMemorial = typeof memorials.$inferInsert;
 export type ReunionAdmin = typeof reunionAdmins.$inferSelect;
 export type NewReunionAdmin = typeof reunionAdmins.$inferInsert;
+export type SuperAdmin = typeof superAdmins.$inferSelect;
+export type NewSuperAdmin = typeof superAdmins.$inferInsert;

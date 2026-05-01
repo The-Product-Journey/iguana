@@ -2,8 +2,10 @@
  * Admin auth helpers — two-tier role model on top of Clerk.
  *
  * Tiers
- *   - Super admin: emails listed in env var SUPER_ADMIN_EMAILS (CSV).
- *     Has access to every reunion. Bootstrap path; no DB row required.
+ *   - Super admin: rows in `super_admins` table. Global; can do anything in
+ *     any reunion. Bootstrap row is inserted via `npm run db:seed-super-admins`.
+ *     New super admins are added via the admin UI (only an existing super
+ *     admin can invite another).
  *   - Reunion admin: rows in `reunion_admins` table linking an email to a
  *     specific reunion. Same email may admin multiple reunions via multiple rows.
  *
@@ -25,7 +27,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { reunionAdmins } from "@/lib/db/schema";
+import { reunionAdmins, superAdmins } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export type AdminContext = {
@@ -40,16 +42,28 @@ const FORBIDDEN_RESPONSE = () =>
   NextResponse.json({ error: "forbidden" }, { status: 403 });
 
 /**
- * Membership-test the lowercased email against SUPER_ADMIN_EMAILS.
- * Empty/missing env returns false for everyone (fail-closed).
+ * Does this email have a row in `super_admins`?
+ *
+ * Wrapped in try/catch so a missing table or DB hiccup fails closed instead
+ * of throwing 500s site-wide — same fail-closed pattern as isReunionAdmin.
+ * If the lookup throws (e.g. deploy lands before db:push runs in prod), all
+ * super-admin checks deny but the public site stays up.
  */
-export function isSuperAdmin(email: string | null | undefined): boolean {
+export async function isSuperAdmin(
+  email: string | null | undefined
+): Promise<boolean> {
   if (!email) return false;
-  const list = (process.env.SUPER_ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean);
-  return list.includes(email.toLowerCase());
+  try {
+    const row = await db
+      .select({ id: superAdmins.id })
+      .from(superAdmins)
+      .where(eq(superAdmins.email, email.toLowerCase()))
+      .get();
+    return !!row;
+  } catch (err) {
+    console.error("[admin-auth] isSuperAdmin lookup failed", err);
+    return false;
+  }
 }
 
 /**
@@ -115,9 +129,47 @@ export async function getCurrentAdminContext(): Promise<AdminContext | null> {
   if (!email) return null;
   email = email.toLowerCase();
 
-  const isSuper = isSuperAdmin(email);
+  const [superRow, reunionIds] = await Promise.all([
+    loadSuperAdminRow(email),
+    loadReunionContext(email, userId),
+  ]);
 
-  let reunionIds: string[] = [];
+  // Best-effort backfill of clerkUserId on the super admin row on first
+  // sign-in. Same fail-closed pattern as the reunion-admin backfill.
+  if (superRow && !superRow.clerkUserId) {
+    try {
+      await db
+        .update(superAdmins)
+        .set({ clerkUserId: userId })
+        .where(eq(superAdmins.id, superRow.id));
+    } catch (err) {
+      console.error("[admin-auth] super admin clerkUserId backfill failed", err);
+    }
+  }
+
+  return { userId, email, isSuper: !!superRow, reunionIds };
+}
+
+async function loadSuperAdminRow(
+  email: string
+): Promise<{ id: string; clerkUserId: string | null } | null> {
+  try {
+    const row = await db
+      .select({ id: superAdmins.id, clerkUserId: superAdmins.clerkUserId })
+      .from(superAdmins)
+      .where(eq(superAdmins.email, email))
+      .get();
+    return row ?? null;
+  } catch (err) {
+    console.error("[admin-auth] super_admins lookup failed", err);
+    return null;
+  }
+}
+
+async function loadReunionContext(
+  email: string,
+  userId: string
+): Promise<string[]> {
   try {
     const rows = await db
       .select({
@@ -128,7 +180,6 @@ export async function getCurrentAdminContext(): Promise<AdminContext | null> {
       .from(reunionAdmins)
       .where(eq(reunionAdmins.email, email))
       .all();
-    reunionIds = rows.map((r) => r.reunionId);
 
     // Best-effort backfill of clerkUserId on first sign-in by this email.
     const toBackfill = rows.filter((r) => !r.clerkUserId);
@@ -146,12 +197,12 @@ export async function getCurrentAdminContext(): Promise<AdminContext | null> {
         console.error("[admin-auth] clerkUserId backfill failed", err);
       }
     }
+
+    return rows.map((r) => r.reunionId);
   } catch (err) {
     console.error("[admin-auth] reunion_admins lookup failed", err);
-    reunionIds = [];
+    return [];
   }
-
-  return { userId, email, isSuper, reunionIds };
 }
 
 // ---------------------------------------------------------------------------
