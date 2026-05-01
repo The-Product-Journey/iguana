@@ -6,6 +6,18 @@ import Link from "next/link";
 import { getEffectiveSiteMode } from "@/lib/site-mode";
 import { formatCents } from "@/lib/utils";
 
+// Banner predicate — must match canonical slugs in src/lib/db/seed-events.ts.
+// We trigger the "details finalizing" banner ONLY when one of these four canonical
+// itinerary events has a null eventTime/eventLocation/eventAddress. Extra events
+// added manually by admins are intentionally excluded so they don't trip the banner.
+// Strict null-only contract: never use placeholder strings like "TBD" — use null.
+const ITINERARY_SLUGS = new Set([
+  "friday-tailgate",
+  "friday-bar",
+  "saturday-service",
+  "saturday-banquet",
+]);
+
 export default async function SchedulePage({
   params,
 }: {
@@ -36,6 +48,14 @@ export default async function SchedulePage({
     eventsByDate.set(event.eventDate, existing);
   }
 
+  const detailsFinalizing = reunionEvents.some(
+    (e) =>
+      ITINERARY_SLUGS.has(e.slug) &&
+      (e.eventTime === null ||
+        e.eventLocation === null ||
+        e.eventAddress === null)
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="mx-auto max-w-3xl px-6">
@@ -54,6 +74,13 @@ export default async function SchedulePage({
             A full weekend of reconnecting, celebrating, and giving back.
           </p>
         </div>
+
+        {detailsFinalizing && (
+          <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Details for these events are still being finalized — check back as
+            we lock in the schedule.
+          </div>
+        )}
 
         <div className="space-y-10">
           {Array.from(eventsByDate.entries()).map(([date, dayEvents]) => (
