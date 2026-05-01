@@ -167,17 +167,19 @@ export function InterestForm({
                       return (
                         <div
                           key={event.id}
-                          className="rounded-lg border border-gray-200 p-3"
+                          className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 p-3"
                         >
-                          <div className="text-sm font-medium">{event.name}</div>
-                          <div className="whitespace-pre-line text-xs italic text-gray-500">
-                            {event.tentativeLabel ||
-                              formatTentativeWhen(event.eventDate, event.eventTime)}
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-medium">{event.name}</div>
+                            <div className="whitespace-pre-line text-xs italic text-gray-500">
+                              {event.tentativeLabel ||
+                                formatTentativeWhen(event.eventDate, event.eventTime)}
+                            </div>
                           </div>
                           <div
                             role="radiogroup"
                             aria-label={`${event.name} response`}
-                            className="mt-2 inline-flex overflow-hidden rounded-md border border-gray-300"
+                            className="inline-flex shrink-0 overflow-hidden rounded-md border border-gray-300"
                           >
                             {RESPONSE_OPTIONS.map((opt) => {
                               const active = current === opt.value;
