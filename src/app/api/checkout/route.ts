@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { reunions, rsvps, events, registrationEvents } from "@/lib/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { getStripe, getBaseUrl, Stripe } from "@/lib/stripe";
-import { PLATFORM_APPLICATION_FEE_CENTS } from "@/lib/constants";
+import { computePlatformFeeCents } from "@/lib/constants";
 
 export async function POST(req: NextRequest) {
   try {
@@ -159,6 +159,10 @@ export async function POST(req: NextRequest) {
 
     const baseUrl = getBaseUrl(req);
 
+    // Platform fee is computed from the customer's total charge
+    // (registration + optional cover-fees donation).
+    const totalChargeCents = totalCents + safeDonation;
+
     const session = await getStripe().checkout.sessions.create({
       mode: "payment",
       line_items: lineItems,
@@ -167,11 +171,11 @@ export async function POST(req: NextRequest) {
           destination: reunion.stripeConnectedAccountId!,
         },
         on_behalf_of: reunion.stripeConnectedAccountId!,
-        // Platform skim. on_behalf_of also makes Stripe processing fees
-        // come out of the connected account's balance, so the connected
-        // account ends up with (charge - PLATFORM_APPLICATION_FEE_CENTS
-        // - Stripe processing fee).
-        application_fee_amount: PLATFORM_APPLICATION_FEE_CENTS,
+        // Platform fee = fixed + percent component. on_behalf_of also makes
+        // Stripe processing fees come out of the connected account, so the
+        // connected account ends up with
+        //   (charge - platform fee - Stripe processing fee).
+        application_fee_amount: computePlatformFeeCents(totalChargeCents),
       },
       success_url: `${baseUrl}/${reunion.slug}/confirmation?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/${reunion.slug}/rsvp?cancelled=true`,

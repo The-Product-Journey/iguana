@@ -53,18 +53,35 @@ One endpoint, one signing secret (`STRIPE_WEBHOOK_SECRET`), handles both platfor
 - Attendee/sponsor pays → Stripe Checkout Session with `transfer_data.destination`,
   `on_behalf_of`, and `application_fee_amount` set
 - Charge amount transfers to the connected account, **minus** the platform
-  application fee (`PLATFORM_APPLICATION_FEE_CENTS` in `src/lib/constants.ts`,
-  currently $2)
+  application fee (computed by `computePlatformFeeCents()` in
+  `src/lib/constants.ts`)
 - Because `on_behalf_of: connectedAccountId` is set, Stripe processing fees
   (~2.9% + $0.30) are debited from the **connected account's** balance, not
   the platform's
-- Net result on a $25 sponsor donation:
-  - Customer pays: $25.00
-  - Platform receives: $2.00 (application fee)
-  - Stripe processing fees: ~$1.03 (debited from connected account)
-  - Connected account net: ~$21.97
-- To remove the platform fee entirely, set `PLATFORM_APPLICATION_FEE_CENTS = 0`
-  in `src/lib/constants.ts`. To raise it, change the same constant.
+
+### Platform fee structure
+
+Two components, both billable on every charge:
+
+```ts
+PLATFORM_FIXED_FEE_CENTS = 100   // $1.00 flat
+PLATFORM_PERCENT_FEE = 1         // 1% of charge
+// total fee = PLATFORM_FIXED_FEE_CENTS + round(charge * PLATFORM_PERCENT_FEE / 100)
+```
+
+Set either to 0 to disable that component. In production you'll likely
+pick one or the other; both are wired so we can experiment.
+
+### Example: $25 sponsor donation (with $1 fixed + 1% percent)
+
+```
+Customer pays:               $25.00
+Platform fixed fee:          $1.00
+Platform percent fee (1%):   $0.25
+Platform receives total:     $1.25
+Stripe processing fees:      ~$1.03   (debited from connected account)
+Connected account net:       ~$22.72
+```
 
 ## 6. Charges vs Payouts Timing
 
