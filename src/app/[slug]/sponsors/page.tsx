@@ -160,15 +160,17 @@ export default async function SponsorsPage({
           </>
         )}
 
-        {/* CTA */}
-        <div className="mt-12 text-center">
-          <Link
-            href={`/${slug}/sponsor`}
-            className="inline-block rounded-full bg-red-700 px-6 py-2 font-semibold text-white transition hover:bg-red-800"
-          >
-            Become a Sponsor
-          </Link>
-        </div>
+        {/* Bottom CTA — hidden when the empty state already provides one */}
+        {allSponsors.length > 0 && (
+          <div className="mt-12 text-center">
+            <Link
+              href={`/${slug}/sponsor`}
+              className="inline-block rounded-full bg-red-700 px-6 py-2 font-semibold text-white transition hover:bg-red-800"
+            >
+              Become a Sponsor
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
