@@ -12,6 +12,7 @@ import {
   eventInterests,
 } from "./schema";
 import { wipeTestTenant, loadProdShell, TEST_REUNION_SLUG } from "./test-tenant";
+import { CANONICAL_EVENTS } from "./canonical-events";
 
 async function seedTest() {
   const client = createClient({
@@ -61,65 +62,23 @@ async function seedTest() {
 
   console.log("Created test reunion (mirroring prod shell)");
 
-  // Create events (same as production)
-  const eventValues = [
-    {
-      reunionId: reunion.id,
-      name: "Friday Night Tailgate",
-      slug: "friday-tailgate",
-      description:
-        "Tailgate at Park Hill High School for the football home opener. Food truck on site. Simple cover charge at the gate.",
-      eventDate: "2026-08-28",
-      eventTime: "5:00 PM",
-      eventLocation: "Park Hill High School",
-      eventAddress: "7701 NW Barry Rd, Kansas City, MO 64153",
-      type: "interest_only" as const,
-      sortOrder: 1,
-    },
-    {
-      reunionId: reunion.id,
-      name: "Friday Night at Kelly Barges",
-      slug: "friday-bar",
-      description:
-        "Live band, streaming of the Park Hill football game, and good times. Drinks and food on your own tab.",
-      eventDate: "2026-08-28",
-      eventTime: "8:00 PM",
-      eventLocation: "Kelly Barges",
-      eventAddress: "Platte Woods, MO",
-      type: "interest_only" as const,
-      sortOrder: 2,
-    },
-    {
-      reunionId: reunion.id,
-      name: "Saturday Community Service — 96 Backpacks",
-      slug: "saturday-service",
-      description:
-        "Give back to the Park Hill community. We're partnering with Replenish KC to fill 96 backpacks of school supplies for Park Hill students.",
-      eventDate: "2026-08-29",
-      // null fields trigger the "details finalizing" banner — keep in sync with seed-events.ts
-      eventTime: null,
-      eventLocation: null,
-      eventAddress: null,
-      type: "interest_only" as const,
-      sortOrder: 3,
-    },
-    {
-      reunionId: reunion.id,
-      name: "Saturday Evening Banquet",
-      slug: "saturday-banquet",
-      description:
-        "The main event! Dinner, drinks, and an evening of reconnecting with your fellow Trojans at The Olde Mill in Parkville.",
-      eventDate: "2026-08-29",
-      eventTime: "6:00 PM",
-      eventLocation: "The Olde Mill",
-      eventAddress: "Parkville, MO",
-      type: "paid" as const,
-      priceCents: 9876,
-      earlyPriceCents: 7500,
-      earlyPriceDeadline: "2026-07-01",
-      sortOrder: 4,
-    },
-  ];
+  // Events use the shared canonical seed so prod and test stay in sync.
+  const eventValues = CANONICAL_EVENTS.map((e) => ({
+    reunionId: reunion.id,
+    name: e.name,
+    slug: e.slug,
+    description: e.description,
+    eventDate: e.eventDate,
+    eventTime: e.eventTime,
+    eventLocation: e.eventLocation,
+    eventAddress: e.eventAddress,
+    tentativeLabel: e.tentativeLabel,
+    type: e.type,
+    priceCents: e.priceCents ?? null,
+    earlyPriceCents: e.earlyPriceCents ?? null,
+    earlyPriceDeadline: e.earlyPriceDeadline ?? null,
+    sortOrder: e.sortOrder,
+  }));
 
   const createdEvents = await db.insert(events).values(eventValues).returning();
   console.log(`Created ${createdEvents.length} events`);

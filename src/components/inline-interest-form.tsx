@@ -147,7 +147,8 @@ export function InlineInterestForm({
                 <div>
                   <div className="text-sm font-medium">{event.name}</div>
                   <div className="text-xs text-gray-500">
-                    {formatTentativeWhen(event.eventDate, event.eventTime)}
+                    {event.tentativeLabel ||
+                      formatTentativeWhen(event.eventDate, event.eventTime)}
                   </div>
                 </div>
               </label>

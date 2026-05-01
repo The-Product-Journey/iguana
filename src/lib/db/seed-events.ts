@@ -7,88 +7,9 @@ import {
   registrationEvents,
   eventInterests,
 } from "./schema";
+import { CANONICAL_EVENTS, ITINERARY_SLUGS } from "./canonical-events";
 
 const REUNION_SLUG = "phhs-1996";
-
-// Canonical itinerary slugs — must match ITINERARY_SLUGS in src/app/[slug]/schedule/page.tsx
-const ITINERARY_SLUGS = [
-  "friday-tailgate",
-  "friday-bar",
-  "saturday-service",
-  "saturday-banquet",
-] as const;
-
-type EventSeed = {
-  slug: (typeof ITINERARY_SLUGS)[number];
-  name: string;
-  description: string;
-  eventDate: string;
-  eventTime: string | null;
-  eventLocation: string | null;
-  eventAddress: string | null;
-  type: "interest_only" | "paid";
-  priceCents?: number;
-  earlyPriceCents?: number;
-  earlyPriceDeadline?: string;
-  sortOrder: number;
-};
-
-// Strict content rule: any field that is not yet confirmed (eventTime, eventLocation,
-// eventAddress) must be `null` — never "TBD" or other placeholder text. The schedule
-// banner detects null fields, not strings.
-const EVENT_SEEDS: EventSeed[] = [
-  {
-    slug: "friday-tailgate",
-    name: "Friday Night Tailgate",
-    description:
-      "Tailgate at Park Hill High School for the football home opener. Food truck on site. Simple cover charge at the gate.",
-    eventDate: "2026-08-28",
-    eventTime: "5:00 PM",
-    eventLocation: "Park Hill High School",
-    eventAddress: "7701 NW Barry Rd, Kansas City, MO 64153",
-    type: "interest_only",
-    sortOrder: 1,
-  },
-  {
-    slug: "friday-bar",
-    name: "Friday Night at Kelly Barges",
-    description:
-      "Live band, streaming of the Park Hill football game, and good times. Drinks and food on your own tab.",
-    eventDate: "2026-08-28",
-    eventTime: "8:00 PM",
-    eventLocation: "Kelly Barges",
-    eventAddress: "Platte Woods, MO",
-    type: "interest_only",
-    sortOrder: 2,
-  },
-  {
-    slug: "saturday-service",
-    name: "Saturday Community Service — 96 Backpacks",
-    description:
-      "Give back to the Park Hill community. We're partnering with Replenish KC to fill 96 backpacks of school supplies for Park Hill students.",
-    eventDate: "2026-08-29",
-    eventTime: null,
-    eventLocation: null,
-    eventAddress: null,
-    type: "interest_only",
-    sortOrder: 3,
-  },
-  {
-    slug: "saturday-banquet",
-    name: "Saturday Evening Banquet",
-    description:
-      "The main event! Dinner, drinks, and an evening of reconnecting with your fellow Trojans at The Olde Mill in Parkville.",
-    eventDate: "2026-08-29",
-    eventTime: "6:00 PM",
-    eventLocation: "The Olde Mill",
-    eventAddress: "Parkville, MO",
-    type: "paid",
-    priceCents: 9876,
-    earlyPriceCents: 7500,
-    earlyPriceDeadline: "2026-07-01",
-    sortOrder: 4,
-  },
-];
 
 async function seedEvents() {
   const client = createClient({
@@ -149,7 +70,7 @@ async function seedEvents() {
     // Wrap mutations in a transaction so a mid-run failure leaves the schedule intact
     await db.transaction(async (tx) => {
       // (a) Upsert canonical events
-      for (const seed of EVENT_SEEDS) {
+      for (const seed of CANONICAL_EVENTS) {
         const found = existingBySlug.get(seed.slug);
         const values = {
           reunionId: reunion.id,
@@ -160,6 +81,7 @@ async function seedEvents() {
           eventTime: seed.eventTime,
           eventLocation: seed.eventLocation,
           eventAddress: seed.eventAddress,
+          tentativeLabel: seed.tentativeLabel,
           type: seed.type,
           priceCents: seed.priceCents ?? null,
           earlyPriceCents: seed.earlyPriceCents ?? null,

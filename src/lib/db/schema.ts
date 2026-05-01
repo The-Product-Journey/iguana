@@ -74,6 +74,11 @@ export const events = sqliteTable("events", {
   type: text("type", { enum: ["interest_only", "paid"] })
     .notNull()
     .default("interest_only"),
+  // Optional human-friendly tentative timeframe label (e.g. "Friday, time
+  // is TBD", "Saturday Morning - TBD"). Used on interest/registration forms
+  // when exact details aren't locked yet. Independent of eventTime — the
+  // schedule page uses eventTime; informal forms prefer this when present.
+  tentativeLabel: text("tentative_label"),
   priceCents: integer("price_cents"),
   earlyPriceCents: integer("early_price_cents"),
   earlyPriceDeadline: text("early_price_deadline"),
