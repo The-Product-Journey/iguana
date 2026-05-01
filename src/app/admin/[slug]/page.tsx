@@ -155,6 +155,11 @@ export default async function AdminReunionPage({
 
       <div className="mb-4 flex items-center gap-2">
         <h2 className="text-2xl font-bold">{reunion.name}</h2>
+        {slug.endsWith("-test") && (
+          <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-amber-800">
+            Test
+          </span>
+        )}
         <a
           href={`/${slug}`}
           target="_blank"

@@ -50,6 +50,11 @@ export default async function AdminDashboard() {
                 >
                   {reunion.name}
                 </Link>
+                {reunion.slug.endsWith("-test") && (
+                  <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-800">
+                    Test
+                  </span>
+                )}
                 <a
                   href={`/${reunion.slug}`}
                   target="_blank"
