@@ -27,12 +27,20 @@ export default async function SuperAdminPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-2xl font-bold">Super Admin</h2>
-        <Link
-          href="/admin/super/admins"
-          className="rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800"
-        >
-          Manage admins →
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/super/new-reunion"
+            className="rounded-lg border border-red-700 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
+          >
+            + New reunion
+          </Link>
+          <Link
+            href="/admin/super/admins"
+            className="rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800"
+          >
+            Manage admins →
+          </Link>
+        </div>
       </div>
 
       <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
