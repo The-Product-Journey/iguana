@@ -314,17 +314,25 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <button
-                    onClick={() => toggleDisplay(s.id)}
-                    disabled={toggling === s.id}
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                  <label
+                    className="inline-flex cursor-pointer items-center gap-2"
+                    title={
                       s.isDisplayed
-                        ? "bg-green-100 text-green-700 hover:bg-green-200"
-                        : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                    }`}
+                        ? "Visible on public sponsors page"
+                        : "Hidden from public sponsors page"
+                    }
                   >
-                    {s.isDisplayed ? "Shown" : "Hidden"}
-                  </button>
+                    <input
+                      type="checkbox"
+                      checked={s.isDisplayed}
+                      onChange={() => toggleDisplay(s.id)}
+                      disabled={toggling === s.id}
+                      className="h-4 w-4 rounded border-gray-300 accent-red-700 focus:ring-red-500 disabled:opacity-50"
+                    />
+                    <span className="text-xs text-gray-600">
+                      {s.isDisplayed ? "Shown" : "Hidden"}
+                    </span>
+                  </label>
                 </td>
               </tr>
             ))
