@@ -33,6 +33,15 @@ export default async function ReunionPage({
       .where(eq(events.reunionId, reunion.id))
       .orderBy(asc(events.sortOrder));
 
+    // Show the AdminMenu inside TeaseLanding only when no banner is also
+    // showing (i.e., previewing the same mode as actual, or no preview).
+    // If the admin is previewing tease while actual is something else,
+    // the AdminPreviewBanner above will own the menu.
+    const showAdminMenu =
+      previewState.isAdmin &&
+      (previewState.previewMode === null ||
+        previewState.previewMode === previewState.actualMode);
+
     return (
       <TeaseLanding
         reunion={{
@@ -44,6 +53,9 @@ export default async function ReunionPage({
         }}
         events={reunionEvents}
         isAdmin={previewState.isAdmin}
+        showAdminMenu={showAdminMenu}
+        previewMode={previewState.previewMode}
+        actualMode={previewState.actualMode}
       />
     );
   }

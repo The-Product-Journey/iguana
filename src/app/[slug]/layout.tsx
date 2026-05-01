@@ -29,11 +29,20 @@ export default async function ReunionLayout({
   // Don't show nav on tease mode landing (it has its own design)
   const showNav = effectiveMode !== "tease";
 
+  // Banner shows only when admin is actively previewing a mode that differs
+  // from what the public sees. Otherwise no ribbon — the page renders against
+  // its own background and the AdminMenu (rendered inside SiteNav or
+  // TeaseLanding) is the admin's control surface.
+  const showPreviewBanner =
+    previewState.isAdmin &&
+    previewState.previewMode !== null &&
+    previewState.previewMode !== previewState.actualMode;
+
   return (
     <>
-      {previewState.isAdmin && (
+      {showPreviewBanner && (
         <AdminPreviewBanner
-          previewMode={previewState.previewMode}
+          previewMode={previewState.previewMode!}
           actualMode={previewState.actualMode}
         />
       )}
@@ -43,6 +52,9 @@ export default async function ReunionLayout({
           reunionName={reunion.name}
           siteMode={effectiveMode}
           isAdmin={previewState.isAdmin}
+          previewMode={previewState.previewMode}
+          actualMode={previewState.actualMode}
+          showAdminMenu={previewState.isAdmin && !showPreviewBanner}
         />
       )}
       {children}

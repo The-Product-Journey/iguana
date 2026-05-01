@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { InterestForm } from "@/components/interest-form";
+import { AdminMenu } from "@/components/admin-menu";
 import type { Event } from "@/lib/db/schema";
+
+type SiteMode = "tease" | "pre_register" | "open";
 
 function useCountdown(targetDate: string) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -30,10 +33,17 @@ export function TeaseLanding({
   reunion,
   events,
   isAdmin,
+  showAdminMenu,
+  previewMode,
+  actualMode,
 }: {
   reunion: { id: string; slug: string; name: string; description: string | null; eventDate: string };
   events: Event[];
   isAdmin?: boolean;
+  /** Render the AdminMenu (true when admin is logged in and no preview banner is showing). */
+  showAdminMenu?: boolean;
+  previewMode?: SiteMode | null;
+  actualMode?: SiteMode;
 }) {
   const [showInterest, setShowInterest] = useState(false);
   const countdown = useCountdown(reunion.eventDate);
@@ -47,6 +57,15 @@ export function TeaseLanding({
         >
           Admin login
         </a>
+      )}
+      {showAdminMenu && actualMode && (
+        <div className="absolute right-4 top-3 z-30">
+          <AdminMenu
+            actualMode={actualMode}
+            previewMode={previewMode ?? null}
+            variant="dark"
+          />
+        </div>
       )}
       <div className="mx-auto max-w-3xl px-6 py-20 text-center">
         {/* Header */}

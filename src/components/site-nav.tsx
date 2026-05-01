@@ -2,15 +2,32 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { AdminMenu } from "./admin-menu";
+
+type SiteMode = "tease" | "pre_register" | "open";
 
 type NavProps = {
   slug: string;
   reunionName: string;
   siteMode: string;
   isAdmin?: boolean;
+  /** Render the AdminMenu in this nav (true when no preview banner is showing). */
+  showAdminMenu?: boolean;
+  /** Current preview override, or null if none. */
+  previewMode?: SiteMode | null;
+  /** Actual DB siteMode (what the public sees). */
+  actualMode?: SiteMode;
 };
 
-export function SiteNav({ slug, reunionName, siteMode, isAdmin }: NavProps) {
+export function SiteNav({
+  slug,
+  reunionName,
+  siteMode,
+  isAdmin,
+  showAdminMenu,
+  previewMode,
+  actualMode,
+}: NavProps) {
   const [open, setOpen] = useState(false);
 
   const links: { label: string; href: string; modes: string[] }[] = [
@@ -60,6 +77,13 @@ export function SiteNav({ slug, reunionName, siteMode, isAdmin }: NavProps) {
             >
               Admin login
             </Link>
+          )}
+          {showAdminMenu && actualMode && (
+            <AdminMenu
+              actualMode={actualMode}
+              previewMode={previewMode ?? null}
+              variant="light"
+            />
           )}
         </div>
 
