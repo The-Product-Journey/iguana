@@ -220,6 +220,7 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
 
 function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
   const [toggling, setToggling] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState<string | null>(null);
 
   async function toggleDisplay(sponsorId: string) {
     setToggling(sponsorId);
@@ -229,6 +230,27 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
       body: JSON.stringify({ sponsorId, action: "toggleDisplay" }),
     });
     window.location.reload();
+  }
+
+  async function refreshFromStripe(sponsorId: string) {
+    setRefreshing(sponsorId);
+    try {
+      const res = await fetch("/api/admin/sponsors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sponsorId, action: "refreshFromStripe" }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Failed to sync from Stripe");
+        setRefreshing(null);
+        return;
+      }
+      window.location.reload();
+    } catch {
+      alert("Something went wrong syncing from Stripe");
+      setRefreshing(null);
+    }
   }
 
   return (
@@ -273,7 +295,19 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <StatusBadge status={s.paymentStatus} />
+                  <div className="flex items-center gap-2">
+                    <StatusBadge status={s.paymentStatus} />
+                    {s.stripeCheckoutSessionId && (
+                      <button
+                        onClick={() => refreshFromStripe(s.id)}
+                        disabled={refreshing === s.id}
+                        title="Sync payment status from Stripe"
+                        className="rounded border border-gray-300 px-2 py-0.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        {refreshing === s.id ? "Syncing…" : "Refresh"}
+                      </button>
+                    )}
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <button
