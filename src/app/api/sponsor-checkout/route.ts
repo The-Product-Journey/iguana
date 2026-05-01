@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { reunions, sponsors } from "@/lib/db/schema";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, getBaseUrl } from "@/lib/stripe";
 import { getSponsorTier } from "@/lib/constants";
 import { uploadImage } from "@/lib/upload";
 
@@ -99,8 +99,8 @@ export async function POST(req: NextRequest) {
         on_behalf_of: reunion.stripeConnectedAccountId!,
       },
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/${reunion.slug}/sponsor/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/${reunion.slug}/sponsor`,
+      success_url: `${getBaseUrl(req)}/${reunion.slug}/sponsor/confirmation?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${getBaseUrl(req)}/${reunion.slug}/sponsor`,
       customer_email: contactEmail,
       metadata: {
         sponsor_id: sponsor.id,

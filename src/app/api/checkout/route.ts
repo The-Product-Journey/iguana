@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { reunions, rsvps, events, registrationEvents } from "@/lib/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
-import { getStripe, Stripe } from "@/lib/stripe";
+import { getStripe, getBaseUrl, Stripe } from "@/lib/stripe";
 
 export async function POST(req: NextRequest) {
   try {
@@ -156,8 +156,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const baseUrl = getBaseUrl(req);
 
     const session = await getStripe().checkout.sessions.create({
       mode: "payment",

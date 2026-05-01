@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, getBaseUrl } from "@/lib/stripe";
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
     const stripe = getStripe();
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
+    const baseUrl = getBaseUrl(req);
     const isProduction = baseUrl.startsWith("https://");
 
     const account = await stripe.accounts.create({
