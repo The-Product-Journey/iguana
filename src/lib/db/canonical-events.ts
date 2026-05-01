@@ -56,7 +56,7 @@ export const CANONICAL_EVENTS: CanonicalEvent[] = [
     eventTime: null,
     eventLocation: "Kelly Barges",
     eventAddress: "Platte Woods, MO",
-    tentativeLabel: "Local Establishment (a la carte) - TBD",
+    tentativeLabel: "Local Establishment - TBD\nDrinks & food on your own",
     type: "interest_only",
     sortOrder: 2,
   },

@@ -149,7 +149,7 @@ export function InlineInterestForm({
       {events.length > 0 && (
         <div>
           <p className="mb-2 text-sm font-medium text-gray-700">
-            Which events are you in for?
+            Which events are you interest in attending?
           </p>
           <div className="space-y-2">
             {events.map((event) => {
