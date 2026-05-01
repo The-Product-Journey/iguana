@@ -74,20 +74,47 @@ async function loadProdShell(db: Db): Promise<Shell> {
   };
 }
 
+export type StripeLinkage = {
+  stripeConnectedAccountId: string;
+  stripeConnectOnboardingComplete: boolean;
+  stripeConnectChargesEnabled: boolean;
+  stripeConnectPayoutsEnabled: boolean;
+};
+
 /**
  * Wipe everything for the test tenant — all dependent rows and the reunion
  * record itself. Safe to call when the test reunion does not exist.
+ *
+ * `options.preserveStripe` (default false): when true, capture the existing
+ * reunion's Stripe Connect linkage and return it so the caller can re-apply
+ * it on a freshly-created reunion. Used by `seed-test` so a data refresh
+ * doesn't force the admin to re-do Stripe onboarding.
  */
-export async function wipeTestTenant(db: Db): Promise<void> {
+export async function wipeTestTenant(
+  db: Db,
+  options: { preserveStripe?: boolean } = {}
+): Promise<StripeLinkage | null> {
   const existing = await db
     .select()
     .from(reunions)
     .where(eq(reunions.slug, TEST_REUNION_SLUG))
     .get();
 
-  if (!existing) return;
+  if (!existing) return null;
 
   const reunionId = existing.id;
+  const captured: StripeLinkage | null =
+    options.preserveStripe && existing.stripeConnectedAccountId
+      ? {
+          stripeConnectedAccountId: existing.stripeConnectedAccountId,
+          stripeConnectOnboardingComplete:
+            !!existing.stripeConnectOnboardingComplete,
+          stripeConnectChargesEnabled:
+            !!existing.stripeConnectChargesEnabled,
+          stripeConnectPayoutsEnabled:
+            !!existing.stripeConnectPayoutsEnabled,
+        }
+      : null;
 
   const existingRsvps = await db
     .select({ id: rsvps.id })
@@ -124,17 +151,23 @@ export async function wipeTestTenant(db: Db): Promise<void> {
     .where(eq(contactMessages.reunionId, reunionId));
   await db.delete(events).where(eq(events.reunionId, reunionId));
   await db.delete(reunions).where(eq(reunions.id, reunionId));
+
+  return captured;
 }
 
 /**
  * Create a bare empty test reunion — what an admin would see right after
- * creating a fresh tenant. No events, no Stripe Connect, siteMode=tease.
- * The admin can then walk through onboarding (toggle modes, add events,
- * connect Stripe, etc.) to test that flow end-to-end.
+ * creating a fresh tenant. No events, siteMode=tease. The shell mirrors
+ * prod so the public site renders identically.
  *
- * The shell mirrors prod so the public site renders identically.
+ * Pass `stripeLinkage` to pre-attach an existing Stripe connected account
+ * (used by `seed-test` to preserve linkage across data wipes so admins
+ * don't have to redo Stripe onboarding).
  */
-export async function createBareTestReunion(db: Db) {
+export async function createBareTestReunion(
+  db: Db,
+  stripeLinkage?: StripeLinkage | null
+) {
   const shell = await loadProdShell(db);
   const [reunion] = await db
     .insert(reunions)
@@ -143,6 +176,13 @@ export async function createBareTestReunion(db: Db) {
       ...shell,
       registrationOpen: false,
       siteMode: "tease",
+      stripeConnectedAccountId: stripeLinkage?.stripeConnectedAccountId ?? null,
+      stripeConnectOnboardingComplete:
+        stripeLinkage?.stripeConnectOnboardingComplete ?? false,
+      stripeConnectChargesEnabled:
+        stripeLinkage?.stripeConnectChargesEnabled ?? false,
+      stripeConnectPayoutsEnabled:
+        stripeLinkage?.stripeConnectPayoutsEnabled ?? false,
     })
     .returning();
   return reunion;

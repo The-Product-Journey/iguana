@@ -22,13 +22,21 @@ async function seedTest() {
 
   // Wipe-and-re-seed: re-running this script gives a clean baseline. No
   // --force flag — this is the test tenant; that's the whole point.
-  console.log(`Wiping any existing test tenant data…`);
-  await wipeTestTenant(db);
+  // PRESERVE Stripe Connect linkage across the wipe so admins don't have to
+  // re-do Stripe onboarding every time they refresh sample data. Use
+  // `npm run db:wipe-test` for the nuclear option that also clears Stripe.
+  console.log(`Wiping any existing test tenant data (preserving Stripe Connect)…`);
+  const stripeLinkage = await wipeTestTenant(db, { preserveStripe: true });
+  if (stripeLinkage) {
+    console.log(
+      `Preserved Stripe linkage: ${stripeLinkage.stripeConnectedAccountId}`
+    );
+  }
 
   // Test reunion mirrors prod's shell (name, description, event metadata) so
   // the public site renders identically — no "TEST" labels visible. Only the
-  // siteMode/registrationOpen state and the sample data below are
-  // test-specific.
+  // siteMode/registrationOpen state, the Stripe linkage we just preserved,
+  // and the sample data below are test-specific.
   const shell = await loadProdShell(db);
   const [reunion] = await db
     .insert(reunions)
@@ -37,6 +45,13 @@ async function seedTest() {
       ...shell,
       registrationOpen: true,
       siteMode: "open",
+      stripeConnectedAccountId: stripeLinkage?.stripeConnectedAccountId ?? null,
+      stripeConnectOnboardingComplete:
+        stripeLinkage?.stripeConnectOnboardingComplete ?? false,
+      stripeConnectChargesEnabled:
+        stripeLinkage?.stripeConnectChargesEnabled ?? false,
+      stripeConnectPayoutsEnabled:
+        stripeLinkage?.stripeConnectPayoutsEnabled ?? false,
     })
     .returning();
 
