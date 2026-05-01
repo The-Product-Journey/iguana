@@ -224,7 +224,12 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
   const [toggling, setToggling] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<string | null>(null);
 
-  async function toggleDisplay(sponsorId: string) {
+  async function toggleDisplay(sponsorId: string, currentlyDisplayed: boolean) {
+    const confirmMessage = currentlyDisplayed
+      ? "Unpublish this sponsor? They won't be shown on the public sponsors page until republished."
+      : "Publish this sponsor to the public sponsors page?";
+    if (!window.confirm(confirmMessage)) return;
+
     setToggling(sponsorId);
     await fetch("/api/admin/sponsors", {
       method: "POST",
@@ -267,7 +272,7 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
             <th className="px-4 py-3 font-medium text-gray-700">Amount</th>
             <th className="px-4 py-3 font-medium text-gray-700">Tier</th>
             <th className="px-4 py-3 font-medium text-gray-700">Status</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Display</th>
+            <th className="px-4 py-3 font-medium text-gray-700">Visibility</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
@@ -314,25 +319,18 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <label
-                    className="inline-flex cursor-pointer items-center gap-2"
+                  <button
+                    onClick={() => toggleDisplay(s.id, s.isDisplayed)}
+                    disabled={toggling === s.id}
                     title={
                       s.isDisplayed
-                        ? "Visible on public sponsors page"
-                        : "Hidden from public sponsors page"
+                        ? "Currently published — click to unpublish"
+                        : "Currently a draft — click to publish to the public site"
                     }
+                    className="text-sm text-red-700 underline-offset-2 hover:text-red-800 hover:underline disabled:opacity-50"
                   >
-                    <input
-                      type="checkbox"
-                      checked={s.isDisplayed}
-                      onChange={() => toggleDisplay(s.id)}
-                      disabled={toggling === s.id}
-                      className="h-4 w-4 rounded border-gray-300 accent-red-700 focus:ring-red-500 disabled:opacity-50"
-                    />
-                    <span className="text-xs text-gray-600">
-                      {s.isDisplayed ? "Shown" : "Hidden"}
-                    </span>
-                  </label>
+                    {s.isDisplayed ? "Unpublish" : "Publish"}
+                  </button>
                 </td>
               </tr>
             ))
