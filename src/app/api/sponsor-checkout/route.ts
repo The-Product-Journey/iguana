@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { reunions, sponsors } from "@/lib/db/schema";
 import { getStripe, getBaseUrl } from "@/lib/stripe";
-import { getSponsorTier, computePlatformFeeCents } from "@/lib/constants";
+import { getSponsorTier, computeApplicationFeeCents } from "@/lib/constants";
 import { uploadImage } from "@/lib/upload";
 
 export async function POST(req: NextRequest) {
@@ -97,11 +97,12 @@ export async function POST(req: NextRequest) {
           destination: reunion.stripeConnectedAccountId!,
         },
         on_behalf_of: reunion.stripeConnectedAccountId!,
-        // Platform fee = fixed + percent component. on_behalf_of also makes
-        // Stripe processing fees come out of the connected account, so the
-        // connected account ends up with
-        //   (amountCents - platform fee - Stripe processing fee).
-        application_fee_amount: computePlatformFeeCents(amountCents),
+        // application_fee_amount = platform's intended cut + estimated
+        // Stripe processing fee. Stripe debits the actual processing fee
+        // from the platform balance, so this gross amount lets us recoup
+        // the Stripe fee and keep our net platform fee. Connected account
+        // ends up with (amountCents - application_fee_amount).
+        application_fee_amount: computeApplicationFeeCents(amountCents),
       },
       mode: "payment",
       success_url: `${getBaseUrl(req)}/${reunion.slug}/sponsor/confirmation?session_id={CHECKOUT_SESSION_ID}`,

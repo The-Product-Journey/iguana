@@ -44,8 +44,9 @@ export const PLATFORM_PERCENT_FEE = 1; // 1%
 export const PLATFORM_MAX_FEE_PERCENT = 10;
 
 /**
- * Total platform application fee for a given charge amount, in cents.
- * `application_fee_amount` parameter on the Stripe Checkout Session.
+ * Net platform fee — what we want to keep after Stripe takes its cut.
+ * This is NOT what we pass to Stripe as `application_fee_amount`. See
+ * `computeApplicationFeeCents()` below for the gross amount.
  */
 export function computePlatformFeeCents(chargeAmountCents: number): number {
   const percent = Math.round((chargeAmountCents * PLATFORM_PERCENT_FEE) / 100);
@@ -60,4 +61,44 @@ export function computePlatformFeeCents(chargeAmountCents: number): number {
     return cap;
   }
   return computed;
+}
+
+/**
+ * Estimated Stripe processing fee for a US-based card charge: 2.9% + $0.30.
+ *
+ * In our destination-charge setup with `on_behalf_of` set, Stripe fees are
+ * still debited from the **platform** balance by default for Express accounts
+ * (the on_behalf_of parameter affects merchant-of-record presentment, not
+ * fee payer). To make the connected account effectively bear the fee, we
+ * add this estimate to `application_fee_amount` so the platform recoups
+ * what it's about to pay Stripe.
+ *
+ * Estimate is approximate — international cards, 3D Secure surcharges,
+ * dispute handling can push the actual fee higher; ACH (not used here)
+ * would be lower. Variance is absorbed by the platform.
+ */
+const STRIPE_FEE_FIXED_CENTS = 30;
+const STRIPE_FEE_BPS = 290; // 2.9%
+
+export function computeStripeFeeEstimateCents(
+  chargeAmountCents: number
+): number {
+  return (
+    STRIPE_FEE_FIXED_CENTS +
+    Math.round((chargeAmountCents * STRIPE_FEE_BPS) / 10000)
+  );
+}
+
+/**
+ * Gross application fee passed to Stripe as `application_fee_amount`.
+ * Platform's intended take + estimated Stripe fee that the platform is
+ * about to absorb. After Stripe debits the actual processing fee from
+ * the platform balance, the platform's net keep is approximately
+ * `computePlatformFeeCents(charge)`.
+ */
+export function computeApplicationFeeCents(chargeAmountCents: number): number {
+  return (
+    computePlatformFeeCents(chargeAmountCents) +
+    computeStripeFeeEstimateCents(chargeAmountCents)
+  );
 }

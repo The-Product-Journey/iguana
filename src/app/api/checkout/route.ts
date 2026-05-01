@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { reunions, rsvps, events, registrationEvents } from "@/lib/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { getStripe, getBaseUrl, Stripe } from "@/lib/stripe";
-import { computePlatformFeeCents } from "@/lib/constants";
+import { computeApplicationFeeCents } from "@/lib/constants";
 
 export async function POST(req: NextRequest) {
   try {
@@ -171,11 +171,12 @@ export async function POST(req: NextRequest) {
           destination: reunion.stripeConnectedAccountId!,
         },
         on_behalf_of: reunion.stripeConnectedAccountId!,
-        // Platform fee = fixed + percent component. on_behalf_of also makes
-        // Stripe processing fees come out of the connected account, so the
-        // connected account ends up with
-        //   (charge - platform fee - Stripe processing fee).
-        application_fee_amount: computePlatformFeeCents(totalChargeCents),
+        // application_fee_amount = platform's intended cut + estimated
+        // Stripe processing fee. Stripe debits the actual processing fee
+        // from the platform balance, so this gross amount lets us recoup
+        // the Stripe fee and keep our net platform fee. Connected account
+        // ends up with (charge - application_fee_amount).
+        application_fee_amount: computeApplicationFeeCents(totalChargeCents),
       },
       success_url: `${baseUrl}/${reunion.slug}/confirmation?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/${reunion.slug}/rsvp?cancelled=true`,
