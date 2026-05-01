@@ -4,6 +4,7 @@ import { eq, and, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { resolveSponsorDisplayName } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -74,43 +75,49 @@ export default async function SponsorsPage({
                   Trojan Sponsors
                 </h2>
                 <div className="grid gap-6 sm:grid-cols-2">
-                  {topSponsors.map((sponsor) => (
-                    <div
-                      key={sponsor.id}
-                      className="rounded-xl border-2 border-red-200 bg-white p-6 shadow-sm"
-                    >
-                      {sponsor.logoUrl && (
-                        <div className="mb-4 flex h-24 items-center justify-center">
-                          <Image
-                            src={sponsor.logoUrl}
-                            alt={sponsor.companyName || "Sponsor"}
-                            width={200}
-                            height={96}
-                            className="max-h-24 w-auto object-contain"
-                          />
-                        </div>
-                      )}
-                      <h3 className="text-lg font-bold text-gray-900">
-                        {sponsor.websiteUrl ? (
-                          <a
-                            href={sponsor.websiteUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:text-red-700"
-                          >
-                            {sponsor.companyName || sponsor.contactName}
-                          </a>
-                        ) : (
-                          sponsor.companyName || sponsor.contactName
+                  {topSponsors.map((sponsor) => {
+                    const displayName = resolveSponsorDisplayName(sponsor);
+                    const showLogo = !sponsor.isAnonymous && sponsor.logoUrl;
+                    const showLink =
+                      !sponsor.isAnonymous && sponsor.websiteUrl;
+                    return (
+                      <div
+                        key={sponsor.id}
+                        className="rounded-xl border-2 border-red-200 bg-white p-6 shadow-sm"
+                      >
+                        {showLogo && (
+                          <div className="mb-4 flex h-24 items-center justify-center">
+                            <Image
+                              src={sponsor.logoUrl!}
+                              alt={displayName}
+                              width={200}
+                              height={96}
+                              className="max-h-24 w-auto object-contain"
+                            />
+                          </div>
                         )}
-                      </h3>
-                      {sponsor.message && (
-                        <p className="mt-2 text-sm text-gray-600">
-                          {sponsor.message}
-                        </p>
-                      )}
-                    </div>
-                  ))}
+                        <h3 className="text-lg font-bold text-gray-900">
+                          {showLink ? (
+                            <a
+                              href={sponsor.websiteUrl!}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:text-red-700"
+                            >
+                              {displayName}
+                            </a>
+                          ) : (
+                            displayName
+                          )}
+                        </h3>
+                        {!sponsor.isAnonymous && sponsor.message && (
+                          <p className="mt-2 text-sm text-gray-600">
+                            {sponsor.message}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -122,38 +129,44 @@ export default async function SponsorsPage({
                   Community Service Project Sponsors
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-3">
-                  {communitySponsors.map((sponsor) => (
-                    <div
-                      key={sponsor.id}
-                      className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
-                    >
-                      {sponsor.logoUrl && (
-                        <div className="mb-3 flex h-16 items-center justify-center">
-                          <Image
-                            src={sponsor.logoUrl}
-                            alt={sponsor.companyName || "Sponsor"}
-                            width={120}
-                            height={64}
-                            className="max-h-16 w-auto object-contain"
-                          />
-                        </div>
-                      )}
-                      <h3 className="text-sm font-semibold text-gray-900">
-                        {sponsor.websiteUrl ? (
-                          <a
-                            href={sponsor.websiteUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:text-red-700"
-                          >
-                            {sponsor.companyName || sponsor.contactName}
-                          </a>
-                        ) : (
-                          sponsor.companyName || sponsor.contactName
+                  {communitySponsors.map((sponsor) => {
+                    const displayName = resolveSponsorDisplayName(sponsor);
+                    const showLogo = !sponsor.isAnonymous && sponsor.logoUrl;
+                    const showLink =
+                      !sponsor.isAnonymous && sponsor.websiteUrl;
+                    return (
+                      <div
+                        key={sponsor.id}
+                        className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+                      >
+                        {showLogo && (
+                          <div className="mb-3 flex h-16 items-center justify-center">
+                            <Image
+                              src={sponsor.logoUrl!}
+                              alt={displayName}
+                              width={120}
+                              height={64}
+                              className="max-h-16 w-auto object-contain"
+                            />
+                          </div>
                         )}
-                      </h3>
-                    </div>
-                  ))}
+                        <h3 className="text-sm font-semibold text-gray-900">
+                          {showLink ? (
+                            <a
+                              href={sponsor.websiteUrl!}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:text-red-700"
+                            >
+                              {displayName}
+                            </a>
+                          ) : (
+                            displayName
+                          )}
+                        </h3>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

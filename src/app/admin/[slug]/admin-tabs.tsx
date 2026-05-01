@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { formatCents } from "@/lib/utils";
 import { getSponsorTierLabel } from "@/lib/constants";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { PublishSponsorDialog } from "@/components/publish-sponsor-dialog";
 import type {
   Rsvp,
   InterestSignup,
@@ -224,19 +225,23 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
   const router = useRouter();
   const [toggling, setToggling] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<string | null>(null);
-  const [pendingToggle, setPendingToggle] = useState<{
-    sponsorId: string;
-    currentlyDisplayed: boolean;
-  } | null>(null);
+  // Unpublish flow uses the simple yes/no ConfirmDialog
+  const [pendingUnpublish, setPendingUnpublish] = useState<string | null>(null);
+  // Publish flow uses the richer PublishSponsorDialog (preview + edit)
+  const [publishingSponsor, setPublishingSponsor] = useState<Sponsor | null>(null);
 
-  function requestToggle(sponsorId: string, currentlyDisplayed: boolean) {
-    setPendingToggle({ sponsorId, currentlyDisplayed });
+  function requestToggle(sponsor: Sponsor) {
+    if (sponsor.isDisplayed) {
+      setPendingUnpublish(sponsor.id);
+    } else {
+      setPublishingSponsor(sponsor);
+    }
   }
 
-  async function confirmToggle() {
-    if (!pendingToggle) return;
-    const { sponsorId } = pendingToggle;
-    setPendingToggle(null);
+  async function confirmUnpublish() {
+    if (!pendingUnpublish) return;
+    const sponsorId = pendingUnpublish;
+    setPendingUnpublish(null);
     setToggling(sponsorId);
     await fetch("/api/admin/sponsors", {
       method: "POST",
@@ -245,6 +250,11 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
     });
     router.refresh();
     setToggling(null);
+  }
+
+  function onPublished() {
+    setPublishingSponsor(null);
+    router.refresh();
   }
 
   async function refreshFromStripe(sponsorId: string) {
@@ -328,7 +338,7 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                 </td>
                 <td className="px-4 py-3">
                   <button
-                    onClick={() => requestToggle(s.id, s.isDisplayed)}
+                    onClick={() => requestToggle(s)}
                     disabled={toggling === s.id}
                     title={
                       s.isDisplayed
@@ -351,21 +361,19 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
       </table>
     </div>
     <ConfirmDialog
-      open={pendingToggle !== null}
-      title={
-        pendingToggle?.currentlyDisplayed
-          ? "Unpublish sponsor?"
-          : "Publish sponsor?"
-      }
-      message={
-        pendingToggle?.currentlyDisplayed
-          ? "They won't be shown on the public sponsors page until you republish."
-          : "This will publish them to the public sponsors page."
-      }
-      confirmLabel={pendingToggle?.currentlyDisplayed ? "Unpublish" : "Publish"}
-      confirmVariant={pendingToggle?.currentlyDisplayed ? "neutral" : "green"}
-      onConfirm={confirmToggle}
-      onCancel={() => setPendingToggle(null)}
+      open={pendingUnpublish !== null}
+      title="Unpublish sponsor?"
+      message="They won't be shown on the public sponsors page until you republish."
+      confirmLabel="Unpublish"
+      confirmVariant="neutral"
+      onConfirm={confirmUnpublish}
+      onCancel={() => setPendingUnpublish(null)}
+    />
+    <PublishSponsorDialog
+      open={publishingSponsor !== null}
+      sponsor={publishingSponsor}
+      onCancel={() => setPublishingSponsor(null)}
+      onPublished={onPublished}
     />
     </>
   );

@@ -15,6 +15,26 @@ export function formatDate(dateStr: string): string {
 }
 
 /**
+ * Resolve the public display name for a sponsor, applying the same rules
+ * the public sponsors page and admin views all use:
+ *   1. If isAnonymous -> "Anonymous Sponsor"
+ *   2. If displayName is set -> displayName (their explicit override)
+ *   3. Otherwise -> companyName || contactName (defaults)
+ */
+export function resolveSponsorDisplayName(sponsor: {
+  contactName: string;
+  companyName: string | null;
+  displayName: string | null;
+  isAnonymous: boolean | null;
+}): string {
+  if (sponsor.isAnonymous) return "Anonymous Sponsor";
+  if (sponsor.displayName && sponsor.displayName.trim()) {
+    return sponsor.displayName.trim();
+  }
+  return sponsor.companyName || sponsor.contactName;
+}
+
+/**
  * Format a tentative day-level descriptor for an event without committing to
  * an exact time — e.g. "Tentatively Friday", "Tentatively Saturday morning",
  * "Tentatively Saturday evening". Used in the interest form / tease landing

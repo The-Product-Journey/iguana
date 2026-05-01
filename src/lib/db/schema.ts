@@ -236,6 +236,13 @@ export const sponsors = sqliteTable("sponsors", {
   amountCents: integer("amount_cents").notNull(),
   tier: text("tier", { enum: ["top", "community"] }).notNull(),
   message: text("message"),
+  // How the sponsor wants to be credited on the public sponsors page.
+  // displayName overrides the default of (companyName || contactName).
+  // isAnonymous shows "Anonymous Sponsor" and hides website/logo.
+  // Nullable for backward compat with rows created before these columns
+  // existed; read with `?? false` for the boolean.
+  displayName: text("display_name"),
+  isAnonymous: integer("is_anonymous", { mode: "boolean" }).default(false),
   stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
   paymentStatus: text("payment_status", {
     enum: ["pending", "paid", "failed"],

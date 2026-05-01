@@ -5,6 +5,12 @@ import { sponsors } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getStripe } from "@/lib/stripe";
 
+function strOrNull(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const trimmed = v.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
   const auth = cookieStore.get("admin_auth");
@@ -12,7 +18,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { sponsorId, action } = await req.json();
+  const body = await req.json();
+  const { sponsorId, action } = body;
 
   if (!sponsorId || !action) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
@@ -33,6 +40,33 @@ export async function POST(req: NextRequest) {
       .update(sponsors)
       .set({
         isDisplayed: !sponsor.isDisplayed,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(sponsors.id, sponsorId));
+
+    return NextResponse.json({ success: true });
+  }
+
+  if (action === "publishWithEdits") {
+    const sponsor = await db
+      .select()
+      .from(sponsors)
+      .where(eq(sponsors.id, sponsorId))
+      .get();
+
+    if (!sponsor) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    // Save the admin's recognition edits and flip isDisplayed=true atomically.
+    await db
+      .update(sponsors)
+      .set({
+        displayName: strOrNull(body.displayName),
+        isAnonymous: !!body.isAnonymous,
+        message: strOrNull(body.message),
+        websiteUrl: strOrNull(body.websiteUrl),
+        isDisplayed: true,
         updatedAt: new Date().toISOString(),
       })
       .where(eq(sponsors.id, sponsorId));
@@ -67,9 +101,6 @@ export async function POST(req: NextRequest) {
         sponsor.stripeCheckoutSessionId
       );
 
-      // Map Stripe session state to our paymentStatus enum.
-      // session.status: "open" | "complete" | "expired"
-      // session.payment_status: "paid" | "unpaid" | "no_payment_required"
       let nextStatus: "pending" | "paid" | "failed" = sponsor.paymentStatus;
       if (
         session.status === "complete" &&
