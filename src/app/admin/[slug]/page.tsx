@@ -171,6 +171,11 @@ export default async function AdminReunionPage({
             Test
           </span>
         )}
+        {!reunion.isActive && (
+          <span className="rounded bg-gray-200 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-gray-700">
+            Inactive
+          </span>
+        )}
         <a
           href={`/${slug}`}
           target="_blank"
@@ -181,6 +186,12 @@ export default async function AdminReunionPage({
         >
           <LaunchIcon className="h-5 w-5" />
         </a>
+        <Link
+          href={`/admin/${slug}/settings`}
+          className="ml-auto rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100"
+        >
+          Settings
+        </Link>
       </div>
 
       <SiteModeToggle
