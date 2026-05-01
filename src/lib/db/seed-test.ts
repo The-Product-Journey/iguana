@@ -37,14 +37,18 @@ async function seedTest() {
   // the public site renders identically — no "TEST" labels visible. Only the
   // siteMode/registrationOpen state, the Stripe linkage we just preserved,
   // and the sample data below are test-specific.
+  //
+  // Default to siteMode=tease so seed-test starts the same way wipe-test does
+  // — admins (and you) progress through tease → pre_register → open via the
+  // admin toggle (or just preview other modes via the admin banner).
   const shell = await loadProdShell(db);
   const [reunion] = await db
     .insert(reunions)
     .values({
       slug: TEST_REUNION_SLUG,
       ...shell,
-      registrationOpen: true,
-      siteMode: "open",
+      registrationOpen: false,
+      siteMode: "tease",
       stripeConnectedAccountId: stripeLinkage?.stripeConnectedAccountId ?? null,
       stripeConnectOnboardingComplete:
         stripeLinkage?.stripeConnectOnboardingComplete ?? false,
