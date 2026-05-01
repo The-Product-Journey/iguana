@@ -19,6 +19,7 @@ import { SiteModeToggle } from "@/components/site-mode-toggle";
 import { AdminTabs } from "./admin-tabs";
 import { ConnectStatus } from "@/components/connect-status";
 import { LaunchIcon } from "@/components/launch-icon";
+import { getTenantConfig } from "@/lib/tenant-config";
 import { requireReunionAdminPage } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
@@ -170,6 +171,11 @@ export default async function AdminReunionPage({
             Test
           </span>
         )}
+        {!reunion.isActive && (
+          <span className="rounded bg-gray-200 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-gray-700">
+            Inactive
+          </span>
+        )}
         <a
           href={`/${slug}`}
           target="_blank"
@@ -180,6 +186,12 @@ export default async function AdminReunionPage({
         >
           <LaunchIcon className="h-5 w-5" />
         </a>
+        <Link
+          href={`/admin/${slug}/settings`}
+          className="ml-auto rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100"
+        >
+          Settings
+        </Link>
       </div>
 
       <SiteModeToggle
@@ -232,6 +244,10 @@ export default async function AdminReunionPage({
         profiles={allProfiles}
         events={allEvents}
         messages={messages}
+        sponsorTopTierLabel={getTenantConfig(reunion).sponsorTopTierLabel}
+        sponsorCommunityTierLabel={
+          getTenantConfig(reunion).sponsorCommunityTierLabel
+        }
         interestEventCounts={interestEventCounts}
         regEventCounts={regEventCounts}
         categoryLabels={CATEGORY_LABELS}

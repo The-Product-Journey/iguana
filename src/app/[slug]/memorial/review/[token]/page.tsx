@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { memorials } from "@/lib/db/schema";
+import { memorials, reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { MemorialReviewClient } from "./review-client";
@@ -11,13 +11,22 @@ export default async function MemorialReviewPage({
 }) {
   const { slug, token } = await params;
 
+  const reunion = await db
+    .select({ id: reunions.id })
+    .from(reunions)
+    .where(eq(reunions.slug, slug))
+    .get();
+  if (!reunion) notFound();
+
   const memorial = await db
     .select()
     .from(memorials)
     .where(eq(memorials.reviewToken, token))
     .get();
 
-  if (!memorial) notFound();
+  // Cross-tenant scope check: a review token from reunion B must not
+  // resolve under reunion A's URL even if the token is valid.
+  if (!memorial || memorial.reunionId !== reunion.id) notFound();
 
   // Only show review page when in pending_review status
   if (memorial.status !== "pending_review") {

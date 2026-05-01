@@ -8,8 +8,13 @@ type SiteMode = "tease" | "pre_register" | "open";
 
 type NavProps = {
   slug: string;
-  reunionName: string;
+  /** Display label for the brand link (left side). Per-tenant. */
+  orgShortName: string;
   siteMode: string;
+  /** True when the tenant has a community-service project configured.
+   * Hides the "Community Service" nav link when false to match the
+   * page-level 404 in `[slug]/community-service/page.tsx`. */
+  hasCommunityServiceProject: boolean;
   isAdmin?: boolean;
   /** Render the AdminMenu in this nav (true when no preview banner is showing). */
   showAdminMenu?: boolean;
@@ -21,8 +26,9 @@ type NavProps = {
 
 export function SiteNav({
   slug,
-  reunionName,
+  orgShortName,
   siteMode,
+  hasCommunityServiceProject,
   isAdmin,
   showAdminMenu,
   previewMode,
@@ -34,7 +40,15 @@ export function SiteNav({
     { label: "Schedule", href: `/${slug}/schedule`, modes: ["pre_register", "open"] },
     { label: "Sponsors", href: `/${slug}/sponsors`, modes: ["tease", "pre_register", "open"] },
     { label: "Yearbook", href: `/${slug}/yearbook`, modes: ["pre_register", "open"] },
-    { label: "Community Service", href: `/${slug}/community-service`, modes: ["pre_register", "open"] },
+    ...(hasCommunityServiceProject
+      ? [
+          {
+            label: "Community Service",
+            href: `/${slug}/community-service`,
+            modes: ["pre_register", "open"],
+          },
+        ]
+      : []),
     { label: "Memorial", href: `/${slug}/memorial`, modes: ["pre_register", "open"] },
     { label: "Sponsor Us", href: `/${slug}/sponsor`, modes: ["tease", "pre_register", "open"] },
   ];
@@ -48,7 +62,7 @@ export function SiteNav({
           href={`/${slug}`}
           className="text-lg font-bold text-red-800 hover:text-red-900"
         >
-          PHHS &apos;96
+          {orgShortName}
         </Link>
 
         {/* Desktop */}

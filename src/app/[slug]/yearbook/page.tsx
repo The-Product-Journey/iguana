@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { reunions, profiles, rsvps } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { getEffectiveSiteMode } from "@/lib/site-mode";
@@ -24,7 +24,9 @@ export default async function YearbookPage({
   const effectiveMode = await getEffectiveSiteMode(reunion);
   if (effectiveMode === "tease") redirect(`/${slug}`);
 
-  // Get all published profiles with rsvp data
+  // Get all published profiles with rsvp data — scope by reunion via the
+  // rsvps join (profiles has no reunionId column, so the join through
+  // rsvps.reunionId is the only way to filter cross-tenant leaks).
   const allProfiles = await db
     .select({
       profile: profiles,
@@ -33,7 +35,12 @@ export default async function YearbookPage({
     })
     .from(profiles)
     .innerJoin(rsvps, eq(profiles.rsvpId, rsvps.id))
-    .where(eq(profiles.isPublished, true));
+    .where(
+      and(
+        eq(rsvps.reunionId, reunion.id),
+        eq(profiles.isPublished, true)
+      )
+    );
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -51,7 +58,7 @@ export default async function YearbookPage({
               Digital Yearbook
             </h1>
             <p className="text-gray-600">
-              See what your classmates have been up to since &apos;96.
+              See what your classmates have been up to.
             </p>
           </div>
           <Link

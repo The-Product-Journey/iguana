@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCents } from "@/lib/utils";
-import { getSponsorTierLabel } from "@/lib/constants";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PublishSponsorDialog } from "@/components/publish-sponsor-dialog";
 import type {
@@ -54,6 +53,8 @@ export function AdminTabs({
   interestEventCounts,
   regEventCounts,
   categoryLabels,
+  sponsorTopTierLabel,
+  sponsorCommunityTierLabel,
 }: {
   slug: string;
   rsvps: Rsvp[];
@@ -66,6 +67,8 @@ export function AdminTabs({
   interestEventCounts: Record<string, number>;
   regEventCounts: Record<string, { confirmed: number; pending: number }>;
   categoryLabels: Record<string, string>;
+  sponsorTopTierLabel: string;
+  sponsorCommunityTierLabel: string;
 }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>("RSVPs");
 
@@ -99,7 +102,13 @@ export function AdminTabs({
 
       {tab === "RSVPs" && <RsvpsTab rsvps={rsvps} />}
       {tab === "Interests" && <InterestsTab interests={interests} />}
-      {tab === "Sponsors" && <SponsorsTab sponsors={sponsors} />}
+      {tab === "Sponsors" && (
+        <SponsorsTab
+          sponsors={sponsors}
+          topTierLabel={sponsorTopTierLabel}
+          communityTierLabel={sponsorCommunityTierLabel}
+        />
+      )}
       {tab === "Memorials" && (
         <MemorialsTab memorials={memorials} slug={slug} />
       )}
@@ -221,10 +230,20 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
   );
 }
 
-function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
+function SponsorsTab({
+  sponsors,
+  topTierLabel,
+  communityTierLabel,
+}: {
+  sponsors: Sponsor[];
+  topTierLabel: string;
+  communityTierLabel: string;
+}) {
   const router = useRouter();
   const [toggling, setToggling] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<string | null>(null);
+  const sponsorTierLabel = (tier: "top" | "community") =>
+    tier === "top" ? topTierLabel : communityTierLabel;
   // Unpublish flow uses the simple yes/no ConfirmDialog
   const [pendingUnpublish, setPendingUnpublish] = useState<string | null>(null);
   // Publish flow uses the richer PublishSponsorDialog (preview + edit)
@@ -318,7 +337,7 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                         : "bg-gray-100 text-gray-700"
                     }`}
                   >
-                    {getSponsorTierLabel(s.tier)}
+                    {sponsorTierLabel(s.tier)}
                   </span>
                 </td>
                 <td className="px-4 py-3">
@@ -512,7 +531,7 @@ function ProfilesTab({
                 profile.currentCity,
                 profile.occupation,
                 profile.family,
-                profile.favoritePHMemory,
+                profile.favoriteSchoolMemory ?? profile.favoritePHMemory,
                 profile.beenUpTo,
                 profile.funFact,
               ];

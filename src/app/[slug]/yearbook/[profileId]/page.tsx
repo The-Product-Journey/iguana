@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { getEffectiveSiteMode } from "@/lib/site-mode";
+import { getTenantConfig } from "@/lib/tenant-config";
 import Image from "next/image";
 
 export default async function ProfileViewPage({
@@ -36,14 +37,26 @@ export default async function ProfileViewPage({
     .where(eq(rsvps.id, profile.rsvpId))
     .get();
 
-  if (!rsvp) notFound();
+  // Cross-tenant scope check: profiles has no reunionId column, so the
+  // profile id alone isn't enough — confirm via the parent rsvp's
+  // reunionId. Without this, a profile from reunion B would render
+  // publicly under reunion A's URL.
+  if (!rsvp || rsvp.reunionId !== reunion.id) notFound();
+
+  const tenantConfig = getTenantConfig(reunion);
+  const sinceLabel = tenantConfig.classYear
+    ? `since '${tenantConfig.classYear.slice(-2)}`
+    : "lately";
 
   const fields = [
     { label: "Where I live now", value: profile.currentCity },
     { label: "What I do", value: profile.occupation },
     { label: "Family", value: profile.family },
-    { label: "Favorite Park Hill Memory", value: profile.favoritePHMemory },
-    { label: "What I've been up to since '96", value: profile.beenUpTo },
+    {
+      label: tenantConfig.favoriteMemoryLabel,
+      value: profile.favoriteSchoolMemory ?? profile.favoritePHMemory,
+    },
+    { label: `What I've been up to ${sinceLabel}`, value: profile.beenUpTo },
     { label: "Fun Fact", value: profile.funFact },
   ];
 

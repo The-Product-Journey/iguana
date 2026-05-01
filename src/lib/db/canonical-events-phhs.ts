@@ -1,7 +1,11 @@
-// The four canonical itinerary events for the PHHS '96 reunion.
-// Used by both seed-events (prod) and seed-test (test) so the two tenants
-// always render the same set of events with identical names, descriptions,
-// and tentative-timeframe labels.
+// PHHS '96 canonical itinerary events. Frozen copy used only by
+// `seed-events.ts` (idempotent prod refresh of the live PHHS tenant) and
+// the Phase 6 PHHS backfill script. **Do not** import this from any
+// generic / multi-tenant code path — `canonical-events-demo.ts` is the
+// generic equivalent for new tenants.
+//
+// Was previously `canonical-events.ts`; renamed in Phase 2 to make the
+// PHHS coupling explicit.
 //
 // Strict null-only contract on confirmed-detail fields (eventTime,
 // eventLocation, eventAddress): use null when a value isn't locked, never

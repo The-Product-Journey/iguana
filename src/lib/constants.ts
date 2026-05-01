@@ -1,13 +1,12 @@
 /** Sponsorship tiers — amount in cents */
 export const SPONSOR_TIER_THRESHOLD_CENTS = 50000; // $500
 
-// Internal DB enum values "top" / "community" — UI labels: "Trojan Sponsor" / "Community Service Project Sponsor"
+// Internal DB enum values are "top" / "community". Public-facing labels are
+// per-tenant via getTenantConfig() — see src/lib/tenant-config.ts. The
+// previous global `getSponsorTierLabel` was retired in Phase 3 of the
+// multi-tenant work (it returned hardcoded "Trojan" / "Community Service").
 export function getSponsorTier(amountCents: number): "top" | "community" {
   return amountCents >= SPONSOR_TIER_THRESHOLD_CENTS ? "top" : "community";
-}
-
-export function getSponsorTierLabel(tier: "top" | "community"): string {
-  return tier === "top" ? "Trojan" : "Community Service";
 }
 
 export const REFUND_POLICY_TEXT =

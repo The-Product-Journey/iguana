@@ -175,7 +175,7 @@ export function RsvpForm({
           id="message"
           name="message"
           rows={3}
-          placeholder="Share what you've been up to since '96!"
+          placeholder="Share what you've been up to!"
           className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
         />
       </div>

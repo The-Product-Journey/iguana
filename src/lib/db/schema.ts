@@ -45,6 +45,40 @@ export const reunions = sqliteTable("reunions", {
   stripeConnectPayoutsEnabled: integer("stripe_connect_payouts_enabled", {
     mode: "boolean",
   }).default(false),
+  // -------------------------------------------------------------------------
+  // Tenant identity / branding (Phase 1 of multi-tenant work)
+  // -------------------------------------------------------------------------
+  // All nullable so existing rows survive schema push without backfill;
+  // getTenantConfig() in src/lib/tenant-config.ts wraps these with defaults.
+  // The PHHS-specific tenant gets values populated via
+  // src/lib/db/backfill-phhs-config.ts (Phase 6) so its public site
+  // continues to render identically post-deploy.
+  orgName: text("org_name"),
+  orgShortName: text("org_short_name"),
+  mascot: text("mascot"),
+  classYear: text("class_year"),
+  // Stored, not derived — lets a tenant override the math when reality
+  // disagrees (COVID-delayed reunions, "We're skipping the 25th, doing 26").
+  reunionMilestoneLabel: text("reunion_milestone_label"),
+  brandColorPrimary: text("brand_color_primary"),
+  brandColorPrimaryDark: text("brand_color_primary_dark"),
+  logoUrl: text("logo_url"),
+  // Community service block. If communityServiceProjectName is null,
+  // the /[slug]/community-service page returns notFound() and the
+  // homepage block is hidden.
+  communityServiceProjectName: text("community_service_project_name"),
+  communityServiceCharityName: text("community_service_charity_name"),
+  communityServiceTeaserCopy: text("community_service_teaser_copy"),
+  communityServiceFullCopy: text("community_service_full_copy"),
+  // Sponsor recognition tier labels — public-facing strings such as
+  // "Trojan" / "Community Service Project". DB enum (top/community)
+  // remains the source of truth for tier classification.
+  sponsorTopTierLabel: text("sponsor_top_tier_label"),
+  sponsorCommunityTierLabel: text("sponsor_community_tier_label"),
+  // Yearbook field label — historically "Favorite Park Hill Memory".
+  favoriteMemoryLabel: text("favorite_memory_label"),
+  // Banquet event label on the landing-page details card.
+  banquetLabel: text("banquet_label"),
   isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
   createdAt: text("created_at")
     .notNull()
@@ -274,7 +308,13 @@ export const profiles = sqliteTable("profiles", {
   currentCity: text("current_city"),
   occupation: text("occupation"),
   family: text("family"),
+  // Legacy PHHS-flavored column. New writes go to `favoriteSchoolMemory`
+  // (Phase 3 of multi-tenant work). Reads fall back through this column
+  // until Phase 6 backfill mirrors old → new for every existing row.
+  // Drop is queued for a follow-up plan once both columns proven equal
+  // in prod for one full reunion cycle.
   favoritePHMemory: text("favorite_ph_memory"),
+  favoriteSchoolMemory: text("favorite_school_memory"),
   beenUpTo: text("been_up_to"),
   funFact: text("fun_fact"),
   photoUrl: text("photo_url"),

@@ -1,9 +1,10 @@
 import { db } from "@/lib/db";
 import { reunions, profiles, rsvps } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import { PrintButton } from "./print-button";
 import { getEffectiveSiteMode } from "@/lib/site-mode";
+import { getTenantConfig } from "@/lib/tenant-config";
 
 export const dynamic = "force-dynamic";
 
@@ -31,12 +32,29 @@ export default async function YearbookPrintPage({
     })
     .from(profiles)
     .innerJoin(rsvps, eq(profiles.rsvpId, rsvps.id))
-    .where(eq(profiles.isPublished, true));
+    .where(
+      and(
+        eq(rsvps.reunionId, reunion.id),
+        eq(profiles.isPublished, true)
+      )
+    );
 
   // Sort alphabetically by last name
   allProfiles.sort((a, b) =>
     `${a.lastName} ${a.firstName}`.localeCompare(`${b.lastName} ${b.firstName}`)
   );
+
+  const tenantConfig = getTenantConfig(reunion);
+  // Format the cover date the same way the homepage card does (Phase 3.6).
+  const start = new Date(`${reunion.eventDate}T00:00:00Z`);
+  const coverDate = isNaN(start.getTime())
+    ? reunion.eventDate
+    : new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        timeZone: "UTC",
+      }).format(start);
 
   return (
     <div className="mx-auto max-w-3xl p-8 print:p-0">
@@ -62,9 +80,11 @@ export default async function YearbookPrintPage({
       <div className="mb-12 text-center">
         <h1 className="text-4xl font-bold text-gray-900">{reunion.name}</h1>
         <p className="mt-2 text-xl text-gray-600">
-          30 Year Reunion — Digital Yearbook
+          {tenantConfig.reunionMilestoneLabel
+            ? `${tenantConfig.reunionMilestoneLabel} — Digital Yearbook`
+            : "Digital Yearbook"}
         </p>
-        <p className="mt-1 text-gray-500">August 28–29, 2026</p>
+        <p className="mt-1 text-gray-500">{coverDate}</p>
         <p className="mt-4 text-sm text-gray-400">
           {allProfiles.length} classmates
         </p>
@@ -101,15 +121,16 @@ export default async function YearbookPrintPage({
                     <strong>Family:</strong> {profile.family}
                   </p>
                 )}
-                {profile.favoritePHMemory && (
+                {(profile.favoriteSchoolMemory ||
+                  profile.favoritePHMemory) && (
                   <p className="mt-1 text-sm text-gray-700">
                     <strong>Favorite Memory:</strong>{" "}
-                    {profile.favoritePHMemory}
+                    {profile.favoriteSchoolMemory ?? profile.favoritePHMemory}
                   </p>
                 )}
                 {profile.beenUpTo && (
                   <p className="mt-1 text-sm text-gray-700">
-                    <strong>Since &apos;96:</strong> {profile.beenUpTo}
+                    <strong>Since high school:</strong> {profile.beenUpTo}
                   </p>
                 )}
                 {profile.funFact && (

@@ -13,10 +13,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Root metadata is platform-generic. Per-tenant title/description should
+// be set in the tenant's own page metadata; the root metadata only ships
+// when a visitor lands on `/` itself, which (for now) redirects to the
+// first active reunion (see src/app/page.tsx).
 export const metadata: Metadata = {
-  title: "PHHS Class of 1996 — 30 Year Reunion",
-  description:
-    "Park Hill High School Class of 1996 — 30 Year Reunion. August 28–29, 2026 in Parkville, MO. RSVP now!",
+  title: "Reunion",
+  description: "A platform for organizing reunions.",
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
