@@ -86,6 +86,13 @@ export function ConnectStatus({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reunionId, slug }),
       });
+      // Stale UI: server already has an account. Refresh status from server truth
+      // and let the user resume onboarding instead of dead-ending on the error.
+      if (res.status === 409) {
+        await refreshStatus();
+        setLoading(false);
+        return;
+      }
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Failed to create account");

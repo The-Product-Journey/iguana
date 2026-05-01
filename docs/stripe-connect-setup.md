@@ -34,7 +34,9 @@ One endpoint, one signing secret (`STRIPE_WEBHOOK_SECRET`), handles both platfor
 2. This creates a Stripe Express account (organizer chooses individual or business during Stripe's onboarding)
 3. Organizer is redirected to Stripe's hosted onboarding form
 4. They provide identity info and connect a bank account (personal or business)
-5. On return, the admin panel shows the account status
+5. On return, the admin panel runs a one-shot status refresh and shows the account status
+
+**Manual-refresh model:** The admin page does NOT poll Stripe for status changes on an interval. After completing Stripe onboarding, the post-return URL (`?connect=complete`) triggers a single `refreshStatus()` call. If Stripe takes longer to flip `charges_enabled` / `payouts_enabled` than that one check, the admin must hard-refresh `/admin/{slug}` to see the updated status. The `account.updated` webhook keeps the DB in sync in the background regardless. Adding interval polling is intentionally deferred — file a follow-up if needed.
 
 ### Status States
 
