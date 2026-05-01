@@ -6,29 +6,70 @@ import type { Reunion } from "@/lib/db/schema";
 
 type SiteMode = Reunion["siteMode"];
 
+export const SITE_MODES: readonly SiteMode[] = [
+  "tease",
+  "pre_register",
+  "open",
+] as const;
+
+export const ADMIN_PREVIEW_COOKIE = "admin_preview_mode";
+
+export type AdminPreviewState = {
+  isAdmin: boolean;
+  /** Mode the admin has explicitly chosen to preview, if any. */
+  previewMode: SiteMode | null;
+  /** The reunion's DB-level siteMode — what the public sees. */
+  actualMode: SiteMode;
+  /** Mode the page should render as. */
+  effectiveMode: SiteMode;
+};
+
 /**
- * Check if the current request has admin preview access.
- * When an admin is logged in, the site behaves as if siteMode is "open".
+ * Resolve admin auth + preview-mode override + actual DB mode in one shot.
+ *
+ * **Default behavior change (May 2026):** admins now see the public view by
+ * default. Previously, any admin auth cookie auto-promoted the rendered mode
+ * to "open" — that was confusing because admins couldn't actually see what
+ * the public was seeing. Now admins must opt in to preview a different mode
+ * by setting the `admin_preview_mode` cookie via /api/admin/preview-mode.
  */
-export async function isAdminPreview(): Promise<boolean> {
-  try {
-    const cookieStore = await cookies();
-    const auth = cookieStore.get("admin_auth");
-    return auth?.value === process.env.ADMIN_PASSWORD;
-  } catch {
-    return false;
+export async function getAdminPreviewState(
+  reunion: Reunion
+): Promise<AdminPreviewState> {
+  const cookieStore = await cookies();
+  const auth = cookieStore.get("admin_auth");
+  const isAdmin = auth?.value === process.env.ADMIN_PASSWORD;
+
+  let previewMode: SiteMode | null = null;
+  if (isAdmin) {
+    const cookieMode = cookieStore.get(ADMIN_PREVIEW_COOKIE)?.value;
+    if (
+      cookieMode === "tease" ||
+      cookieMode === "pre_register" ||
+      cookieMode === "open"
+    ) {
+      previewMode = cookieMode;
+    }
   }
+
+  return {
+    isAdmin,
+    previewMode,
+    actualMode: reunion.siteMode,
+    effectiveMode: previewMode ?? reunion.siteMode,
+  };
 }
 
 /**
- * Get the effective site mode — "open" if admin is previewing,
- * otherwise the reunion's actual siteMode.
+ * Get the effective site mode for rendering.
+ * Public visitors get the DB siteMode. Admins get the same unless they have
+ * an active preview override.
  */
 export async function getEffectiveSiteMode(
   reunion: Reunion
 ): Promise<SiteMode> {
-  const preview = await isAdminPreview();
-  return preview ? "open" : reunion.siteMode;
+  const state = await getAdminPreviewState(reunion);
+  return state.effectiveMode;
 }
 
 export async function assertSiteMode(

@@ -3,7 +3,8 @@ import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/components/site-nav";
-import { getEffectiveSiteMode } from "@/lib/site-mode";
+import { AdminPreviewBanner } from "@/components/admin-preview-banner";
+import { getAdminPreviewState } from "@/lib/site-mode";
 
 export default async function ReunionLayout({
   children,
@@ -22,13 +23,20 @@ export default async function ReunionLayout({
 
   if (!reunion) notFound();
 
-  const effectiveMode = await getEffectiveSiteMode(reunion);
+  const previewState = await getAdminPreviewState(reunion);
+  const effectiveMode = previewState.effectiveMode;
 
   // Don't show nav on tease mode landing (it has its own design)
   const showNav = effectiveMode !== "tease";
 
   return (
     <>
+      {previewState.isAdmin && (
+        <AdminPreviewBanner
+          previewMode={previewState.previewMode}
+          actualMode={previewState.actualMode}
+        />
+      )}
       {showNav && (
         <SiteNav
           slug={slug}
