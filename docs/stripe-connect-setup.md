@@ -50,11 +50,21 @@ One endpoint, one signing secret (`STRIPE_WEBHOOK_SECRET`), handles both platfor
 
 ## 5. How Payments Work
 
-- Attendee/sponsor pays → Stripe Checkout Session with `transfer_data.destination`
-- Full charge amount transfers to the connected account
-- Stripe processing fees (~2.9% + $0.30) are debited from the **platform** balance
-- The "cover processing fees" attendee opt-in offsets this cost
-- No platform fee (`application_fee_amount`) is charged currently — can be added later
+- Attendee/sponsor pays → Stripe Checkout Session with `transfer_data.destination`,
+  `on_behalf_of`, and `application_fee_amount` set
+- Charge amount transfers to the connected account, **minus** the platform
+  application fee (`PLATFORM_APPLICATION_FEE_CENTS` in `src/lib/constants.ts`,
+  currently $2)
+- Because `on_behalf_of: connectedAccountId` is set, Stripe processing fees
+  (~2.9% + $0.30) are debited from the **connected account's** balance, not
+  the platform's
+- Net result on a $25 sponsor donation:
+  - Customer pays: $25.00
+  - Platform receives: $2.00 (application fee)
+  - Stripe processing fees: ~$1.03 (debited from connected account)
+  - Connected account net: ~$21.97
+- To remove the platform fee entirely, set `PLATFORM_APPLICATION_FEE_CENTS = 0`
+  in `src/lib/constants.ts`. To raise it, change the same constant.
 
 ## 6. Charges vs Payouts Timing
 
