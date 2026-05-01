@@ -35,9 +35,7 @@ export function InterestForm({
     setResponses((prev) => ({ ...prev, [eventId]: value }));
   }
 
-  const allEventsAnswered = events.every((e) => responses[e.id] !== undefined);
-  const formReady =
-    email.trim() !== "" && name.trim() !== "" && allEventsAnswered;
+  const formReady = email.trim() !== "" && name.trim() !== "";
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -159,7 +157,7 @@ export function InterestForm({
               {events.length > 0 && (
                 <div>
                   <p className="mb-2 text-sm font-medium text-gray-700">
-                    Which events are you in for?
+                    Which events are you interested in?
                   </p>
                   <div className="space-y-2">
                     {events.map((event) => {

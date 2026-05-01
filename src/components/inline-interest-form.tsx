@@ -33,9 +33,7 @@ export function InlineInterestForm({
     setResponses((prev) => ({ ...prev, [eventId]: value }));
   }
 
-  const allEventsAnswered = events.every((e) => responses[e.id] !== undefined);
-  const formReady =
-    email.trim() !== "" && name.trim() !== "" && allEventsAnswered;
+  const formReady = email.trim() !== "" && name.trim() !== "";
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -149,7 +147,7 @@ export function InlineInterestForm({
       {events.length > 0 && (
         <div>
           <p className="mb-2 text-sm font-medium text-gray-700">
-            Which events are you interest in attending?
+            Which events are you interested in?
           </p>
           <div className="space-y-2">
             {events.map((event) => {
