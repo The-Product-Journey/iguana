@@ -245,6 +245,13 @@ export const sponsors = sqliteTable("sponsors", {
   isDisplayed: integer("is_displayed", { mode: "boolean" })
     .notNull()
     .default(false),
+  // displayName + isAnonymous were added on `staging` after this worktree
+  // forked off (commits 5bfda0b / f17a265 — sponsor recognition flow).
+  // Mirrored here so db:push from this worktree doesn't drop them.
+  // The full feature behavior comes in at PR-merge time when we rebase
+  // onto staging.
+  displayName: text("display_name"),
+  isAnonymous: integer("is_anonymous", { mode: "boolean" }).default(false),
   createdAt: text("created_at")
     .notNull()
     .default(sql`(datetime('now'))`),
@@ -347,6 +354,38 @@ export const contactMessages = sqliteTable("contact_messages", {
 });
 
 // ---------------------------------------------------------------------------
+// Reunion admins (per-tenant admin allowlist; super admins live in env var)
+// ---------------------------------------------------------------------------
+// Email is stored lowercased on insert; (reunionId, email) is unique so the
+// same person can admin multiple reunions via separate rows.
+// clerkUserId is backfilled on first sign-in by that email (best-effort,
+// fail-closed on error — see src/lib/admin-auth.ts).
+export const reunionAdmins = sqliteTable(
+  "reunion_admins",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    reunionId: text("reunion_id")
+      .notNull()
+      .references(() => reunions.id),
+    email: text("email").notNull(),
+    clerkUserId: text("clerk_user_id"),
+    invitedByEmail: text("invited_by_email"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(datetime('now'))`),
+  },
+  (table) => [
+    uniqueIndex("idx_reunion_admins_reunion_email").on(
+      table.reunionId,
+      table.email
+    ),
+    index("idx_reunion_admins_email").on(table.email),
+  ]
+);
+
+// ---------------------------------------------------------------------------
 // Type exports
 // ---------------------------------------------------------------------------
 export type Reunion = typeof reunions.$inferSelect;
@@ -365,3 +404,5 @@ export type Profile = typeof profiles.$inferSelect;
 export type NewProfile = typeof profiles.$inferInsert;
 export type Memorial = typeof memorials.$inferSelect;
 export type NewMemorial = typeof memorials.$inferInsert;
+export type ReunionAdmin = typeof reunionAdmins.$inferSelect;
+export type NewReunionAdmin = typeof reunionAdmins.$inferInsert;
