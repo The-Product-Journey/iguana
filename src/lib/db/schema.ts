@@ -34,17 +34,6 @@ export const reunions = sqliteTable("reunions", {
   })
     .notNull()
     .default("tease"),
-  stripeConnectedAccountId: text("stripe_connected_account_id"),
-  stripeConnectOnboardingComplete: integer(
-    "stripe_connect_onboarding_complete",
-    { mode: "boolean" }
-  ).default(false),
-  stripeConnectChargesEnabled: integer("stripe_connect_charges_enabled", {
-    mode: "boolean",
-  }).default(false),
-  stripeConnectPayoutsEnabled: integer("stripe_connect_payouts_enabled", {
-    mode: "boolean",
-  }).default(false),
   isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
   createdAt: text("created_at")
     .notNull()
@@ -354,6 +343,51 @@ export const contactMessages = sqliteTable("contact_messages", {
 });
 
 // ---------------------------------------------------------------------------
+// Stripe Connect accounts (one row per reunion × Stripe environment)
+// ---------------------------------------------------------------------------
+// We share a single Turso DB across staging (Stripe test) and production
+// (Stripe live). A test-mode `acct_*` ID is invalid in live mode and vice
+// versa, so we can't store it as one column on `reunions` — it must be
+// scoped by environment.
+// Status booleans are cached here (kept fresh by the account.updated
+// webhook + connect/status endpoint) so public sponsor/RSVP pages can
+// gate on "Connect ready?" without making a Stripe API call per render.
+export const stripeConnectAccounts = sqliteTable(
+  "stripe_connect_accounts",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    reunionId: text("reunion_id")
+      .notNull()
+      .references(() => reunions.id),
+    environment: text("environment", { enum: ["test", "live"] }).notNull(),
+    accountId: text("account_id").notNull(),
+    detailsSubmitted: integer("details_submitted", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    chargesEnabled: integer("charges_enabled", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    payoutsEnabled: integer("payouts_enabled", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(datetime('now'))`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(datetime('now'))`),
+  },
+  (table) => [
+    uniqueIndex("idx_stripe_connect_accounts_reunion_env").on(
+      table.reunionId,
+      table.environment
+    ),
+  ]
+);
+
+// ---------------------------------------------------------------------------
 // Super admins (global; can do anything in any reunion, can invite other
 // super admins). Bootstrap row is inserted via `db:seed-super-admins`.
 // ---------------------------------------------------------------------------
@@ -431,3 +465,5 @@ export type ReunionAdmin = typeof reunionAdmins.$inferSelect;
 export type NewReunionAdmin = typeof reunionAdmins.$inferInsert;
 export type SuperAdmin = typeof superAdmins.$inferSelect;
 export type NewSuperAdmin = typeof superAdmins.$inferInsert;
+export type StripeConnectAccount = typeof stripeConnectAccounts.$inferSelect;
+export type NewStripeConnectAccount = typeof stripeConnectAccounts.$inferInsert;

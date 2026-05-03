@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, refreshConnectAccount } from "@/lib/stripe";
 import { requireReunionAdmin } from "@/lib/admin-auth";
 
 /**
@@ -39,14 +39,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Reunion not found" }, { status: 404 });
     }
 
-    if (!reunion.stripeConnectedAccountId) {
+    // Pull live status from Stripe before issuing the login link — Stripe
+    // rejects login links on accounts where details_submitted=false, so
+    // we'd rather refresh the cache here than show a stale "complete" UI.
+    const connect = await refreshConnectAccount(reunionId);
+    if (!connect) {
       return NextResponse.json(
         { error: "No connected account on this reunion." },
         { status: 400 }
       );
     }
 
-    if (!reunion.stripeConnectOnboardingComplete) {
+    if (!connect.detailsSubmitted) {
       return NextResponse.json(
         {
           error:
@@ -57,14 +61,12 @@ export async function POST(req: NextRequest) {
     }
 
     const stripe = getStripe();
-    const link = await stripe.accounts.createLoginLink(
-      reunion.stripeConnectedAccountId
-    );
+    const link = await stripe.accounts.createLoginLink(connect.accountId);
 
     console.log("[connect/login-link] Issued login link", {
       reunionId,
       slug: reunion.slug,
-      connectedAccountId: reunion.stripeConnectedAccountId,
+      connectedAccountId: connect.accountId,
     });
 
     return NextResponse.json({ url: link.url });

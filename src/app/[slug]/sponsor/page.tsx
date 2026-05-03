@@ -6,6 +6,7 @@ import Link from "next/link";
 import { SponsorForm } from "@/components/sponsor-form";
 import { formatCents } from "@/lib/utils";
 import { SPONSOR_TIER_THRESHOLD_CENTS } from "@/lib/constants";
+import { loadConnectAccount } from "@/lib/stripe";
 
 export default async function SponsorPage({
   params,
@@ -20,6 +21,9 @@ export default async function SponsorPage({
     .get();
 
   if (!reunion) notFound();
+
+  const connect = await loadConnectAccount(reunion.id);
+  const canTakePayments = !!connect?.chargesEnabled;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -81,7 +85,7 @@ export default async function SponsorPage({
           Stripe. You will receive a receipt from Stripe for your records.
         </div>
 
-        {reunion.stripeConnectedAccountId && reunion.stripeConnectChargesEnabled ? (
+        {canTakePayments ? (
           <SponsorForm reunionId={reunion.id} slug={slug} />
         ) : (
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-8 text-center">

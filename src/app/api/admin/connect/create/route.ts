@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { reunions } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
-import { getStripe, getBaseUrl, buildConnectReturnUrl } from "@/lib/stripe";
+import { reunions, stripeConnectAccounts } from "@/lib/db/schema";
+import { and, eq } from "drizzle-orm";
+import {
+  getStripe,
+  getBaseUrl,
+  buildConnectReturnUrl,
+  stripeEnvironment,
+} from "@/lib/stripe";
 import { requireReunionAdmin } from "@/lib/admin-auth";
 
 export async function POST(req: NextRequest) {
@@ -32,7 +37,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (reunion.stripeConnectedAccountId) {
+    const env = stripeEnvironment();
+
+    const existing = await db
+      .select({ accountId: stripeConnectAccounts.accountId })
+      .from(stripeConnectAccounts)
+      .where(
+        and(
+          eq(stripeConnectAccounts.reunionId, reunionId),
+          eq(stripeConnectAccounts.environment, env)
+        )
+      )
+      .get();
+
+    if (existing) {
       return NextResponse.json(
         {
           error:
@@ -61,13 +79,11 @@ export async function POST(req: NextRequest) {
       }),
     });
 
-    await db
-      .update(reunions)
-      .set({
-        stripeConnectedAccountId: account.id,
-        updatedAt: new Date().toISOString(),
-      })
-      .where(eq(reunions.id, reunionId));
+    await db.insert(stripeConnectAccounts).values({
+      reunionId,
+      environment: env,
+      accountId: account.id,
+    });
 
     const fallbackPath = `/admin/${reunion.slug}`;
     const accountLink = await stripe.accountLinks.create({

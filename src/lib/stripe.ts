@@ -1,5 +1,8 @@
 import Stripe from "stripe";
 import type { NextRequest } from "next/server";
+import { db } from "@/lib/db";
+import { stripeConnectAccounts } from "@/lib/db/schema";
+import { and, eq } from "drizzle-orm";
 
 let _stripe: Stripe | null = null;
 
@@ -10,6 +13,133 @@ export function getStripe(): Stripe {
     });
   }
   return _stripe;
+}
+
+export type StripeEnvironment = "test" | "live";
+
+/**
+ * Which Stripe environment is the running process pointed at?
+ *
+ * Inferred from the secret key prefix — Stripe keys are `sk_live_...` in
+ * live mode and `sk_test_...` in test mode. This lets the same Turso DB
+ * back both staging (test) and production (live) deploys without their
+ * Connect account IDs colliding.
+ */
+export function stripeEnvironment(): StripeEnvironment {
+  return process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "live" : "test";
+}
+
+export type ConnectAccount = {
+  accountId: string;
+  detailsSubmitted: boolean;
+  chargesEnabled: boolean;
+  payoutsEnabled: boolean;
+};
+
+/**
+ * Read a reunion's Stripe Connect account for the current environment from
+ * the DB cache. Returns null when no row exists in `stripe_connect_accounts`
+ * — meaning the organizer hasn't onboarded payouts in this environment yet.
+ *
+ * Cached values are kept fresh by:
+ *   - the `account.updated` webhook (src/app/api/webhooks/stripe/route.ts)
+ *   - the `/api/admin/connect/status` endpoint (admin pull-to-refresh)
+ *
+ * This is the cheap, no-Stripe-call read used by public sponsor / RSVP
+ * pages to gate the payment UI. Admin operations that need live ground
+ * truth (login link, post-onboarding capability check) call
+ * `refreshConnectAccount()` instead.
+ */
+export async function loadConnectAccount(
+  reunionId: string
+): Promise<ConnectAccount | null> {
+  const env = stripeEnvironment();
+  const row = await db
+    .select()
+    .from(stripeConnectAccounts)
+    .where(
+      and(
+        eq(stripeConnectAccounts.reunionId, reunionId),
+        eq(stripeConnectAccounts.environment, env)
+      )
+    )
+    .get();
+  if (!row) return null;
+  return {
+    accountId: row.accountId,
+    detailsSubmitted: row.detailsSubmitted,
+    chargesEnabled: row.chargesEnabled,
+    payoutsEnabled: row.payoutsEnabled,
+  };
+}
+
+/**
+ * Pull the latest status from Stripe for this reunion's connected account
+ * (current environment), update the DB cache, and return the fresh values.
+ *
+ * Returns null if no row exists for the reunion in this environment.
+ * On Stripe API failure, returns the existing cached row unchanged — we
+ * never erase known-good cached state because of a transient API error.
+ */
+export async function refreshConnectAccount(
+  reunionId: string
+): Promise<ConnectAccount | null> {
+  const env = stripeEnvironment();
+  const row = await db
+    .select()
+    .from(stripeConnectAccounts)
+    .where(
+      and(
+        eq(stripeConnectAccounts.reunionId, reunionId),
+        eq(stripeConnectAccounts.environment, env)
+      )
+    )
+    .get();
+  if (!row) return null;
+
+  try {
+    const account = await getStripe().accounts.retrieve(row.accountId);
+    const detailsSubmitted = account.details_submitted ?? false;
+    const chargesEnabled = account.charges_enabled ?? false;
+    const payoutsEnabled = account.payouts_enabled ?? false;
+
+    const changed =
+      detailsSubmitted !== row.detailsSubmitted ||
+      chargesEnabled !== row.chargesEnabled ||
+      payoutsEnabled !== row.payoutsEnabled;
+
+    if (changed) {
+      await db
+        .update(stripeConnectAccounts)
+        .set({
+          detailsSubmitted,
+          chargesEnabled,
+          payoutsEnabled,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(stripeConnectAccounts.id, row.id));
+    }
+
+    return {
+      accountId: row.accountId,
+      detailsSubmitted,
+      chargesEnabled,
+      payoutsEnabled,
+    };
+  } catch (err) {
+    console.error("[stripe] refreshConnectAccount retrieve failed", {
+      reunionId,
+      accountId: row.accountId,
+      env,
+      err,
+    });
+    return {
+      accountId: row.accountId,
+      detailsSubmitted: row.detailsSubmitted,
+      chargesEnabled: row.chargesEnabled,
+      payoutsEnabled: row.payoutsEnabled,
+    };
+  }
 }
 
 /**

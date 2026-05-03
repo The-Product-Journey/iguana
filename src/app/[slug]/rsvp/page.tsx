@@ -6,6 +6,7 @@ import Link from "next/link";
 import { RegistrationForm } from "@/components/registration-form";
 import { InlineInterestForm } from "@/components/inline-interest-form";
 import { getEffectiveSiteMode } from "@/lib/site-mode";
+import { loadConnectAccount } from "@/lib/stripe";
 
 export default async function RsvpPage({
   params,
@@ -63,6 +64,8 @@ export default async function RsvpPage({
   }
 
   // Open mode — full registration
+  const connect = await loadConnectAccount(reunion.id);
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="mx-auto max-w-xl px-6">
@@ -82,7 +85,7 @@ export default async function RsvpPage({
           reunionId={reunion.id}
           slug={slug}
           events={reunionEvents}
-          chargesEnabled={!!reunion.stripeConnectChargesEnabled && !!reunion.stripeConnectedAccountId}
+          chargesEnabled={!!connect?.chargesEnabled}
         />
       </div>
     </div>
