@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { reunions, sponsors } from "@/lib/db/schema";
-import { getStripe, getBaseUrl } from "@/lib/stripe";
+import { getStripe, getBaseUrl, loadConnectAccount } from "@/lib/stripe";
 import { getSponsorTier, computeApplicationFeeCents } from "@/lib/constants";
 import { uploadImage } from "@/lib/upload";
 
@@ -42,7 +42,15 @@ export async function POST(req: NextRequest) {
       .where(eq(reunions.id, reunionId))
       .get();
 
-    if (!reunion || !reunion.stripeConnectedAccountId || !reunion.stripeConnectChargesEnabled) {
+    if (!reunion) {
+      return NextResponse.json(
+        { error: "Reunion not found" },
+        { status: 404 }
+      );
+    }
+
+    const connect = await loadConnectAccount(reunionId);
+    if (!connect || !connect.chargesEnabled) {
       return NextResponse.json(
         { error: "Payouts not configured — organizer needs to complete Stripe setup" },
         { status: 400 }
@@ -94,9 +102,9 @@ export async function POST(req: NextRequest) {
       ],
       payment_intent_data: {
         transfer_data: {
-          destination: reunion.stripeConnectedAccountId!,
+          destination: connect.accountId,
         },
-        on_behalf_of: reunion.stripeConnectedAccountId!,
+        on_behalf_of: connect.accountId,
         // application_fee_amount = platform's intended cut + estimated
         // Stripe processing fee. Stripe debits the actual processing fee
         // from the platform balance, so this gross amount lets us recoup

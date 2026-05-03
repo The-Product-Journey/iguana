@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { reunions, rsvps, events, registrationEvents } from "@/lib/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
-import { getStripe, getBaseUrl, Stripe } from "@/lib/stripe";
+import { getStripe, getBaseUrl, Stripe, loadConnectAccount } from "@/lib/stripe";
 import { computeApplicationFeeCents } from "@/lib/constants";
 
 export async function POST(req: NextRequest) {
@@ -50,8 +50,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate Stripe Connect is configured before creating any records
-    if (!reunion.stripeConnectedAccountId || !reunion.stripeConnectChargesEnabled) {
+    // Validate Stripe Connect is configured (in current Stripe environment)
+    // before creating any records.
+    const connect = await loadConnectAccount(reunionId);
+    if (!connect || !connect.chargesEnabled) {
       return NextResponse.json(
         { error: "Payouts not configured — organizer needs to complete Stripe setup" },
         { status: 400 }
@@ -168,9 +170,9 @@ export async function POST(req: NextRequest) {
       line_items: lineItems,
       payment_intent_data: {
         transfer_data: {
-          destination: reunion.stripeConnectedAccountId!,
+          destination: connect.accountId,
         },
-        on_behalf_of: reunion.stripeConnectedAccountId!,
+        on_behalf_of: connect.accountId,
         // application_fee_amount = platform's intended cut + estimated
         // Stripe processing fee. Stripe debits the actual processing fee
         // from the platform balance, so this gross amount lets us recoup

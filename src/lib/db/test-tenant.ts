@@ -19,6 +19,7 @@ import {
   interestSignups,
   eventInterests,
   contactMessages,
+  stripeConnectAccounts,
 } from "./schema";
 
 export const TEST_REUNION_SLUG = "phhs-1996-test";
@@ -75,10 +76,11 @@ async function loadProdShell(db: Db): Promise<Shell> {
 }
 
 export type StripeLinkage = {
-  stripeConnectedAccountId: string;
-  stripeConnectOnboardingComplete: boolean;
-  stripeConnectChargesEnabled: boolean;
-  stripeConnectPayoutsEnabled: boolean;
+  environment: "test" | "live";
+  accountId: string;
+  detailsSubmitted: boolean;
+  chargesEnabled: boolean;
+  payoutsEnabled: boolean;
 };
 
 /**
@@ -86,35 +88,44 @@ export type StripeLinkage = {
  * record itself. Safe to call when the test reunion does not exist.
  *
  * `options.preserveStripe` (default false): when true, capture the existing
- * reunion's Stripe Connect linkage and return it so the caller can re-apply
- * it on a freshly-created reunion. Used by `seed-test` so a data refresh
- * doesn't force the admin to re-do Stripe onboarding.
+ * reunion's Stripe Connect linkages (one row per environment) and return
+ * them so the caller can re-apply them on a freshly-created reunion. Used
+ * by `seed-test` so a data refresh doesn't force the admin to re-do Stripe
+ * onboarding.
  */
 export async function wipeTestTenant(
   db: Db,
   options: { preserveStripe?: boolean } = {}
-): Promise<StripeLinkage | null> {
+): Promise<StripeLinkage[]> {
   const existing = await db
     .select()
     .from(reunions)
     .where(eq(reunions.slug, TEST_REUNION_SLUG))
     .get();
 
-  if (!existing) return null;
+  if (!existing) return [];
 
   const reunionId = existing.id;
-  const captured: StripeLinkage | null =
-    options.preserveStripe && existing.stripeConnectedAccountId
-      ? {
-          stripeConnectedAccountId: existing.stripeConnectedAccountId,
-          stripeConnectOnboardingComplete:
-            !!existing.stripeConnectOnboardingComplete,
-          stripeConnectChargesEnabled:
-            !!existing.stripeConnectChargesEnabled,
-          stripeConnectPayoutsEnabled:
-            !!existing.stripeConnectPayoutsEnabled,
-        }
-      : null;
+  const captured: StripeLinkage[] = options.preserveStripe
+    ? (
+        await db
+          .select()
+          .from(stripeConnectAccounts)
+          .where(eq(stripeConnectAccounts.reunionId, reunionId))
+      ).map((row) => ({
+        environment: row.environment,
+        accountId: row.accountId,
+        detailsSubmitted: row.detailsSubmitted,
+        chargesEnabled: row.chargesEnabled,
+        payoutsEnabled: row.payoutsEnabled,
+      }))
+    : [];
+
+  // Always delete the connect rows even when preserving — the FK to
+  // reunions.id requires they go before the reunion does.
+  await db
+    .delete(stripeConnectAccounts)
+    .where(eq(stripeConnectAccounts.reunionId, reunionId));
 
   const existingRsvps = await db
     .select({ id: rsvps.id })
@@ -160,13 +171,14 @@ export async function wipeTestTenant(
  * creating a fresh tenant. No events, siteMode=tease. The shell mirrors
  * prod so the public site renders identically.
  *
- * Pass `stripeLinkage` to pre-attach an existing Stripe connected account
- * (used by `seed-test` to preserve linkage across data wipes so admins
- * don't have to redo Stripe onboarding).
+ * Pass `stripeLinkages` (typically captured by `wipeTestTenant`) to
+ * pre-attach existing Stripe connected accounts (used by `seed-test` to
+ * preserve linkage across data wipes so admins don't have to redo Stripe
+ * onboarding). One linkage per environment.
  */
 export async function createBareTestReunion(
   db: Db,
-  stripeLinkage?: StripeLinkage | null
+  stripeLinkages?: StripeLinkage[] | null
 ) {
   const shell = await loadProdShell(db);
   const [reunion] = await db
@@ -176,15 +188,22 @@ export async function createBareTestReunion(
       ...shell,
       registrationOpen: false,
       siteMode: "tease",
-      stripeConnectedAccountId: stripeLinkage?.stripeConnectedAccountId ?? null,
-      stripeConnectOnboardingComplete:
-        stripeLinkage?.stripeConnectOnboardingComplete ?? false,
-      stripeConnectChargesEnabled:
-        stripeLinkage?.stripeConnectChargesEnabled ?? false,
-      stripeConnectPayoutsEnabled:
-        stripeLinkage?.stripeConnectPayoutsEnabled ?? false,
     })
     .returning();
+
+  if (stripeLinkages && stripeLinkages.length > 0) {
+    await db.insert(stripeConnectAccounts).values(
+      stripeLinkages.map((l) => ({
+        reunionId: reunion.id,
+        environment: l.environment,
+        accountId: l.accountId,
+        detailsSubmitted: l.detailsSubmitted,
+        chargesEnabled: l.chargesEnabled,
+        payoutsEnabled: l.payoutsEnabled,
+      }))
+    );
+  }
+
   return reunion;
 }
 

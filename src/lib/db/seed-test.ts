@@ -1,7 +1,6 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import {
-  reunions,
   events,
   rsvps,
   registrationEvents,
@@ -11,7 +10,11 @@ import {
   interestSignups,
   eventInterests,
 } from "./schema";
-import { wipeTestTenant, loadProdShell, TEST_REUNION_SLUG } from "./test-tenant";
+import {
+  wipeTestTenant,
+  createBareTestReunion,
+  TEST_REUNION_SLUG,
+} from "./test-tenant";
 import { CANONICAL_EVENTS } from "./canonical-events";
 
 async function seedTest() {
@@ -27,38 +30,22 @@ async function seedTest() {
   // re-do Stripe onboarding every time they refresh sample data. Use
   // `npm run db:wipe-test` for the nuclear option that also clears Stripe.
   console.log(`Wiping any existing test tenant data (preserving Stripe Connect)…`);
-  const stripeLinkage = await wipeTestTenant(db, { preserveStripe: true });
-  if (stripeLinkage) {
+  const stripeLinkages = await wipeTestTenant(db, { preserveStripe: true });
+  for (const linkage of stripeLinkages) {
     console.log(
-      `Preserved Stripe linkage: ${stripeLinkage.stripeConnectedAccountId}`
+      `Preserved ${linkage.environment} Stripe linkage: ${linkage.accountId}`
     );
   }
 
   // Test reunion mirrors prod's shell (name, description, event metadata) so
   // the public site renders identically — no "TEST" labels visible. Only the
-  // siteMode/registrationOpen state, the Stripe linkage we just preserved,
+  // siteMode/registrationOpen state, the Stripe linkages we just preserved,
   // and the sample data below are test-specific.
   //
   // Default to siteMode=tease so seed-test starts the same way wipe-test does
   // — admins (and you) progress through tease → pre_register → open via the
   // admin toggle (or just preview other modes via the admin banner).
-  const shell = await loadProdShell(db);
-  const [reunion] = await db
-    .insert(reunions)
-    .values({
-      slug: TEST_REUNION_SLUG,
-      ...shell,
-      registrationOpen: false,
-      siteMode: "tease",
-      stripeConnectedAccountId: stripeLinkage?.stripeConnectedAccountId ?? null,
-      stripeConnectOnboardingComplete:
-        stripeLinkage?.stripeConnectOnboardingComplete ?? false,
-      stripeConnectChargesEnabled:
-        stripeLinkage?.stripeConnectChargesEnabled ?? false,
-      stripeConnectPayoutsEnabled:
-        stripeLinkage?.stripeConnectPayoutsEnabled ?? false,
-    })
-    .returning();
+  const reunion = await createBareTestReunion(db, stripeLinkages);
 
   console.log("Created test reunion (mirroring prod shell)");
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { getStripe, buildConnectReturnUrl } from "@/lib/stripe";
+import { getStripe, buildConnectReturnUrl, loadConnectAccount } from "@/lib/stripe";
 import { requireReunionAdmin } from "@/lib/admin-auth";
 
 export async function POST(req: NextRequest) {
@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!reunion.stripeConnectedAccountId) {
+    const connect = await loadConnectAccount(reunionId);
+    if (!connect) {
       return NextResponse.json(
         { error: "No connected account — set up payouts first." },
         { status: 400 }
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
     const fallbackPath = `/admin/${reunion.slug}`;
 
     const accountLink = await stripe.accountLinks.create({
-      account: reunion.stripeConnectedAccountId,
+      account: connect.accountId,
       refresh_url: buildConnectReturnUrl(req, returnPath, fallbackPath, "refresh"),
       return_url: buildConnectReturnUrl(req, returnPath, fallbackPath, "complete"),
       type: "account_onboarding",

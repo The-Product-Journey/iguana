@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, stripeEnvironment } from "@/lib/stripe";
 import { db } from "@/lib/db";
-import { reunions, rsvps, sponsors } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { rsvps, sponsors, stripeConnectAccounts } from "@/lib/db/schema";
+import { and, eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -99,15 +99,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Update the cached row for this accountId in the current environment.
+    // We scope by environment to avoid a stray webhook from one env touching
+    // a row in the other (defensive — the same accountId can't actually
+    // exist in both, but guards against test/live key crosstalk).
     await db
-      .update(reunions)
+      .update(stripeConnectAccounts)
       .set({
-        stripeConnectOnboardingComplete: account.details_submitted ?? false,
-        stripeConnectChargesEnabled: account.charges_enabled ?? false,
-        stripeConnectPayoutsEnabled: account.payouts_enabled ?? false,
+        detailsSubmitted: account.details_submitted ?? false,
+        chargesEnabled: account.charges_enabled ?? false,
+        payoutsEnabled: account.payouts_enabled ?? false,
         updatedAt: new Date().toISOString(),
       })
-      .where(eq(reunions.stripeConnectedAccountId, accountId));
+      .where(
+        and(
+          eq(stripeConnectAccounts.accountId, accountId),
+          eq(stripeConnectAccounts.environment, stripeEnvironment())
+        )
+      );
   }
 
   return NextResponse.json({ received: true });

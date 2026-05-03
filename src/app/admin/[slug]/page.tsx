@@ -20,6 +20,7 @@ import { AdminTabs } from "./admin-tabs";
 import { ConnectStatus } from "@/components/connect-status";
 import { LaunchIcon } from "@/components/launch-icon";
 import { requireReunionAdminPage } from "@/lib/admin-auth";
+import { loadConnectAccount } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
 
@@ -51,6 +52,7 @@ export default async function AdminReunionPage({
     allMemorials,
     allProfiles,
     allEvents,
+    connect,
   ] = await Promise.all([
     db
       .select()
@@ -96,6 +98,7 @@ export default async function AdminReunionPage({
       .from(events)
       .where(eq(events.reunionId, reunion.id))
       .orderBy(events.sortOrder),
+    loadConnectAccount(reunion.id),
   ]);
 
   // Get event interest counts
@@ -190,11 +193,11 @@ export default async function AdminReunionPage({
       <ConnectStatus
         reunionId={reunion.id}
         slug={slug}
-        connectedAccountId={reunion.stripeConnectedAccountId}
-        initialHasAccount={!!reunion.stripeConnectedAccountId}
-        initialOnboardingComplete={!!reunion.stripeConnectOnboardingComplete}
-        initialChargesEnabled={!!reunion.stripeConnectChargesEnabled}
-        initialPayoutsEnabled={!!reunion.stripeConnectPayoutsEnabled}
+        connectedAccountId={connect?.accountId ?? null}
+        initialHasAccount={!!connect}
+        initialOnboardingComplete={!!connect?.detailsSubmitted}
+        initialChargesEnabled={!!connect?.chargesEnabled}
+        initialPayoutsEnabled={!!connect?.payoutsEnabled}
       />
 
       {/* Summary stats */}
