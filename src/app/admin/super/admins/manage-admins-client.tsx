@@ -168,6 +168,7 @@ function ReunionAdminsTab({
             {reunions.map((r) => (
               <option key={r.id} value={r.id}>
                 {r.name}
+                {r.slug.endsWith("-test") ? " (test)" : ""}
               </option>
             ))}
           </select>
@@ -195,7 +196,14 @@ function ReunionAdminsTab({
         const admins = adminsByReunion[r.id] ?? [];
         return (
           <div key={r.id}>
-            <h3 className="mb-2 text-base font-semibold">{r.name}</h3>
+            <h3 className="mb-2 flex items-center gap-2 text-base font-semibold">
+              {r.name}
+              {r.slug.endsWith("-test") && (
+                <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-800">
+                  Test
+                </span>
+              )}
+            </h3>
             {admins.length === 0 ? (
               <p className="text-sm text-gray-500">No admins yet.</p>
             ) : (
