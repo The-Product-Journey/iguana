@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { reunions, sponsors } from "@/lib/db/schema";
-import { getStripe } from "@/lib/stripe";
-import { getSponsorTier } from "@/lib/constants";
+import { getStripe, getBaseUrl } from "@/lib/stripe";
+import { getSponsorTier, computeApplicationFeeCents } from "@/lib/constants";
 import { uploadImage } from "@/lib/upload";
 
 export async function POST(req: NextRequest) {
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `${tier === "top" ? "Top" : "Community Service"} Sponsorship${companyName ? ` — ${companyName}` : ""}`,
+              name: `${tier === "top" ? "Trojan" : "Community Service Project"} Sponsorship${companyName ? ` — ${companyName}` : ""}`,
               description: `PHHS Class of 1996 Reunion Sponsorship`,
             },
             unit_amount: amountCents,
@@ -97,10 +97,16 @@ export async function POST(req: NextRequest) {
           destination: reunion.stripeConnectedAccountId!,
         },
         on_behalf_of: reunion.stripeConnectedAccountId!,
+        // application_fee_amount = platform's intended cut + estimated
+        // Stripe processing fee. Stripe debits the actual processing fee
+        // from the platform balance, so this gross amount lets us recoup
+        // the Stripe fee and keep our net platform fee. Connected account
+        // ends up with (amountCents - application_fee_amount).
+        application_fee_amount: computeApplicationFeeCents(amountCents),
       },
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/${reunion.slug}/sponsor/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/${reunion.slug}/sponsor`,
+      success_url: `${getBaseUrl(req)}/${reunion.slug}/sponsor/confirmation?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${getBaseUrl(req)}/${reunion.slug}/sponsor`,
       customer_email: contactEmail,
       metadata: {
         sponsor_id: sponsor.id,

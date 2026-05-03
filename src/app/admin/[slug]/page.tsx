@@ -18,6 +18,8 @@ import { formatCents } from "@/lib/utils";
 import { SiteModeToggle } from "@/components/site-mode-toggle";
 import { AdminTabs } from "./admin-tabs";
 import { ConnectStatus } from "@/components/connect-status";
+import { LaunchIcon } from "@/components/launch-icon";
+import { requireReunionAdminPage } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +36,11 @@ export default async function AdminReunionPage({
     .get();
 
   if (!reunion) notFound();
+
+  // Per-reunion scope guard. The proxy only enforces "is any admin"; here
+  // we ensure a reunion-A admin can't load reunion-B's dashboard by URL.
+  // Super admins always pass.
+  await requireReunionAdminPage(reunion.id);
 
   // Fetch all data in parallel
   const [
@@ -79,7 +86,11 @@ export default async function AdminReunionPage({
         editToken: rsvps.editToken,
       })
       .from(profiles)
-      .innerJoin(rsvps, eq(profiles.rsvpId, rsvps.id)),
+      .innerJoin(rsvps, eq(profiles.rsvpId, rsvps.id))
+      // Reunion-scope filter — without this, the join returns profiles for
+      // every reunion. Dormant today (single reunion) but exploitable the
+      // moment per-tenant admins exist.
+      .where(eq(rsvps.reunionId, reunion.id)),
     db
       .select()
       .from(events)
@@ -152,7 +163,24 @@ export default async function AdminReunionPage({
         &larr; Back to dashboard
       </Link>
 
-      <h2 className="mb-4 text-2xl font-bold">{reunion.name}</h2>
+      <div className="mb-4 flex items-center gap-2">
+        <h2 className="text-2xl font-bold">{reunion.name}</h2>
+        {slug.endsWith("-test") && (
+          <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-amber-800">
+            Test
+          </span>
+        )}
+        <a
+          href={`/${slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Open public site in new tab"
+          aria-label={`Open ${reunion.name} public site in new tab`}
+          className="inline-flex h-7 w-7 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+        >
+          <LaunchIcon className="h-5 w-5" />
+        </a>
+      </div>
 
       <SiteModeToggle
         reunionId={reunion.id}

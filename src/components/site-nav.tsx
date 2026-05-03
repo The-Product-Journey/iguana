@@ -2,20 +2,39 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { AdminMenu } from "./admin-menu";
+
+type SiteMode = "tease" | "pre_register" | "open";
 
 type NavProps = {
   slug: string;
   reunionName: string;
   siteMode: string;
+  isAdmin?: boolean;
+  /** Render the AdminMenu in this nav (true when no preview banner is showing). */
+  showAdminMenu?: boolean;
+  /** Current preview override, or null if none. */
+  previewMode?: SiteMode | null;
+  /** Actual DB siteMode (what the public sees). */
+  actualMode?: SiteMode;
 };
 
-export function SiteNav({ slug, reunionName, siteMode }: NavProps) {
+export function SiteNav({
+  slug,
+  reunionName,
+  siteMode,
+  isAdmin,
+  showAdminMenu,
+  previewMode,
+  actualMode,
+}: NavProps) {
   const [open, setOpen] = useState(false);
 
   const links: { label: string; href: string; modes: string[] }[] = [
     { label: "Schedule", href: `/${slug}/schedule`, modes: ["pre_register", "open"] },
     { label: "Sponsors", href: `/${slug}/sponsors`, modes: ["tease", "pre_register", "open"] },
     { label: "Yearbook", href: `/${slug}/yearbook`, modes: ["pre_register", "open"] },
+    { label: "Community Service", href: `/${slug}/community-service`, modes: ["pre_register", "open"] },
     { label: "Memorial", href: `/${slug}/memorial`, modes: ["pre_register", "open"] },
     { label: "Sponsor Us", href: `/${slug}/sponsor`, modes: ["tease", "pre_register", "open"] },
   ];
@@ -50,6 +69,21 @@ export function SiteNav({ slug, reunionName, siteMode }: NavProps) {
             >
               Register
             </Link>
+          )}
+          {!isAdmin && (
+            <Link
+              href="/admin"
+              className="text-xs text-gray-400 hover:text-gray-600"
+            >
+              Admin login
+            </Link>
+          )}
+          {showAdminMenu && actualMode && (
+            <AdminMenu
+              actualMode={actualMode}
+              previewMode={previewMode ?? null}
+              variant="light"
+            />
           )}
         </div>
 

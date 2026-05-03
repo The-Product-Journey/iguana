@@ -3,7 +3,8 @@ import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { SiteNav } from "@/components/site-nav";
-import { getEffectiveSiteMode } from "@/lib/site-mode";
+import { AdminPreviewBanner } from "@/components/admin-preview-banner";
+import { getAdminPreviewState } from "@/lib/site-mode";
 
 export default async function ReunionLayout({
   children,
@@ -22,18 +23,38 @@ export default async function ReunionLayout({
 
   if (!reunion) notFound();
 
-  const effectiveMode = await getEffectiveSiteMode(reunion);
+  const previewState = await getAdminPreviewState(reunion);
+  const effectiveMode = previewState.effectiveMode;
 
   // Don't show nav on tease mode landing (it has its own design)
   const showNav = effectiveMode !== "tease";
 
+  // Banner shows only when admin is actively previewing a mode that differs
+  // from what the public sees. Otherwise no ribbon — the page renders against
+  // its own background and the AdminMenu (rendered inside SiteNav or
+  // TeaseLanding) is the admin's control surface.
+  const showPreviewBanner =
+    previewState.isAdmin &&
+    previewState.previewMode !== null &&
+    previewState.previewMode !== previewState.actualMode;
+
   return (
     <>
+      {showPreviewBanner && (
+        <AdminPreviewBanner
+          previewMode={previewState.previewMode!}
+          actualMode={previewState.actualMode}
+        />
+      )}
       {showNav && (
         <SiteNav
           slug={slug}
           reunionName={reunion.name}
           siteMode={effectiveMode}
+          isAdmin={previewState.isAdmin}
+          previewMode={previewState.previewMode}
+          actualMode={previewState.actualMode}
+          showAdminMenu={previewState.isAdmin && !showPreviewBanner}
         />
       )}
       {children}

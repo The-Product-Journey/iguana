@@ -74,6 +74,11 @@ export const events = sqliteTable("events", {
   type: text("type", { enum: ["interest_only", "paid"] })
     .notNull()
     .default("interest_only"),
+  // Optional human-friendly tentative timeframe label (e.g. "Friday, time
+  // is TBD", "Saturday Morning - TBD"). Used on interest/registration forms
+  // when exact details aren't locked yet. Independent of eventTime — the
+  // schedule page uses eventTime; informal forms prefer this when present.
+  tentativeLabel: text("tentative_label"),
   priceCents: integer("price_cents"),
   earlyPriceCents: integer("early_price_cents"),
   earlyPriceDeadline: text("early_price_deadline"),
@@ -165,6 +170,13 @@ export const interestSignups = sqliteTable(
       .notNull()
       .references(() => reunions.id),
     email: text("email").notNull(),
+    // Full name as entered by the user (preferred for new signups)
+    name: text("name"),
+    // Optional maiden name / previous last name — useful at reunions where
+    // classmates remember each other by their pre-marriage surname
+    maidenName: text("maiden_name"),
+    // Legacy split name fields — kept for backward compat with older signups
+    // and admin views; new signups write to `name` instead
     firstName: text("first_name"),
     lastName: text("last_name"),
     createdAt: text("created_at")
@@ -191,6 +203,11 @@ export const eventInterests = sqliteTable(
     eventId: text("event_id")
       .notNull()
       .references(() => events.id),
+    // "yes" / "maybe" / "no" — the level of interest the signer expressed.
+    // Nullable for backward compat with rows created before this column
+    // existed (those should be read as implicit "yes"). Enum not enforced
+    // at the DB layer because libsql/sqlite doesn't have native enums.
+    response: text("response", { enum: ["yes", "maybe", "no"] }),
   },
   (table) => [
     uniqueIndex("idx_event_interest_signup_event").on(
@@ -219,6 +236,13 @@ export const sponsors = sqliteTable("sponsors", {
   amountCents: integer("amount_cents").notNull(),
   tier: text("tier", { enum: ["top", "community"] }).notNull(),
   message: text("message"),
+  // How the sponsor wants to be credited on the public sponsors page.
+  // displayName overrides the default of (companyName || contactName).
+  // isAnonymous shows "Anonymous Sponsor" and hides website/logo.
+  // Nullable for backward compat with rows created before these columns
+  // existed; read with `?? false` for the boolean.
+  displayName: text("display_name"),
+  isAnonymous: integer("is_anonymous", { mode: "boolean" }).default(false),
   stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
   paymentStatus: text("payment_status", {
     enum: ["pending", "paid", "failed"],
@@ -330,6 +354,61 @@ export const contactMessages = sqliteTable("contact_messages", {
 });
 
 // ---------------------------------------------------------------------------
+// Super admins (global; can do anything in any reunion, can invite other
+// super admins). Bootstrap row is inserted via `db:seed-super-admins`.
+// ---------------------------------------------------------------------------
+// Email is stored lowercased on insert; unique on email so the same person
+// can't be added twice. clerkUserId is backfilled on first sign-in by that
+// email. invitedByEmail is null only for the system bootstrap row.
+export const superAdmins = sqliteTable(
+  "super_admins",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    email: text("email").notNull(),
+    clerkUserId: text("clerk_user_id"),
+    invitedByEmail: text("invited_by_email"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(datetime('now'))`),
+  },
+  (table) => [uniqueIndex("idx_super_admins_email").on(table.email)]
+);
+
+// ---------------------------------------------------------------------------
+// Reunion admins (per-tenant admin allowlist)
+// ---------------------------------------------------------------------------
+// Email is stored lowercased on insert; (reunionId, email) is unique so the
+// same person can admin multiple reunions via separate rows.
+// clerkUserId is backfilled on first sign-in by that email (best-effort,
+// fail-closed on error — see src/lib/admin-auth.ts).
+export const reunionAdmins = sqliteTable(
+  "reunion_admins",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    reunionId: text("reunion_id")
+      .notNull()
+      .references(() => reunions.id),
+    email: text("email").notNull(),
+    clerkUserId: text("clerk_user_id"),
+    invitedByEmail: text("invited_by_email"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(datetime('now'))`),
+  },
+  (table) => [
+    uniqueIndex("idx_reunion_admins_reunion_email").on(
+      table.reunionId,
+      table.email
+    ),
+    index("idx_reunion_admins_email").on(table.email),
+  ]
+);
+
+// ---------------------------------------------------------------------------
 // Type exports
 // ---------------------------------------------------------------------------
 export type Reunion = typeof reunions.$inferSelect;
@@ -348,3 +427,7 @@ export type Profile = typeof profiles.$inferSelect;
 export type NewProfile = typeof profiles.$inferInsert;
 export type Memorial = typeof memorials.$inferSelect;
 export type NewMemorial = typeof memorials.$inferInsert;
+export type ReunionAdmin = typeof reunionAdmins.$inferSelect;
+export type NewReunionAdmin = typeof reunionAdmins.$inferInsert;
+export type SuperAdmin = typeof superAdmins.$inferSelect;
+export type NewSuperAdmin = typeof superAdmins.$inferInsert;

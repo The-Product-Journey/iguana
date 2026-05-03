@@ -40,3 +40,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.gstack/
+
+# clerk configuration (can include secrets)
+/.clerk/
+
+# claude code session state (local agent files, not for VCS)
+/.claude/

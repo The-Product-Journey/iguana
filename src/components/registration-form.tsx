@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { formatCents } from "@/lib/utils";
+import { REFUND_POLICY_TEXT } from "@/lib/constants";
 import type { Event } from "@/lib/db/schema";
 
 const FEE_PRESETS = [
@@ -447,6 +448,12 @@ export function RegistrationForm({
                 <span>Total</span>
                 <span>{formatCents(grandTotal)}</span>
               </div>
+            </div>
+          )}
+
+          {hasPaidEvent && payNow && chargesEnabled && (
+            <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-gray-700">
+              {REFUND_POLICY_TEXT}
             </div>
           )}
 

@@ -1,6 +1,5 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
-import { eq } from "drizzle-orm";
 import {
   reunions,
   events,
@@ -12,6 +11,8 @@ import {
   interestSignups,
   eventInterests,
 } from "./schema";
+import { wipeTestTenant, loadProdShell, TEST_REUNION_SLUG } from "./test-tenant";
+import { CANONICAL_EVENTS } from "./canonical-events";
 
 async function seedTest() {
   const client = createClient({
@@ -20,96 +21,64 @@ async function seedTest() {
   });
   const db = drizzle(client);
 
-  // Check if test reunion already exists
-  const existing = await db
-    .select()
-    .from(reunions)
-    .where(eq(reunions.slug, "phhs-1996-test"))
-    .get();
-
-  if (existing) {
-    console.log("Test reunion already exists. Delete it first to re-seed.");
-    process.exit(0);
+  // Wipe-and-re-seed: re-running this script gives a clean baseline. No
+  // --force flag — this is the test tenant; that's the whole point.
+  // PRESERVE Stripe Connect linkage across the wipe so admins don't have to
+  // re-do Stripe onboarding every time they refresh sample data. Use
+  // `npm run db:wipe-test` for the nuclear option that also clears Stripe.
+  console.log(`Wiping any existing test tenant data (preserving Stripe Connect)…`);
+  const stripeLinkage = await wipeTestTenant(db, { preserveStripe: true });
+  if (stripeLinkage) {
+    console.log(
+      `Preserved Stripe linkage: ${stripeLinkage.stripeConnectedAccountId}`
+    );
   }
 
-  // Create test reunion (siteMode: open so everything is browsable)
+  // Test reunion mirrors prod's shell (name, description, event metadata) so
+  // the public site renders identically — no "TEST" labels visible. Only the
+  // siteMode/registrationOpen state, the Stripe linkage we just preserved,
+  // and the sample data below are test-specific.
+  //
+  // Default to siteMode=tease so seed-test starts the same way wipe-test does
+  // — admins (and you) progress through tease → pre_register → open via the
+  // admin toggle (or just preview other modes via the admin banner).
+  const shell = await loadProdShell(db);
   const [reunion] = await db
     .insert(reunions)
     .values({
-      slug: "phhs-1996-test",
-      name: "Park Hill High School — Class of 1996 (TEST)",
-      description:
-        "This is a TEST environment with sample data. Join us for our 30-year reunion! Reconnect with fellow Trojans, share stories, and celebrate three decades since graduation.",
-      eventDate: "2026-08-28",
-      eventTime: "August 28–29, 2026",
-      eventLocation: "The Olde Mill",
-      eventAddress: "Parkville, MO",
-      registrationFeeCents: 9876,
-      registrationOpen: true,
-      siteMode: "open",
-      maxAttendees: 300,
+      slug: TEST_REUNION_SLUG,
+      ...shell,
+      registrationOpen: false,
+      siteMode: "tease",
+      stripeConnectedAccountId: stripeLinkage?.stripeConnectedAccountId ?? null,
+      stripeConnectOnboardingComplete:
+        stripeLinkage?.stripeConnectOnboardingComplete ?? false,
+      stripeConnectChargesEnabled:
+        stripeLinkage?.stripeConnectChargesEnabled ?? false,
+      stripeConnectPayoutsEnabled:
+        stripeLinkage?.stripeConnectPayoutsEnabled ?? false,
     })
     .returning();
 
-  console.log("Created test reunion");
+  console.log("Created test reunion (mirroring prod shell)");
 
-  // Create events (same as production)
-  const eventValues = [
-    {
-      reunionId: reunion.id,
-      name: "Friday Night Tailgate",
-      slug: "friday-tailgate",
-      description:
-        "Tailgate at Park Hill High School for the football home opener. Food truck on site. Simple cover charge at the gate.",
-      eventDate: "2026-08-28",
-      eventTime: "5:00 PM",
-      eventLocation: "Park Hill High School",
-      eventAddress: "7701 NW Barry Rd, Kansas City, MO 64153",
-      type: "interest_only" as const,
-      sortOrder: 1,
-    },
-    {
-      reunionId: reunion.id,
-      name: "Friday Night at Kelly Barges",
-      slug: "friday-bar",
-      description:
-        "Live band, streaming of the Park Hill football game, and good times. Drinks and food on your own tab.",
-      eventDate: "2026-08-28",
-      eventTime: "8:00 PM",
-      eventLocation: "Kelly Barges",
-      eventAddress: "Platte Woods, MO",
-      type: "interest_only" as const,
-      sortOrder: 2,
-    },
-    {
-      reunionId: reunion.id,
-      name: "Saturday Community Service",
-      slug: "saturday-service",
-      description:
-        "Give back to the Park Hill community. We're partnering with a local charity for a morning of community service — likely school supply backpack stuffing.",
-      eventDate: "2026-08-29",
-      eventTime: "9:00 AM",
-      eventLocation: "TBD",
-      type: "interest_only" as const,
-      sortOrder: 3,
-    },
-    {
-      reunionId: reunion.id,
-      name: "Saturday Evening Banquet",
-      slug: "saturday-banquet",
-      description:
-        "The main event! Dinner, drinks, and an evening of reconnecting with your fellow Trojans at The Olde Mill in Parkville.",
-      eventDate: "2026-08-29",
-      eventTime: "6:00 PM",
-      eventLocation: "The Olde Mill",
-      eventAddress: "Parkville, MO",
-      type: "paid" as const,
-      priceCents: 9876,
-      earlyPriceCents: 7500,
-      earlyPriceDeadline: "2026-07-01",
-      sortOrder: 4,
-    },
-  ];
+  // Events use the shared canonical seed so prod and test stay in sync.
+  const eventValues = CANONICAL_EVENTS.map((e) => ({
+    reunionId: reunion.id,
+    name: e.name,
+    slug: e.slug,
+    description: e.description,
+    eventDate: e.eventDate,
+    eventTime: e.eventTime,
+    eventLocation: e.eventLocation,
+    eventAddress: e.eventAddress,
+    tentativeLabel: e.tentativeLabel,
+    type: e.type,
+    priceCents: e.priceCents ?? null,
+    earlyPriceCents: e.earlyPriceCents ?? null,
+    earlyPriceDeadline: e.earlyPriceDeadline ?? null,
+    sortOrder: e.sortOrder,
+  }));
 
   const createdEvents = await db.insert(events).values(eventValues).returning();
   console.log(`Created ${createdEvents.length} events`);
@@ -282,12 +251,17 @@ async function seedTest() {
   console.log("Created 5 sample interest signups");
 
   console.log("\n--- Test environment ready! ---");
-  console.log(`Browse: http://localhost:3000/phhs-1996-test`);
-  console.log(`Admin:  http://localhost:3000/admin/phhs-1996-test`);
-  process.exit(0);
+  console.log(`Browse: http://localhost:3000/${TEST_REUNION_SLUG}`);
+  console.log(`Admin:  http://localhost:3000/admin/${TEST_REUNION_SLUG}`);
+  console.log("");
+  console.log(`To reset to an empty tenant (onboarding test), run: npm run db:wipe-test`);
+  client.close();
+  return 0;
 }
 
-seedTest().catch((e) => {
-  console.error("Test seed failed:", e);
-  process.exit(1);
-});
+seedTest()
+  .then((code) => process.exit(code))
+  .catch((e) => {
+    console.error("Test seed failed:", e);
+    process.exit(1);
+  });

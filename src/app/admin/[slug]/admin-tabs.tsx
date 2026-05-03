@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { formatCents } from "@/lib/utils";
+import { getSponsorTierLabel } from "@/lib/constants";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { PublishSponsorDialog } from "@/components/publish-sponsor-dialog";
 import type {
   Rsvp,
   InterestSignup,
@@ -188,17 +192,28 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
               </td>
             </tr>
           ) : (
-            interests.map((i) => (
-              <tr key={i.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 text-gray-600">{i.email}</td>
-                <td className="px-4 py-3 font-medium">
-                  {i.firstName || ""} {i.lastName || ""}
-                </td>
-                <td className="px-4 py-3 text-gray-500">
-                  {new Date(i.createdAt).toLocaleDateString()}
-                </td>
-              </tr>
-            ))
+            interests.map((i) => {
+              const displayName =
+                i.name ||
+                [i.firstName, i.lastName].filter(Boolean).join(" ") ||
+                "—";
+              return (
+                <tr key={i.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 text-gray-600">{i.email}</td>
+                  <td className="px-4 py-3 font-medium">
+                    {displayName}
+                    {i.maidenName && (
+                      <span className="ml-1 text-xs text-gray-500">
+                        (née {i.maidenName})
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-gray-500">
+                    {new Date(i.createdAt).toLocaleDateString()}
+                  </td>
+                </tr>
+              );
+            })
           )}
         </tbody>
       </table>
@@ -207,19 +222,65 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
 }
 
 function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
+  const router = useRouter();
   const [toggling, setToggling] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState<string | null>(null);
+  // Unpublish flow uses the simple yes/no ConfirmDialog
+  const [pendingUnpublish, setPendingUnpublish] = useState<string | null>(null);
+  // Publish flow uses the richer PublishSponsorDialog (preview + edit)
+  const [publishingSponsor, setPublishingSponsor] = useState<Sponsor | null>(null);
 
-  async function toggleDisplay(sponsorId: string) {
+  function requestToggle(sponsor: Sponsor) {
+    if (sponsor.isDisplayed) {
+      setPendingUnpublish(sponsor.id);
+    } else {
+      setPublishingSponsor(sponsor);
+    }
+  }
+
+  async function confirmUnpublish() {
+    if (!pendingUnpublish) return;
+    const sponsorId = pendingUnpublish;
+    setPendingUnpublish(null);
     setToggling(sponsorId);
     await fetch("/api/admin/sponsors", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sponsorId, action: "toggleDisplay" }),
     });
-    window.location.reload();
+    router.refresh();
+    setToggling(null);
+  }
+
+  function onPublished() {
+    setPublishingSponsor(null);
+    router.refresh();
+  }
+
+  async function refreshFromStripe(sponsorId: string) {
+    setRefreshing(sponsorId);
+    try {
+      const res = await fetch("/api/admin/sponsors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sponsorId, action: "refreshFromStripe" }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Failed to sync from Stripe");
+        setRefreshing(null);
+        return;
+      }
+      router.refresh();
+      setRefreshing(null);
+    } catch {
+      alert("Something went wrong syncing from Stripe");
+      setRefreshing(null);
+    }
   }
 
   return (
+    <>
     <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
       <table className="w-full text-left text-sm">
         <thead className="border-b border-gray-200 bg-gray-50">
@@ -229,7 +290,7 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
             <th className="px-4 py-3 font-medium text-gray-700">Amount</th>
             <th className="px-4 py-3 font-medium text-gray-700">Tier</th>
             <th className="px-4 py-3 font-medium text-gray-700">Status</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Display</th>
+            <th className="px-4 py-3 font-medium text-gray-700">Visibility</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
@@ -257,23 +318,40 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                         : "bg-gray-100 text-gray-700"
                     }`}
                   >
-                    {s.tier === "top" ? "Top" : "Community"}
+                    {getSponsorTierLabel(s.tier)}
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <StatusBadge status={s.paymentStatus} />
+                  <div className="flex items-center gap-2">
+                    <StatusBadge status={s.paymentStatus} />
+                    {s.stripeCheckoutSessionId && (
+                      <button
+                        onClick={() => refreshFromStripe(s.id)}
+                        disabled={refreshing === s.id}
+                        title="Sync payment status from Stripe"
+                        className="rounded border border-gray-300 px-2 py-0.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        {refreshing === s.id ? "Syncing…" : "Refresh"}
+                      </button>
+                    )}
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <button
-                    onClick={() => toggleDisplay(s.id)}
+                    onClick={() => requestToggle(s)}
                     disabled={toggling === s.id}
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                    title={
                       s.isDisplayed
-                        ? "bg-green-100 text-green-700 hover:bg-green-200"
-                        : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                        ? "Currently published — click to unpublish"
+                        : "Currently a draft — click to publish to the public site"
+                    }
+                    className={`text-sm underline-offset-2 hover:underline disabled:opacity-50 ${
+                      s.isDisplayed
+                        ? "text-gray-500 hover:text-gray-700"
+                        : "text-green-700 hover:text-green-800"
                     }`}
                   >
-                    {s.isDisplayed ? "Shown" : "Hidden"}
+                    {s.isDisplayed ? "Unpublish" : "Publish"}
                   </button>
                 </td>
               </tr>
@@ -282,6 +360,22 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
         </tbody>
       </table>
     </div>
+    <ConfirmDialog
+      open={pendingUnpublish !== null}
+      title="Unpublish sponsor?"
+      message="They won't be shown on the public sponsors page until you republish."
+      confirmLabel="Unpublish"
+      confirmVariant="neutral"
+      onConfirm={confirmUnpublish}
+      onCancel={() => setPendingUnpublish(null)}
+    />
+    <PublishSponsorDialog
+      open={publishingSponsor !== null}
+      sponsor={publishingSponsor}
+      onCancel={() => setPublishingSponsor(null)}
+      onPublished={onPublished}
+    />
+    </>
   );
 }
 
@@ -377,6 +471,7 @@ function ProfilesTab({
   profiles: ProfileWithRsvp[];
   slug: string;
 }) {
+  const router = useRouter();
   const [toggling, setToggling] = useState<string | null>(null);
 
   async function togglePublished(profileId: string) {
@@ -386,7 +481,8 @@ function ProfilesTab({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ profileId, action: "togglePublished" }),
     });
-    window.location.reload();
+    router.refresh();
+    setToggling(null);
   }
 
   return (

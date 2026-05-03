@@ -1,19 +1,15 @@
-import { cookies } from "next/headers";
-import { AdminLogin } from "@/components/admin-login";
+import { UserButton } from "@clerk/nextjs";
 
-export default async function AdminLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const adminAuth = cookieStore.get("admin_auth")?.value;
-  const isAuthed = adminAuth === process.env.ADMIN_PASSWORD;
-
-  if (!isAuthed) {
-    return <AdminLogin />;
-  }
-
+  // Auth is enforced upstream:
+  //   - src/proxy.ts gates /admin(.*) on signed-in + any-admin
+  //   - per-page helpers (e.g. requireReunionAdminPage on /admin/[slug])
+  //     enforce per-reunion scope
+  // This layout no longer needs a cookie check.
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="border-b border-gray-200 bg-white px-6 py-4">
@@ -21,14 +17,9 @@ export default async function AdminLayout({
           <h1 className="text-lg font-semibold text-gray-900">
             Reunion Admin
           </h1>
-          <form action="/api/admin/logout" method="POST">
-            <button
-              type="submit"
-              className="text-sm text-gray-500 hover:text-gray-700"
-            >
-              Logout
-            </button>
-          </form>
+          {/* afterSignOutUrl is configured globally on ClerkProvider in
+              src/app/layout.tsx — see Clerk v7 prop changes. */}
+          <UserButton />
         </div>
       </nav>
       <div className="mx-auto max-w-5xl px-6 py-8">{children}</div>

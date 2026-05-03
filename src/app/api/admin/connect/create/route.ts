@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, getBaseUrl, buildConnectReturnUrl } from "@/lib/stripe";
+import { requireReunionAdmin } from "@/lib/admin-auth";
 
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies();
-  const auth = cookieStore.get("admin_auth");
-  if (auth?.value !== process.env.ADMIN_PASSWORD) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
-    const { reunionId, slug } = await req.json();
+    const { reunionId, slug, returnPath } = await req.json();
 
     if (!reunionId || !slug) {
       return NextResponse.json(
@@ -21,6 +15,9 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const guard = await requireReunionAdmin(reunionId);
+    if (guard instanceof NextResponse) return guard;
 
     const reunion = await db
       .select()
@@ -47,7 +44,7 @@ export async function POST(req: NextRequest) {
 
     const stripe = getStripe();
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
+    const baseUrl = getBaseUrl(req);
     const isProduction = baseUrl.startsWith("https://");
 
     const account = await stripe.accounts.create({
@@ -72,10 +69,11 @@ export async function POST(req: NextRequest) {
       })
       .where(eq(reunions.id, reunionId));
 
+    const fallbackPath = `/admin/${reunion.slug}`;
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
-      refresh_url: `${baseUrl}/admin/${reunion.slug}?connect=refresh`,
-      return_url: `${baseUrl}/admin/${reunion.slug}?connect=complete`,
+      refresh_url: buildConnectReturnUrl(req, returnPath, fallbackPath, "refresh"),
+      return_url: buildConnectReturnUrl(req, returnPath, fallbackPath, "complete"),
       type: "account_onboarding",
     });
 

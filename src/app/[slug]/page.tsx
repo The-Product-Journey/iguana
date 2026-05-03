@@ -6,7 +6,7 @@ import Link from "next/link";
 import { formatCents } from "@/lib/utils";
 import { HelpSection } from "@/components/help-section";
 import { TeaseLanding } from "@/components/tease-landing";
-import { getEffectiveSiteMode } from "@/lib/site-mode";
+import { getAdminPreviewState } from "@/lib/site-mode";
 
 export default async function ReunionPage({
   params,
@@ -22,7 +22,8 @@ export default async function ReunionPage({
 
   if (!reunion) notFound();
 
-  const effectiveMode = await getEffectiveSiteMode(reunion);
+  const previewState = await getAdminPreviewState(reunion);
+  const effectiveMode = previewState.effectiveMode;
 
   // Tease mode — show the teaser landing
   if (effectiveMode === "tease") {
@@ -31,6 +32,15 @@ export default async function ReunionPage({
       .from(events)
       .where(eq(events.reunionId, reunion.id))
       .orderBy(asc(events.sortOrder));
+
+    // Show the AdminMenu inside TeaseLanding only when no banner is also
+    // showing (i.e., previewing the same mode as actual, or no preview).
+    // If the admin is previewing tease while actual is something else,
+    // the AdminPreviewBanner above will own the menu.
+    const showAdminMenu =
+      previewState.isAdmin &&
+      (previewState.previewMode === null ||
+        previewState.previewMode === previewState.actualMode);
 
     return (
       <TeaseLanding
@@ -42,6 +52,10 @@ export default async function ReunionPage({
           eventDate: reunion.eventDate,
         }}
         events={reunionEvents}
+        isAdmin={previewState.isAdmin}
+        showAdminMenu={showAdminMenu}
+        previewMode={previewState.previewMode}
+        actualMode={previewState.actualMode}
       />
     );
   }
@@ -109,6 +123,26 @@ export default async function ReunionPage({
 
         {/* Help / Contact section */}
         <HelpSection reunionId={reunion.id} />
+
+        {/* Community Service Project */}
+        <div className="mt-12 rounded-2xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-white p-8 shadow-sm">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-red-700">
+            Community Service Project
+          </p>
+          <h3 className="mb-2 text-2xl font-bold text-gray-900">
+            96 Backpacks
+          </h3>
+          <p className="mb-4 text-gray-700">
+            Saturday morning, we&apos;re assembling 96 backpacks of school
+            supplies for Park Hill students — partnering with Replenish KC.
+          </p>
+          <Link
+            href={`/${slug}/community-service`}
+            className="inline-block text-sm font-semibold text-red-700 hover:text-red-800"
+          >
+            Learn about 96 Backpacks &rarr;
+          </Link>
+        </div>
 
         <div className="mt-12 text-center">
           <Link
