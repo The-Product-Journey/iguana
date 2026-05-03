@@ -143,23 +143,19 @@ export async function refreshConnectAccount(
 }
 
 /**
- * Resolve the canonical base URL we hand to Stripe for return/refresh URLs,
- * Checkout success/cancel URLs, etc.
+ * Resolve the base URL we hand to Stripe for return/refresh URLs, Checkout
+ * success/cancel URLs, etc. — always derived from the incoming request's
+ * origin so that redirects land back on whatever domain the user came in on.
  *
- * In production, we trust the explicit `NEXT_PUBLIC_BASE_URL` env var — it's
- * the canonical public origin (e.g. `https://reunion.example.com`). We never
- * derive from request headers in prod because those can be spoofed.
+ * Safe on Vercel because the platform only routes traffic to this project
+ * from domains explicitly added to it — an attacker can't spoof the Host
+ * header to inject a foreign domain into our redirect URLs. This also makes
+ * per-tenant custom domains "just work": a request from phhs1996.com gets
+ * redirects back to phhs1996.com without any per-tenant config.
  *
- * In dev (or when the env var is missing/non-https), we derive from the
- * request's own origin. This means whatever port `next dev` actually picked
- * (3000, 3002, whatever) gets used, which fixes the "wrong port" redirect
- * problem when 3000 is taken.
+ * In dev, this also handles whatever port `next dev` happened to pick.
  */
 export function getBaseUrl(req: NextRequest): string {
-  const envUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  if (envUrl && envUrl.startsWith("https://")) {
-    return envUrl.replace(/\/$/, "");
-  }
   return req.nextUrl.origin;
 }
 
