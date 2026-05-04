@@ -49,7 +49,7 @@ export const CANONICAL_EVENTS: CanonicalEvent[] = [
   },
   {
     slug: "friday-bar",
-    name: "Live Music & Food (a la carte)",
+    name: "Live Music & Food",
     description:
       "Live band, streaming of the Park Hill football game, and good times. Drinks and food on your own tab.",
     eventDate: "2026-08-28",
