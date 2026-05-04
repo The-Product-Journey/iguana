@@ -56,6 +56,7 @@ export default async function ReunionPage({
         showAdminMenu={showAdminMenu}
         previewMode={previewState.previewMode}
         actualMode={previewState.actualMode}
+        customDomain={reunion.customDomain}
       />
     );
   }

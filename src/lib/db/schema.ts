@@ -35,13 +35,25 @@ export const reunions = sqliteTable("reunions", {
     .notNull()
     .default("tease"),
   isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  // Optional vanity domain for the public-facing reunion site (e.g.
+  // "www.parkhill1996reunion.com"). Stored as host only — no protocol,
+  // path, or port. Unique across reunions; the proxy middleware reads
+  // this column (with a TTL cache) to map an inbound vanity host to
+  // the reunion slug. NULL = reunion only reachable via canonical URL.
+  customDomain: text("custom_domain"),
+  // Optional favicon URL (Vercel Blob) for per-tenant branding on the
+  // public reunion site. Rendered via generateMetadata in [slug]/layout
+  // when set; falls back to the platform's default favicon when NULL.
+  faviconUrl: text("favicon_url"),
   createdAt: text("created_at")
     .notNull()
     .default(sql`(datetime('now'))`),
   updatedAt: text("updated_at")
     .notNull()
     .default(sql`(datetime('now'))`),
-});
+}, (table) => [
+  uniqueIndex("idx_reunions_custom_domain").on(table.customDomain),
+]);
 
 // ---------------------------------------------------------------------------
 // Events (per-reunion)

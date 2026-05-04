@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AdminMenu } from "./admin-menu";
+import { useAdminModeHref } from "@/lib/use-admin-mode-href";
 
 type SiteMode = "tease" | "pre_register" | "open";
 
@@ -17,6 +18,8 @@ type NavProps = {
   previewMode?: SiteMode | null;
   /** Actual DB siteMode (what the public sees). */
   actualMode?: SiteMode;
+  /** Reunion's vanity domain, if configured — passed through to AdminMenu. */
+  customDomain?: string | null;
 };
 
 export function SiteNav({
@@ -27,8 +30,10 @@ export function SiteNav({
   showAdminMenu,
   previewMode,
   actualMode,
+  customDomain,
 }: NavProps) {
   const [open, setOpen] = useState(false);
+  const adminModeHref = useAdminModeHref(slug);
 
   const links: { label: string; href: string; modes: string[] }[] = [
     { label: "Schedule", href: `/${slug}/schedule`, modes: ["pre_register", "open"] },
@@ -71,18 +76,19 @@ export function SiteNav({
             </Link>
           )}
           {!isAdmin && (
-            <Link
-              href="/admin"
+            <a
+              href={adminModeHref}
               className="text-xs text-gray-400 hover:text-gray-600"
             >
-              Admin login
-            </Link>
+              Admin Mode
+            </a>
           )}
           {showAdminMenu && actualMode && (
             <AdminMenu
               actualMode={actualMode}
               previewMode={previewMode ?? null}
               variant="light"
+              customDomain={customDomain}
             />
           )}
         </div>

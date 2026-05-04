@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description:
     "Park Hill High School Class of 1996 — 30 Year Reunion. August 28–29, 2026 in Parkville, MO. RSVP now!",
   icons: {
-    icon: "/favicon.ico",
+    icon: { url: "/favicon.svg", type: "image/svg+xml" },
     apple: "/apple-touch-icon.png",
   },
 };

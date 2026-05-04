@@ -18,7 +18,8 @@ import { formatCents } from "@/lib/utils";
 import { SiteModeToggle } from "@/components/site-mode-toggle";
 import { AdminTabs } from "./admin-tabs";
 import { ConnectStatus } from "@/components/connect-status";
-import { LaunchIcon } from "@/components/launch-icon";
+import { LaunchSiteMenu } from "@/components/launch-site-menu";
+import { SiteCustomization } from "@/components/site-customization";
 import { requireReunionAdminPage } from "@/lib/admin-auth";
 import { loadConnectAccount } from "@/lib/stripe";
 
@@ -173,21 +174,24 @@ export default async function AdminReunionPage({
             Test
           </span>
         )}
-        <a
-          href={`/${slug}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          title="Open public site in new tab"
-          aria-label={`Open ${reunion.name} public site in new tab`}
-          className="inline-flex h-7 w-7 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
-        >
-          <LaunchIcon className="h-5 w-5" />
-        </a>
+        <LaunchSiteMenu
+          slug={slug}
+          reunionName={reunion.name}
+          customDomain={reunion.customDomain}
+          iconClassName="h-5 w-5"
+          triggerClassName="inline-flex h-7 w-7 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+        />
       </div>
 
       <SiteModeToggle
         reunionId={reunion.id}
         initialMode={reunion.siteMode}
+      />
+
+      <SiteCustomization
+        reunionId={reunion.id}
+        initialCustomDomain={reunion.customDomain}
+        initialFaviconUrl={reunion.faviconUrl}
       />
 
       <ConnectStatus

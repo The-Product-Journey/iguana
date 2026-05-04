@@ -3,7 +3,7 @@ import { reunions, reunionAdmins } from "@/lib/db/schema";
 import { sql, eq } from "drizzle-orm";
 import Link from "next/link";
 import { requireSuperAdminPage } from "@/lib/admin-auth";
-import { LaunchIcon } from "@/components/launch-icon";
+import { LaunchSiteMenu } from "@/components/launch-site-menu";
 
 export const dynamic = "force-dynamic";
 
@@ -57,16 +57,13 @@ export default async function SuperAdminPage() {
                     Test
                   </span>
                 )}
-                <a
-                  href={`/${reunion.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-5 w-5 items-center justify-center text-gray-400 hover:text-gray-700"
-                  title="Open public site"
-                  aria-label={`Open ${reunion.name} public site`}
-                >
-                  <LaunchIcon className="h-4 w-4" />
-                </a>
+                <LaunchSiteMenu
+                  slug={reunion.slug}
+                  reunionName={reunion.name}
+                  customDomain={reunion.customDomain}
+                  iconClassName="h-4 w-4"
+                  triggerClassName="inline-flex h-5 w-5 items-center justify-center text-gray-400 hover:text-gray-700"
+                />
               </div>
               <div className="text-sm text-gray-500">
                 {reunion.eventDate} · mode: {reunion.siteMode}
