@@ -4,7 +4,7 @@ import { inArray } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requireAnyAdminPage } from "@/lib/admin-auth";
-import { LaunchIcon } from "@/components/launch-icon";
+import { LaunchSiteMenu } from "@/components/launch-site-menu";
 
 export const dynamic = "force-dynamic";
 
@@ -65,16 +65,11 @@ export default async function AdminIndexPage() {
                       Test
                     </span>
                   )}
-                  <a
-                    href={`/${r.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title="Open public site in new tab"
-                    aria-label={`Open ${r.name} public site in new tab`}
-                    className="inline-flex h-6 w-6 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
-                  >
-                    <LaunchIcon />
-                  </a>
+                  <LaunchSiteMenu
+                    slug={r.slug}
+                    reunionName={r.name}
+                    customDomain={r.customDomain}
+                  />
                 </div>
                 <div className="mt-1 text-sm text-gray-500">{r.eventDate}</div>
               </div>

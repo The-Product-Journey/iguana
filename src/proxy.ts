@@ -37,21 +37,12 @@
  */
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { slugForHost } from "@/lib/tenant-domains";
 
 const isAdminApi = createRouteMatcher(["/api/admin(.*)"]);
 const isAdminPage = createRouteMatcher(["/admin(.*)"]);
 const isAuthPage = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
 const isForbiddenPage = createRouteMatcher(["/admin/forbidden(.*)"]);
-
-// Vanity-domain → reunion-slug map. Add new entries here when a reunion
-// gets its own custom public-facing domain. Include both apex and `www.`
-// variants if both DNS records are configured. Auth surfaces (admin/sign-in)
-// arriving on these hosts get bounced to the canonical origin instead of
-// being rewritten — see step 1 above.
-const TENANT_DOMAIN_TO_SLUG: Record<string, string> = {
-  "parkhill1996reunion.com": "phhs-1996",
-  "www.parkhill1996reunion.com": "phhs-1996",
-};
 
 export default clerkMiddleware(async (auth, req) => {
   if (isForbiddenPage(req)) return;
@@ -75,9 +66,14 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   // 2. Per-tenant vanity-domain handling — two complementary rules.
-  const slugForHost = TENANT_DOMAIN_TO_SLUG[host];
-  if (slugForHost && !isAuthSurface && !req.nextUrl.pathname.startsWith("/api/")) {
-    const slugPrefix = `/${slugForHost}`;
+  //    slugForHost queries the reunions table (with a TTL cache) so admins
+  //    can manage vanity domains via the UI without redeploys.
+  const tenantSlug =
+    !isAuthSurface && !req.nextUrl.pathname.startsWith("/api/")
+      ? await slugForHost(host)
+      : null;
+  if (tenantSlug) {
+    const slugPrefix = `/${tenantSlug}`;
     const path = req.nextUrl.pathname;
     const hasSlugPrefix = path === slugPrefix || path.startsWith(`${slugPrefix}/`);
 
