@@ -337,8 +337,8 @@ export function ConnectStatus({
       {state === "active" && (
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
-            <span className="text-sm font-medium text-green-700">
+            <span className="inline-block h-2 w-2 rounded-full bg-success" />
+            <span className="text-sm font-medium text-success">
               Payouts active
             </span>
             <span className="text-sm text-ink-subtle">

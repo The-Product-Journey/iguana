@@ -39,17 +39,8 @@ export function SiteCard({ site }: { site: Reunion }) {
         </div>
         <div className="mt-auto">
           <h3 className="mb-2 text-lg font-semibold text-ink">{site.name}</h3>
-          <span
-            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium"
-            style={{
-              backgroundColor: "rgb(45 122 95 / 0.12)",
-              color: "var(--color-success)",
-            }}
-          >
-            <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{ backgroundColor: "var(--color-success)" }}
-            />
+          <span className="inline-flex items-center gap-1.5 rounded-md bg-success/10 px-2 py-1 text-xs font-medium text-success">
+            <span className="h-1.5 w-1.5 rounded-full bg-success" />
             Production
           </span>
         </div>

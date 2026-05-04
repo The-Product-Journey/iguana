@@ -348,7 +348,7 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                     className={`text-sm underline-offset-2 hover:underline disabled:opacity-50 ${
                       s.isDisplayed
                         ? "text-ink-subtle hover:text-ink-muted"
-                        : "text-green-700 hover:text-green-800"
+                        : "text-success hover:opacity-80"
                     }`}
                   >
                     {s.isDisplayed ? "Unpublish" : "Publish"}
@@ -424,18 +424,18 @@ function MemorialsTab({
                   <span
                     className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                       m.status === "published"
-                        ? "bg-green-100 text-green-700"
+                        ? "bg-success/10 text-success"
                         : m.status === "pending_review"
-                          ? "bg-blue-100 text-blue-700"
+                          ? "bg-forest/10 text-forest"
                           : m.status === "draft"
-                            ? "bg-amber-100 text-amber-700"
+                            ? "bg-warning/10 text-warning"
                             : "bg-bg-subtle text-ink-muted"
                     }`}
                   >
                     {m.status}
                   </span>
                   {m.reviewNotes && (
-                    <p className="mt-1 text-xs text-amber-600 max-w-xs truncate">
+                    <p className="mt-1 text-xs text-warning max-w-xs truncate">
                       Notes: {m.reviewNotes}
                     </p>
                   )}
@@ -534,7 +534,7 @@ function ProfilesTab({
                       disabled={toggling === profile.id}
                       className={`rounded-full px-3 py-1 text-xs font-medium transition ${
                         profile.isPublished
-                          ? "bg-green-100 text-green-700 hover:bg-green-200"
+                          ? "bg-success/10 text-success hover:bg-success/20"
                           : "bg-bg-subtle text-ink-subtle hover:bg-border-warm"
                       }`}
                     >
@@ -597,8 +597,8 @@ function EventsTab({
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                     event.type === "paid"
-                      ? "bg-cream text-forest"
-                      : "bg-green-100 text-green-700"
+                      ? "bg-forest/10 text-forest"
+                      : "bg-success/10 text-success"
                   }`}
                 >
                   {event.type === "paid"
@@ -610,7 +610,7 @@ function EventsTab({
                 {interestCounts[event.id] || 0}
               </td>
               <td className="px-4 py-3">
-                <span className="text-green-700">
+                <span className="text-success">
                   {regCounts[event.id]?.confirmed || 0}
                 </span>
                 {(regCounts[event.id]?.pending || 0) > 0 && (
@@ -679,12 +679,16 @@ function MessagesTab({
 }
 
 function StatusBadge({ status }: { status: string }) {
+  // Status colors use brand tokens (--color-success/warning/danger) so
+  // they harmonize with the Glad You Made It palette while still reading
+  // unambiguously as good/warning/danger. Failed and refunded both fall
+  // through to the danger color.
   const colors =
     status === "paid"
-      ? "bg-green-100 text-green-700"
+      ? "bg-success/10 text-success"
       : status === "pending"
-        ? "bg-yellow-100 text-yellow-700"
-        : "bg-cream text-forest";
+        ? "bg-warning/10 text-warning"
+        : "bg-danger/10 text-danger";
 
   return (
     <span
