@@ -3,16 +3,18 @@ import { db } from "@/lib/db";
 import { reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { SiteNav } from "@/components/site-nav";
 import { AdminPreviewBanner } from "@/components/admin-preview-banner";
 import { getAdminPreviewState } from "@/lib/site-mode";
 
 /**
- * Per-reunion metadata override. The reunion's faviconUrl (set by admin via
- * the Site Customization UI, stored on Vercel Blob) takes precedence over
- * the platform default. Returning empty `icons` would inherit from the root
- * layout, so we always return an explicit icons block — either the tenant's
- * favicon or undefined (falls through to root).
+ * Per-reunion metadata override. The reunion's faviconUrl applies ONLY when
+ * the request is arriving on that reunion's customDomain — i.e. visitors
+ * on the tenant's vanity URL see the tenant's branding, while visitors on
+ * the canonical platform domain (app.gladyoumadeit.com/<slug>) keep seeing
+ * the platform favicon. Falling through to the root layout's icons block
+ * happens when this returns an empty Metadata object.
  */
 export async function generateMetadata({
   params,
@@ -21,11 +23,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const reunion = await db
-    .select({ faviconUrl: reunions.faviconUrl, name: reunions.name })
+    .select({
+      faviconUrl: reunions.faviconUrl,
+      customDomain: reunions.customDomain,
+    })
     .from(reunions)
     .where(eq(reunions.slug, slug))
     .get();
-  if (!reunion?.faviconUrl) return {};
+  if (!reunion?.faviconUrl || !reunion.customDomain) return {};
+  const host = (await headers()).get("host");
+  if (host !== reunion.customDomain) return {};
   return {
     icons: { icon: reunion.faviconUrl },
   };
