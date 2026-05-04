@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AdminMenu } from "./admin-menu";
+import { useAdminModeHref } from "@/lib/use-admin-mode-href";
 
 type SiteMode = "tease" | "pre_register" | "open";
 
@@ -29,6 +30,7 @@ export function SiteNav({
   actualMode,
 }: NavProps) {
   const [open, setOpen] = useState(false);
+  const adminModeHref = useAdminModeHref(slug);
 
   const links: { label: string; href: string; modes: string[] }[] = [
     { label: "Schedule", href: `/${slug}/schedule`, modes: ["pre_register", "open"] },
@@ -71,12 +73,12 @@ export function SiteNav({
             </Link>
           )}
           {!isAdmin && (
-            <Link
-              href="/admin"
+            <a
+              href={adminModeHref}
               className="text-xs text-gray-400 hover:text-gray-600"
             >
-              Admin login
-            </Link>
+              Admin Mode
+            </a>
           )}
           {showAdminMenu && actualMode && (
             <AdminMenu

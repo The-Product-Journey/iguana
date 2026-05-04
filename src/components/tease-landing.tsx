@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { InterestForm } from "@/components/interest-form";
 import { AdminMenu } from "@/components/admin-menu";
+import { useAdminModeHref } from "@/lib/use-admin-mode-href";
 import type { Event } from "@/lib/db/schema";
 
 type SiteMode = "tease" | "pre_register" | "open";
@@ -47,15 +48,16 @@ export function TeaseLanding({
 }) {
   const [showInterest, setShowInterest] = useState(false);
   const countdown = useCountdown(reunion.eventDate);
+  const adminModeHref = useAdminModeHref(reunion.slug);
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-red-800 via-red-900 to-red-950 text-white">
       {!isAdmin && (
         <a
-          href="/admin"
+          href={adminModeHref}
           className="absolute right-4 top-3 text-xs text-red-300 hover:text-white"
         >
-          Admin login
+          Admin Mode
         </a>
       )}
       {showAdminMenu && actualMode && (
