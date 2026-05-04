@@ -4,6 +4,20 @@ import { useEffect, useRef, useState } from "react";
 import { LaunchIcon } from "./launch-icon";
 
 /**
+ * Resolve the canonical origin client-side. Used to show full URLs in
+ * the menu (`app.gladyoumadeit.com/phhs-1996`) instead of relative paths.
+ * Computed in useEffect to avoid SSR/CSR hydration mismatch — the menu
+ * only renders after click anyway, so the slight delay is invisible.
+ */
+function useCanonicalOrigin() {
+  const [origin, setOrigin] = useState("");
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+  return origin;
+}
+
+/**
  * Launch button for a reunion's public site. When the reunion has a
  * `customDomain` configured, renders a dropdown letting the admin pick
  * between the default canonical URL and the vanity URL — they sometimes
@@ -27,6 +41,7 @@ export function LaunchSiteMenu({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const canonicalOrigin = useCanonicalOrigin();
 
   useEffect(() => {
     if (!open) return;
@@ -69,6 +84,12 @@ export function LaunchSiteMenu({
   }
 
   const vanityUrl = `https://${customDomain}`;
+  const defaultUrl = canonicalOrigin
+    ? `${canonicalOrigin}${defaultPath}`
+    : defaultPath;
+  const defaultDisplay = canonicalOrigin
+    ? `${new URL(canonicalOrigin).host}${defaultPath}`
+    : defaultPath;
 
   return (
     <div ref={ref} className="relative inline-block">
@@ -110,14 +131,14 @@ export function LaunchSiteMenu({
             <div className="text-xs text-gray-500">Custom domain</div>
           </a>
           <a
-            href={defaultPath}
+            href={defaultUrl}
             target="_blank"
             rel="noopener noreferrer"
             role="menuitem"
             onClick={() => setOpen(false)}
             className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
           >
-            <div className="font-medium text-gray-900">/{slug}</div>
+            <div className="font-medium text-gray-900">{defaultDisplay}</div>
             <div className="text-xs text-gray-500">Default URL</div>
           </a>
         </div>
