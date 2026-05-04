@@ -34,12 +34,12 @@ export function SiteCustomization({
   initialFaviconUrl: string | null;
 }) {
   return (
-    <div className="mb-8 rounded-lg border border-gray-200 bg-white shadow-sm">
-      <div className="border-b border-gray-100 px-5 py-4">
-        <h3 className="text-lg font-semibold text-gray-900">
+    <div className="mb-8 rounded-lg border border-border-warm bg-white shadow-sm">
+      <div className="border-b border-border-warm px-5 py-4">
+        <h3 className="text-lg font-semibold text-ink">
           Site Customization
         </h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-ink-subtle">
           Configure your reunion&apos;s public-facing branding.
         </p>
       </div>
@@ -49,7 +49,7 @@ export function SiteCustomization({
           reunionId={reunionId}
           initialValue={initialCustomDomain}
         />
-        <div className="border-t border-gray-100" />
+        <div className="border-t border-border-warm" />
         <FaviconSection
           reunionId={reunionId}
           initialUrl={initialFaviconUrl}
@@ -110,13 +110,13 @@ function DomainSection({
 
   return (
     <form onSubmit={save}>
-      <label className="block text-sm font-semibold text-gray-700">
+      <label className="block text-sm font-semibold text-ink-muted">
         Custom domain
       </label>
-      <p className="mt-1 mb-2 text-xs text-gray-500">
+      <p className="mt-1 mb-2 text-xs text-ink-subtle">
         Optional. The public-facing domain for this reunion. Enter the
         hostname only — for example{" "}
-        <code className="rounded bg-gray-100 px-1 py-0.5 text-[11px]">
+        <code className="rounded bg-bg-subtle px-1 py-0.5 text-[11px]">
           www.yourdomain.com
         </code>
         . Leave blank to use the default URL.
@@ -138,14 +138,14 @@ function DomainSection({
             autoCapitalize="none"
             className={`rounded-lg border px-3 py-2 text-sm ${
               !formatValid && trimmed !== ""
-                ? "border-red-300 focus:border-red-500"
-                : "border-gray-300"
+                ? "border-cream focus:border-forest-deep"
+                : "border-border-strong"
             }`}
           />
           {!formatValid && trimmed !== "" && (
-            <p className="mt-1 text-xs text-red-600">
+            <p className="mt-1 text-xs text-danger">
               Not a valid hostname. Don&apos;t include{" "}
-              <code className="rounded bg-red-50 px-1">https://</code>, paths,
+              <code className="rounded bg-cream px-1">https://</code>, paths,
               or ports.
             </p>
           )}
@@ -153,12 +153,12 @@ function DomainSection({
         <button
           type="submit"
           disabled={busy || !dirty || !formatValid}
-          className="rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800 disabled:opacity-50"
+          className="rounded-lg bg-forest px-4 py-2 text-sm font-medium text-white hover:bg-forest-deep disabled:opacity-50"
         >
           {busy ? "Saving…" : "Save domain"}
         </button>
       </div>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
       {success && (
         <p className="mt-2 text-sm text-green-700">
           Saved. Some manual setup is required before the new domain serves
@@ -291,16 +291,16 @@ function FaviconSection({
 
   return (
     <div>
-      <label className="block text-sm font-semibold text-gray-700">
+      <label className="block text-sm font-semibold text-ink-muted">
         Favicon
       </label>
-      <p className="mt-1 mb-3 text-xs text-gray-500">
+      <p className="mt-1 mb-3 text-xs text-ink-subtle">
         Optional. Square image that browsers show in the tab. SVG, PNG, or ICO,
         at least 32×32, under 1 MB.
       </p>
 
       <div className="flex items-start gap-4">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border-warm bg-bg-subtle">
           {displayUrl ? (
             // eslint-disable-next-line @next/next/no-img-element -- vercel blob URLs vary; <Image> needs whitelist config
             <img
@@ -309,7 +309,7 @@ function FaviconSection({
               className="max-h-full max-w-full"
             />
           ) : (
-            <span className="text-[10px] text-gray-400">No favicon</span>
+            <span className="text-[10px] text-ink-subtle">No favicon</span>
           )}
         </div>
 
@@ -320,14 +320,14 @@ function FaviconSection({
             accept=".svg,.png,.ico,image/svg+xml,image/png,image/x-icon,image/vnd.microsoft.icon"
             disabled={busy}
             onChange={(e) => onFileSelected(e.target.files?.[0] ?? null)}
-            className="text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-200"
+            className="text-sm text-ink-muted file:mr-3 file:rounded-md file:border-0 file:bg-bg-subtle file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-ink-muted hover:file:bg-gray-200"
           />
           <div className="flex gap-2">
             <button
               type="button"
               disabled={busy || !pendingFile}
               onClick={upload}
-              className="rounded-lg bg-red-700 px-4 py-1.5 text-sm font-medium text-white hover:bg-red-800 disabled:opacity-50"
+              className="rounded-lg bg-forest px-4 py-1.5 text-sm font-medium text-white hover:bg-forest-deep disabled:opacity-50"
             >
               {busy ? "Uploading…" : "Upload favicon"}
             </button>
@@ -336,7 +336,7 @@ function FaviconSection({
                 type="button"
                 disabled={busy}
                 onClick={clearFavicon}
-                className="text-sm text-red-700 hover:text-red-800 disabled:opacity-50"
+                className="text-sm text-forest hover:text-forest-deep disabled:opacity-50"
               >
                 Remove
               </button>
@@ -345,7 +345,7 @@ function FaviconSection({
         </div>
       </div>
 
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
     </div>
   );
 }

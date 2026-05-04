@@ -162,7 +162,7 @@ export default async function AdminReunionPage({
     <div>
       <Link
         href="/admin"
-        className="mb-4 inline-block text-sm text-red-700 hover:text-red-800"
+        className="mb-4 inline-block text-sm text-forest hover:text-forest-deep"
       >
         &larr; Back to dashboard
       </Link>
@@ -179,7 +179,7 @@ export default async function AdminReunionPage({
           reunionName={reunion.name}
           customDomain={reunion.customDomain}
           iconClassName="h-5 w-5"
-          triggerClassName="inline-flex h-7 w-7 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+          triggerClassName="inline-flex h-7 w-7 items-center justify-center rounded text-ink-subtle transition hover:bg-bg-subtle hover:text-ink-muted"
         />
       </div>
 
@@ -206,24 +206,24 @@ export default async function AdminReunionPage({
 
       {/* Summary stats */}
       <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-5">
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-          <p className="text-sm text-gray-500">Confirmed</p>
+        <div className="rounded-lg border border-border-warm bg-white p-4 shadow-sm">
+          <p className="text-sm text-ink-subtle">Confirmed</p>
           <p className="text-2xl font-bold">{paidRsvps.length}</p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-          <p className="text-sm text-gray-500">Total Guests</p>
+        <div className="rounded-lg border border-border-warm bg-white p-4 shadow-sm">
+          <p className="text-sm text-ink-subtle">Total Guests</p>
           <p className="text-2xl font-bold">{totalGuests}</p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-          <p className="text-sm text-gray-500">Revenue</p>
+        <div className="rounded-lg border border-border-warm bg-white p-4 shadow-sm">
+          <p className="text-sm text-ink-subtle">Revenue</p>
           <p className="text-2xl font-bold">{formatCents(totalRevenue)}</p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-          <p className="text-sm text-gray-500">Fees Covered</p>
+        <div className="rounded-lg border border-border-warm bg-white p-4 shadow-sm">
+          <p className="text-sm text-ink-subtle">Fees Covered</p>
           <p className="text-2xl font-bold">{formatCents(totalFeesCovered)}</p>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-          <p className="text-sm text-gray-500">Sponsorships</p>
+        <div className="rounded-lg border border-border-warm bg-white p-4 shadow-sm">
+          <p className="text-sm text-ink-subtle">Sponsorships</p>
           <p className="text-2xl font-bold">
             {formatCents(totalSponsorRevenue)}
           </p>

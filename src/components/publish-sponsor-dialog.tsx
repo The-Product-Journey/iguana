@@ -105,16 +105,16 @@ export function PublishSponsorDialog({
         className="w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-1 text-lg font-semibold text-gray-900">
+        <h2 className="mb-1 text-lg font-semibold text-ink">
           Publish sponsor?
         </h2>
-        <p className="mb-4 text-sm text-gray-600">
+        <p className="mb-4 text-sm text-ink-muted">
           Review and tweak how the sponsor will appear on the public sponsors
           page. Saving will publish them.
         </p>
 
         {error && (
-          <div className="mb-3 rounded-lg bg-red-50 p-2 text-sm text-red-700">
+          <div className="mb-3 rounded-lg bg-cream p-2 text-sm text-forest">
             {error}
           </div>
         )}
@@ -125,9 +125,9 @@ export function PublishSponsorDialog({
               type="checkbox"
               checked={isAnonymous}
               onChange={(e) => setIsAnonymous(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded border-gray-300 accent-red-700 focus:ring-red-500"
+              className="mt-1 h-4 w-4 rounded border-border-strong accent-red-700 focus:ring-persimmon"
             />
-            <span className="text-sm text-gray-700">
+            <span className="text-sm text-ink-muted">
               Anonymous (hides name, website, logo)
             </span>
           </label>
@@ -135,7 +135,7 @@ export function PublishSponsorDialog({
           <div className={isAnonymous ? "pointer-events-none opacity-50" : ""}>
             <label
               htmlFor="pub-displayName"
-              className="mb-1 block text-xs font-medium text-gray-700"
+              className="mb-1 block text-xs font-medium text-ink-muted"
             >
               Display name
             </label>
@@ -145,14 +145,14 @@ export function PublishSponsorDialog({
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder={sponsor.companyName || sponsor.contactName}
               disabled={isAnonymous}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+              className="w-full rounded-lg border border-border-strong px-3 py-2 text-sm shadow-sm focus:border-forest-deep focus:outline-none focus:ring-1 focus:ring-persimmon"
             />
           </div>
 
           <div className={isAnonymous ? "pointer-events-none opacity-50" : ""}>
             <label
               htmlFor="pub-website"
-              className="mb-1 block text-xs font-medium text-gray-700"
+              className="mb-1 block text-xs font-medium text-ink-muted"
             >
               Website
             </label>
@@ -163,14 +163,14 @@ export function PublishSponsorDialog({
               onChange={(e) => setWebsiteUrl(e.target.value)}
               placeholder="https://"
               disabled={isAnonymous}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+              className="w-full rounded-lg border border-border-strong px-3 py-2 text-sm shadow-sm focus:border-forest-deep focus:outline-none focus:ring-1 focus:ring-persimmon"
             />
           </div>
 
           <div className={isAnonymous ? "pointer-events-none opacity-50" : ""}>
             <label
               htmlFor="pub-message"
-              className="mb-1 block text-xs font-medium text-gray-700"
+              className="mb-1 block text-xs font-medium text-ink-muted"
             >
               Tagline / message
             </label>
@@ -180,14 +180,14 @@ export function PublishSponsorDialog({
               onChange={(e) => setMessage(e.target.value)}
               rows={2}
               disabled={isAnonymous}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+              className="w-full rounded-lg border border-border-strong px-3 py-2 text-sm shadow-sm focus:border-forest-deep focus:outline-none focus:ring-1 focus:ring-persimmon"
             />
           </div>
         </div>
 
         {sponsor.logoUrl && !isAnonymous && (
           <div className="mt-4">
-            <p className="mb-1 text-xs font-medium text-gray-700">Logo</p>
+            <p className="mb-1 text-xs font-medium text-ink-muted">Logo</p>
             {removeLogo ? (
               <p className="text-xs text-amber-700">
                 Logo will be removed on save.{" "}
@@ -203,7 +203,7 @@ export function PublishSponsorDialog({
               <button
                 type="button"
                 onClick={() => setRemoveLogo(true)}
-                className="text-xs text-gray-500 underline-offset-2 hover:text-gray-700 hover:underline"
+                className="text-xs text-ink-subtle underline-offset-2 hover:text-ink-muted hover:underline"
               >
                 Remove logo
               </button>
@@ -211,11 +211,11 @@ export function PublishSponsorDialog({
           </div>
         )}
 
-        <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3">
-          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500">
+        <div className="mt-4 rounded-lg border border-border-warm bg-bg-subtle p-3">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-ink-subtle">
             Preview
           </p>
-          <div className="rounded border border-gray-200 bg-white p-3">
+          <div className="rounded border border-border-warm bg-white p-3">
             {!isAnonymous && !removeLogo && sponsor.logoUrl && (
               <div className="mb-2 flex h-16 items-center justify-center">
                 <Image
@@ -227,12 +227,12 @@ export function PublishSponsorDialog({
                 />
               </div>
             )}
-            <p className="text-sm font-bold text-gray-900">{previewName}</p>
+            <p className="text-sm font-bold text-ink">{previewName}</p>
             {!isAnonymous && message.trim() && (
-              <p className="mt-1 text-xs text-gray-600">{message.trim()}</p>
+              <p className="mt-1 text-xs text-ink-muted">{message.trim()}</p>
             )}
             {!isAnonymous && websiteUrl.trim() && (
-              <p className="mt-1 text-xs text-gray-400">{websiteUrl.trim()}</p>
+              <p className="mt-1 text-xs text-ink-subtle">{websiteUrl.trim()}</p>
             )}
           </div>
         </div>
@@ -241,7 +241,7 @@ export function PublishSponsorDialog({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+            className="rounded-md border border-border-strong bg-white px-3 py-1.5 text-sm font-medium text-ink-muted transition hover:bg-bg-subtle"
           >
             Cancel
           </button>

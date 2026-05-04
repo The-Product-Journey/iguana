@@ -37,7 +37,7 @@ export function ManageAdminsClient({
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-1 border-b border-gray-200">
+      <div className="flex gap-1 border-b border-border-warm">
         <TabButton active={tab === "reunion"} onClick={() => setTab("reunion")}>
           Reunion admins
         </TabButton>
@@ -77,8 +77,8 @@ function TabButton({
       className={
         "border-b-2 px-4 py-2 text-sm font-medium transition " +
         (active
-          ? "border-red-700 text-red-700"
-          : "border-transparent text-gray-500 hover:text-gray-700")
+          ? "border-forest text-forest"
+          : "border-transparent text-ink-subtle hover:text-ink-muted")
       }
     >
       {children}
@@ -153,9 +153,9 @@ function ReunionAdminsTab({
     <div className="space-y-8">
       <form
         onSubmit={add}
-        className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+        className="rounded-lg border border-border-warm bg-white p-4 shadow-sm"
       >
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-subtle">
           Add reunion admin
         </h3>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_2fr_auto]">
@@ -163,7 +163,7 @@ function ReunionAdminsTab({
             value={reunionId}
             onChange={(e) => setReunionId(e.target.value)}
             disabled={busy}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="rounded-lg border border-border-strong px-3 py-2 text-sm"
           >
             {reunions.map((r) => (
               <option key={r.id} value={r.id}>
@@ -179,17 +179,17 @@ function ReunionAdminsTab({
             placeholder="email@example.com"
             required
             disabled={busy}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="rounded-lg border border-border-strong px-3 py-2 text-sm"
           />
           <button
             type="submit"
             disabled={busy || !email || !reunionId}
-            className="rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800 disabled:opacity-50"
+            className="rounded-lg bg-forest px-4 py-2 text-sm font-medium text-white hover:bg-forest-deep disabled:opacity-50"
           >
             {busy ? "..." : "Add"}
           </button>
         </div>
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-2 text-sm text-danger">{error}</p>}
       </form>
 
       {reunions.map((r) => {
@@ -205,9 +205,9 @@ function ReunionAdminsTab({
               )}
             </h3>
             {admins.length === 0 ? (
-              <p className="text-sm text-gray-500">No admins yet.</p>
+              <p className="text-sm text-ink-subtle">No admins yet.</p>
             ) : (
-              <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white shadow-sm">
+              <ul className="divide-y divide-border-warm rounded-lg border border-border-warm bg-white shadow-sm">
                 {admins.map((a) => (
                   <li
                     key={a.id}
@@ -215,7 +215,7 @@ function ReunionAdminsTab({
                   >
                     <div>
                       <div className="text-sm font-medium">{a.email}</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-ink-subtle">
                         {a.clerkUserId ? "linked to Clerk" : "not signed in yet"}
                         {a.invitedByEmail
                           ? ` · invited by ${a.invitedByEmail}`
@@ -226,7 +226,7 @@ function ReunionAdminsTab({
                       type="button"
                       onClick={() => remove(a.id)}
                       disabled={busy}
-                      className="text-sm text-red-700 hover:text-red-800 disabled:opacity-50"
+                      className="text-sm text-forest hover:text-forest-deep disabled:opacity-50"
                     >
                       Remove
                     </button>
@@ -311,7 +311,7 @@ function SuperAdminsTab({
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-ink-muted">
         Super admins can do anything in any reunion, including managing other
         super admins. New super admins can only be added by an existing super
         admin.
@@ -319,9 +319,9 @@ function SuperAdminsTab({
 
       <form
         onSubmit={add}
-        className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+        className="rounded-lg border border-border-warm bg-white p-4 shadow-sm"
       >
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-subtle">
           Invite super admin
         </h3>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
@@ -332,20 +332,20 @@ function SuperAdminsTab({
             placeholder="email@example.com"
             required
             disabled={busy}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="rounded-lg border border-border-strong px-3 py-2 text-sm"
           />
           <button
             type="submit"
             disabled={busy || !email}
-            className="rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800 disabled:opacity-50"
+            className="rounded-lg bg-forest px-4 py-2 text-sm font-medium text-white hover:bg-forest-deep disabled:opacity-50"
           >
             {busy ? "..." : "Add"}
           </button>
         </div>
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-2 text-sm text-danger">{error}</p>}
       </form>
 
-      <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white shadow-sm">
+      <ul className="divide-y divide-border-warm rounded-lg border border-border-warm bg-white shadow-sm">
         {superAdmins.map((a) => {
           const isSelf = a.email === currentEmail;
           const cannotRemove = isSelf || isLastSuperAdmin;
@@ -363,12 +363,12 @@ function SuperAdminsTab({
                 <div className="text-sm font-medium">
                   {a.email}
                   {isSelf && (
-                    <span className="ml-2 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-gray-600">
+                    <span className="ml-2 rounded bg-bg-subtle px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-ink-muted">
                       you
                     </span>
                   )}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-ink-subtle">
                   {a.clerkUserId ? "linked to Clerk" : "not signed in yet"}
                   {a.invitedByEmail
                     ? ` · invited by ${a.invitedByEmail}`
@@ -380,7 +380,7 @@ function SuperAdminsTab({
                 onClick={() => remove(a.id, a.email)}
                 disabled={busy || cannotRemove}
                 title={removeReason}
-                className="text-sm text-red-700 hover:text-red-800 disabled:cursor-not-allowed disabled:text-gray-400"
+                className="text-sm text-forest hover:text-forest-deep disabled:cursor-not-allowed disabled:text-ink-subtle"
               >
                 Remove
               </button>

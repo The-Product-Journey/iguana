@@ -1,6 +1,64 @@
 @import "tailwindcss";
 
+/*
+ * Glad You Made It — platform brand tokens.
+ *
+ * The platform itself (Sites homepage, admin pages) renders in this brand.
+ * Public-facing reunion pages keep their tenant-specific brand (today
+ * hardcoded PHHS red; configurable later).
+ *
+ * Tokens are exposed as Tailwind theme colors so authors write `bg-forest`,
+ * `text-forest-deep`, etc. instead of arbitrary `bg-[var(...)]` classes.
+ * Fonts are loaded via next/font in src/app/layout.tsx:
+ *   - --font-sans (Bricolage Grotesque) — primary UI typeface
+ *   - --font-serif (Fraunces) — italic light, used at moments of warmth
+ *     (page headings, empty states). Caveat is logo-only and lives
+ *     inside the brand asset PNGs in /public/brand/.
+ */
+
+@theme {
+  /* Brand surfaces */
+  --color-forest: #2b5747;
+  --color-forest-deep: #1e3f33;
+  --color-forest-soft: #3d6a59;
+
+  /* Accent — used sparingly. Never a primary action button. */
+  --color-persimmon: #f2a065;
+  --color-persimmon-deep: #e08a4d;
+
+  /* Warm neutral */
+  --color-cream: #f4ecda;
+
+  /* Functional surfaces */
+  --color-bg-subtle: #faf7f2;
+  --color-border-warm: #e8e4dd;
+  --color-border-strong: #c9c2b5;
+
+  /* Text */
+  --color-ink: #1f1b16;
+  --color-ink-muted: #6b6359;
+  --color-ink-subtle: #8e8579;
+  --color-on-forest: #f4ecda;
+  --color-on-persimmon: #2b5747;
+
+  /* Status — harmonized with the brand */
+  --color-success: #2d7a5f;
+  --color-warning: #d89535;
+  --color-danger: #b23a2a;
+}
+
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-bricolage), system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-fraunces), Georgia, serif;
+}
+
+/*
+ * Persimmon focus ring across the app. Tenant pages currently inherit
+ * this too — acceptable since persimmon is only used on focus, not as a
+ * surface, so it doesn't compete with the tenant's brand.
+ */
+:focus-visible {
+  outline: 2px solid var(--color-persimmon);
+  outline-offset: 2px;
+  border-radius: inherit;
 }

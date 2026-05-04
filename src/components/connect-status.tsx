@@ -212,16 +212,16 @@ export function ConnectStatus({
   }
 
   return (
-    <div className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <div className="mb-8 rounded-lg border border-border-warm bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-gray-700">
+        <h3 className="text-sm font-semibold text-ink-muted">
           Stripe Connect — Payouts
         </h3>
         {state !== "not_connected" && state !== "loading" && (
           <button
             onClick={handleManualRefresh}
             disabled={loading}
-            className="rounded border border-gray-300 px-2 py-1 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-50"
+            className="rounded border border-border-strong px-2 py-1 text-xs font-medium text-ink-muted transition hover:bg-bg-subtle disabled:opacity-50"
             title="Pull live status from Stripe and update the database"
           >
             {loading ? "Refreshing…" : "Refresh status"}
@@ -230,25 +230,25 @@ export function ConnectStatus({
       </div>
 
       {error && (
-        <div className="mb-3 rounded-lg bg-red-50 p-2 text-sm text-red-700">
+        <div className="mb-3 rounded-lg bg-cream p-2 text-sm text-forest">
           {error}
         </div>
       )}
 
       {state === "loading" && (
-        <p className="text-sm text-gray-500">Checking status...</p>
+        <p className="text-sm text-ink-subtle">Checking status...</p>
       )}
 
       {state === "not_connected" && (
         <div>
-          <p className="mb-3 text-sm text-gray-600">
+          <p className="mb-3 text-sm text-ink-muted">
             Set up a Stripe account to receive payments directly. The organizer
             will complete a short onboarding form with Stripe.
           </p>
           <button
             onClick={handleSetupPayouts}
             disabled={loading}
-            className="rounded-lg bg-red-700 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-red-800 disabled:opacity-50"
+            className="rounded-lg bg-forest px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-forest-deep disabled:opacity-50"
           >
             {loading ? "Setting up..." : "Set up payouts"}
           </button>
@@ -263,14 +263,14 @@ export function ConnectStatus({
               Onboarding incomplete
             </span>
           </div>
-          <p className="mb-3 text-sm text-gray-600">
+          <p className="mb-3 text-sm text-ink-muted">
             The organizer started but didn&apos;t finish Stripe setup. They need
             to complete the onboarding form.
           </p>
           <button
             onClick={handleResumeOnboarding}
             disabled={loading}
-            className="rounded-lg border border-red-700 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50"
+            className="rounded-lg border border-forest px-4 py-2 text-sm font-semibold text-forest transition hover:bg-cream disabled:opacity-50"
           >
             {loading ? "Redirecting..." : "Resume onboarding"}
           </button>
@@ -284,7 +284,7 @@ export function ConnectStatus({
             <span className="text-sm font-medium text-amber-700">
               Verification pending
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-ink-subtle">
               — Stripe is reviewing the account. Online payments will be available
               once verified.
             </span>
@@ -294,7 +294,7 @@ export function ConnectStatus({
               <button
                 onClick={handleOpenStripeDashboard}
                 disabled={busyDashboard}
-                className="text-sm text-red-700 hover:text-red-800 underline disabled:opacity-50"
+                className="text-sm text-forest hover:text-forest-deep underline disabled:opacity-50"
               >
                 {busyDashboard ? "Opening..." : "Open Stripe Dashboard →"}
               </button>
@@ -302,7 +302,7 @@ export function ConnectStatus({
             <button
               onClick={handleResumeOnboarding}
               disabled={loading}
-              className="text-sm text-red-700 hover:text-red-800 underline disabled:opacity-50"
+              className="text-sm text-forest hover:text-forest-deep underline disabled:opacity-50"
             >
               {loading ? "Redirecting..." : "Resume onboarding"}
             </button>
@@ -317,7 +317,7 @@ export function ConnectStatus({
             <span className="text-sm font-medium text-amber-700">
               Bank verification pending
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-ink-subtle">
               — Online payments are active. Payouts to bank will begin once
               verification completes.
             </span>
@@ -326,7 +326,7 @@ export function ConnectStatus({
             <button
               onClick={handleOpenStripeDashboard}
               disabled={busyDashboard}
-              className="mt-3 inline-block text-sm text-red-700 hover:text-red-800 underline disabled:opacity-50"
+              className="mt-3 inline-block text-sm text-forest hover:text-forest-deep underline disabled:opacity-50"
             >
               {busyDashboard ? "Opening..." : "Open Stripe Dashboard →"}
             </button>
@@ -341,7 +341,7 @@ export function ConnectStatus({
             <span className="text-sm font-medium text-green-700">
               Payouts active
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-ink-subtle">
               — Payments are being received and paid out to the organizer&apos;s
               bank account.
             </span>
@@ -350,7 +350,7 @@ export function ConnectStatus({
             <button
               onClick={handleOpenStripeDashboard}
               disabled={busyDashboard}
-              className="mt-3 inline-block text-sm text-red-700 hover:text-red-800 underline disabled:opacity-50"
+              className="mt-3 inline-block text-sm text-forest hover:text-forest-deep underline disabled:opacity-50"
             >
               {busyDashboard ? "Opening..." : "Open Stripe Dashboard →"}
             </button>

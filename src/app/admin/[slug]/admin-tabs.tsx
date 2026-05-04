@@ -72,19 +72,19 @@ export function AdminTabs({
   return (
     <div>
       {/* Tab bar */}
-      <div className="mb-6 flex flex-wrap gap-1 border-b border-gray-200">
+      <div className="mb-6 flex flex-wrap gap-1 border-b border-border-warm">
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`px-4 py-2 text-sm font-medium transition ${
               tab === t
-                ? "border-b-2 border-red-600 text-red-700"
-                : "text-gray-500 hover:text-gray-700"
+                ? "border-b-2 border-forest text-forest"
+                : "text-ink-subtle hover:text-ink-muted"
             }`}
           >
             {t}
-            <span className="ml-1 text-xs text-gray-400">
+            <span className="ml-1 text-xs text-ink-subtle">
               {t === "RSVPs" && `(${rsvps.length})`}
               {t === "Interests" && `(${interests.length})`}
               {t === "Sponsors" && `(${sponsors.length})`}
@@ -122,36 +122,36 @@ export function AdminTabs({
 
 function RsvpsTab({ rsvps }: { rsvps: Rsvp[] }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div className="overflow-x-auto rounded-xl border border-border-warm bg-white shadow-sm">
       <table className="w-full text-left text-sm">
-        <thead className="border-b border-gray-200 bg-gray-50">
+        <thead className="border-b border-border-warm bg-bg-subtle">
           <tr>
-            <th className="px-4 py-3 font-medium text-gray-700">Name</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Email</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Guests</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Method</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Paid</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Status</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Date</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Name</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Email</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Guests</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Method</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Paid</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Status</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Date</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-border-warm">
           {rsvps.length === 0 ? (
             <tr>
-              <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={7} className="px-4 py-8 text-center text-ink-subtle">
                 No RSVPs yet.
               </td>
             </tr>
           ) : (
             rsvps.map((rsvp) => (
-              <tr key={rsvp.id} className="hover:bg-gray-50">
+              <tr key={rsvp.id} className="hover:bg-bg-subtle">
                 <td className="px-4 py-3 font-medium">
                   {rsvp.firstName} {rsvp.lastName}
                 </td>
-                <td className="px-4 py-3 text-gray-600">{rsvp.email}</td>
+                <td className="px-4 py-3 text-ink-muted">{rsvp.email}</td>
                 <td className="px-4 py-3">{rsvp.guestCount}</td>
                 <td className="px-4 py-3">
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-ink-subtle">
                     {rsvp.paymentMethod || "online"}
                   </span>
                 </td>
@@ -161,7 +161,7 @@ function RsvpsTab({ rsvps }: { rsvps: Rsvp[] }) {
                 <td className="px-4 py-3">
                   <StatusBadge status={rsvp.paymentStatus} />
                 </td>
-                <td className="px-4 py-3 text-gray-500">
+                <td className="px-4 py-3 text-ink-subtle">
                   {new Date(rsvp.createdAt).toLocaleDateString()}
                 </td>
               </tr>
@@ -175,19 +175,19 @@ function RsvpsTab({ rsvps }: { rsvps: Rsvp[] }) {
 
 function InterestsTab({ interests }: { interests: InterestSignup[] }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div className="overflow-x-auto rounded-xl border border-border-warm bg-white shadow-sm">
       <table className="w-full text-left text-sm">
-        <thead className="border-b border-gray-200 bg-gray-50">
+        <thead className="border-b border-border-warm bg-bg-subtle">
           <tr>
-            <th className="px-4 py-3 font-medium text-gray-700">Email</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Name</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Date</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Email</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Name</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Date</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-border-warm">
           {interests.length === 0 ? (
             <tr>
-              <td colSpan={3} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={3} className="px-4 py-8 text-center text-ink-subtle">
                 No interest signups yet.
               </td>
             </tr>
@@ -198,17 +198,17 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
                 [i.firstName, i.lastName].filter(Boolean).join(" ") ||
                 "—";
               return (
-                <tr key={i.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-gray-600">{i.email}</td>
+                <tr key={i.id} className="hover:bg-bg-subtle">
+                  <td className="px-4 py-3 text-ink-muted">{i.email}</td>
                   <td className="px-4 py-3 font-medium">
                     {displayName}
                     {i.maidenName && (
-                      <span className="ml-1 text-xs text-gray-500">
+                      <span className="ml-1 text-xs text-ink-subtle">
                         (née {i.maidenName})
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-gray-500">
+                  <td className="px-4 py-3 text-ink-subtle">
                     {new Date(i.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
@@ -281,30 +281,30 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
 
   return (
     <>
-    <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div className="overflow-x-auto rounded-xl border border-border-warm bg-white shadow-sm">
       <table className="w-full text-left text-sm">
-        <thead className="border-b border-gray-200 bg-gray-50">
+        <thead className="border-b border-border-warm bg-bg-subtle">
           <tr>
-            <th className="px-4 py-3 font-medium text-gray-700">Company</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Contact</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Amount</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Tier</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Status</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Visibility</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Company</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Contact</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Amount</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Tier</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Status</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Visibility</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-border-warm">
           {sponsors.length === 0 ? (
             <tr>
-              <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={6} className="px-4 py-8 text-center text-ink-subtle">
                 No sponsors yet.
               </td>
             </tr>
           ) : (
             sponsors.map((s) => (
-              <tr key={s.id} className="hover:bg-gray-50">
+              <tr key={s.id} className="hover:bg-bg-subtle">
                 <td className="px-4 py-3 font-medium">{s.companyName || "—"}</td>
-                <td className="px-4 py-3 text-gray-600">
+                <td className="px-4 py-3 text-ink-muted">
                   {s.contactName}
                   <br />
                   <span className="text-xs">{s.contactEmail}</span>
@@ -314,8 +314,8 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                   <span
                     className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                       s.tier === "top"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-gray-100 text-gray-700"
+                        ? "bg-cream text-forest"
+                        : "bg-bg-subtle text-ink-muted"
                     }`}
                   >
                     {getSponsorTierLabel(s.tier)}
@@ -329,7 +329,7 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                         onClick={() => refreshFromStripe(s.id)}
                         disabled={refreshing === s.id}
                         title="Sync payment status from Stripe"
-                        className="rounded border border-gray-300 px-2 py-0.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-50"
+                        className="rounded border border-border-strong px-2 py-0.5 text-xs font-medium text-ink-muted transition hover:bg-bg-subtle disabled:opacity-50"
                       >
                         {refreshing === s.id ? "Syncing…" : "Refresh"}
                       </button>
@@ -347,7 +347,7 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                     }
                     className={`text-sm underline-offset-2 hover:underline disabled:opacity-50 ${
                       s.isDisplayed
-                        ? "text-gray-500 hover:text-gray-700"
+                        ? "text-ink-subtle hover:text-ink-muted"
                         : "text-green-700 hover:text-green-800"
                     }`}
                   >
@@ -387,35 +387,35 @@ function MemorialsTab({
   slug: string;
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div className="overflow-x-auto rounded-xl border border-border-warm bg-white shadow-sm">
       <table className="w-full text-left text-sm">
-        <thead className="border-b border-gray-200 bg-gray-50">
+        <thead className="border-b border-border-warm bg-bg-subtle">
           <tr>
-            <th className="px-4 py-3 font-medium text-gray-700">Deceased</th>
-            <th className="px-4 py-3 font-medium text-gray-700">
+            <th className="px-4 py-3 font-medium text-ink-muted">Deceased</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">
               Submitted By
             </th>
-            <th className="px-4 py-3 font-medium text-gray-700">Status</th>
-            <th className="px-4 py-3 font-medium text-gray-700">
+            <th className="px-4 py-3 font-medium text-ink-muted">Status</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">
               Review Link
             </th>
-            <th className="px-4 py-3 font-medium text-gray-700">Date</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Date</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-border-warm">
           {memorials.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={5} className="px-4 py-8 text-center text-ink-subtle">
                 No memorial submissions yet.
               </td>
             </tr>
           ) : (
             memorials.map((m) => (
-              <tr key={m.id} className="hover:bg-gray-50">
+              <tr key={m.id} className="hover:bg-bg-subtle">
                 <td className="px-4 py-3 font-medium">
                   {m.deceasedFirstName} {m.deceasedLastName}
                 </td>
-                <td className="px-4 py-3 text-gray-600">
+                <td className="px-4 py-3 text-ink-muted">
                   {m.submitterName}
                   <br />
                   <span className="text-xs">{m.submitterEmail}</span>
@@ -429,7 +429,7 @@ function MemorialsTab({
                           ? "bg-blue-100 text-blue-700"
                           : m.status === "draft"
                             ? "bg-amber-100 text-amber-700"
-                            : "bg-gray-100 text-gray-700"
+                            : "bg-bg-subtle text-ink-muted"
                     }`}
                   >
                     {m.status}
@@ -452,7 +452,7 @@ function MemorialsTab({
                     Copy Link
                   </button>
                 </td>
-                <td className="px-4 py-3 text-gray-500">
+                <td className="px-4 py-3 text-ink-subtle">
                   {new Date(m.createdAt).toLocaleDateString()}
                 </td>
               </tr>
@@ -486,23 +486,23 @@ function ProfilesTab({
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div className="overflow-x-auto rounded-xl border border-border-warm bg-white shadow-sm">
       <table className="w-full text-left text-sm">
-        <thead className="border-b border-gray-200 bg-gray-50">
+        <thead className="border-b border-border-warm bg-bg-subtle">
           <tr>
-            <th className="px-4 py-3 font-medium text-gray-700">Name</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Email</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Completed</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Published</th>
-            <th className="px-4 py-3 font-medium text-gray-700">
+            <th className="px-4 py-3 font-medium text-ink-muted">Name</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Email</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Completed</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Published</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">
               Edit Link
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-border-warm">
           {profiles.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={5} className="px-4 py-8 text-center text-ink-subtle">
                 No profiles yet.
               </td>
             </tr>
@@ -518,13 +518,13 @@ function ProfilesTab({
               ];
               const filled = fields.filter(Boolean).length;
               return (
-                <tr key={profile.id} className="hover:bg-gray-50">
+                <tr key={profile.id} className="hover:bg-bg-subtle">
                   <td className="px-4 py-3 font-medium">
                     {firstName} {lastName}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{email}</td>
+                  <td className="px-4 py-3 text-ink-muted">{email}</td>
                   <td className="px-4 py-3">
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-ink-subtle">
                       {filled}/6 fields
                     </span>
                   </td>
@@ -535,7 +535,7 @@ function ProfilesTab({
                       className={`rounded-full px-3 py-1 text-xs font-medium transition ${
                         profile.isPublished
                           ? "bg-green-100 text-green-700 hover:bg-green-200"
-                          : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                          : "bg-bg-subtle text-ink-subtle hover:bg-border-warm"
                       }`}
                     >
                       {profile.isPublished ? "Published" : "Hidden"}
@@ -575,29 +575,29 @@ function EventsTab({
   regCounts: Record<string, { confirmed: number; pending: number }>;
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div className="overflow-x-auto rounded-xl border border-border-warm bg-white shadow-sm">
       <table className="w-full text-left text-sm">
-        <thead className="border-b border-gray-200 bg-gray-50">
+        <thead className="border-b border-border-warm bg-bg-subtle">
           <tr>
-            <th className="px-4 py-3 font-medium text-gray-700">Event</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Date</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Type</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Interested</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Registered</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Event</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Date</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Type</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Interested</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Registered</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-border-warm">
           {events.map((event) => (
-            <tr key={event.id} className="hover:bg-gray-50">
+            <tr key={event.id} className="hover:bg-bg-subtle">
               <td className="px-4 py-3 font-medium">{event.name}</td>
-              <td className="px-4 py-3 text-gray-600">
+              <td className="px-4 py-3 text-ink-muted">
                 {event.eventDate} {event.eventTime && `· ${event.eventTime}`}
               </td>
               <td className="px-4 py-3">
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                     event.type === "paid"
-                      ? "bg-red-100 text-red-700"
+                      ? "bg-cream text-forest"
                       : "bg-green-100 text-green-700"
                   }`}
                 >
@@ -614,7 +614,7 @@ function EventsTab({
                   {regCounts[event.id]?.confirmed || 0}
                 </span>
                 {(regCounts[event.id]?.pending || 0) > 0 && (
-                  <span className="ml-1 text-xs text-gray-400">
+                  <span className="ml-1 text-xs text-ink-subtle">
                     (+{regCounts[event.id]?.pending} pending)
                   </span>
                 )}
@@ -635,38 +635,38 @@ function MessagesTab({
   categoryLabels: Record<string, string>;
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div className="overflow-x-auto rounded-xl border border-border-warm bg-white shadow-sm">
       <table className="w-full text-left text-sm">
-        <thead className="border-b border-gray-200 bg-gray-50">
+        <thead className="border-b border-border-warm bg-bg-subtle">
           <tr>
-            <th className="px-4 py-3 font-medium text-gray-700">Name</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Email</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Category</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Message</th>
-            <th className="px-4 py-3 font-medium text-gray-700">Date</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Name</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Email</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Category</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Message</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">Date</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-border-warm">
           {messages.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={5} className="px-4 py-8 text-center text-ink-subtle">
                 No messages yet.
               </td>
             </tr>
           ) : (
             messages.map((msg) => (
-              <tr key={msg.id} className="hover:bg-gray-50">
+              <tr key={msg.id} className="hover:bg-bg-subtle">
                 <td className="px-4 py-3 font-medium">{msg.name}</td>
-                <td className="px-4 py-3 text-gray-600">{msg.email}</td>
+                <td className="px-4 py-3 text-ink-muted">{msg.email}</td>
                 <td className="px-4 py-3">
-                  <span className="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                  <span className="inline-block rounded-full bg-bg-subtle px-2 py-0.5 text-xs font-medium text-ink-muted">
                     {categoryLabels[msg.category] || msg.category}
                   </span>
                 </td>
-                <td className="max-w-xs px-4 py-3 text-gray-600 truncate">
+                <td className="max-w-xs px-4 py-3 text-ink-muted truncate">
                   {msg.message}
                 </td>
-                <td className="px-4 py-3 text-gray-500">
+                <td className="px-4 py-3 text-ink-subtle">
                   {new Date(msg.createdAt).toLocaleDateString()}
                 </td>
               </tr>
@@ -684,7 +684,7 @@ function StatusBadge({ status }: { status: string }) {
       ? "bg-green-100 text-green-700"
       : status === "pending"
         ? "bg-yellow-100 text-yellow-700"
-        : "bg-red-100 text-red-700";
+        : "bg-cream text-forest";
 
   return (
     <span

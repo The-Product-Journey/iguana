@@ -1,4 +1,6 @@
 import { UserButton } from "@clerk/nextjs";
+import Link from "next/link";
+import { Wordmark } from "@/components/wordmark";
 
 export default function AdminLayout({
   children,
@@ -11,12 +13,12 @@ export default function AdminLayout({
   //     enforce per-reunion scope
   // This layout no longer needs a cookie check.
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="border-b border-gray-200 bg-white px-6 py-4">
+    <div className="min-h-screen bg-bg-subtle">
+      <nav className="border-b border-border-warm bg-white px-6 py-4">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <h1 className="text-lg font-semibold text-gray-900">
-            Reunion Admin
-          </h1>
+          <Link href="/" aria-label="Glad You Made It home">
+            <Wordmark className="h-7 w-auto" />
+          </Link>
           {/* afterSignOutUrl is configured globally on ClerkProvider in
               src/app/layout.tsx — see Clerk v7 prop changes. */}
           <UserButton />

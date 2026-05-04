@@ -13,7 +13,7 @@ export function CreateSiteCard() {
       onClick={() => {
         alert("This feature is coming soon.");
       }}
-      className="flex min-h-[280px] items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-white text-gray-500 transition-colors hover:border-gray-400 hover:bg-gray-50 hover:text-gray-700"
+      className="group flex min-h-[280px] items-center justify-center rounded-xl border border-dashed border-border-strong bg-white text-ink-muted transition-colors hover:border-forest hover:bg-bg-subtle hover:text-forest"
     >
       <span className="text-sm font-medium">+ Create site</span>
     </button>

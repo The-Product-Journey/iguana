@@ -85,7 +85,7 @@ export function LaunchSiteMenu({
         aria-label={`Open ${reunionName} public site`}
         className={
           triggerClassName ??
-          "inline-flex h-6 w-6 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+          "inline-flex h-6 w-6 items-center justify-center rounded text-ink-subtle transition hover:bg-bg-subtle hover:text-ink-muted"
         }
       >
         <LaunchIcon className={iconClassName} />
@@ -94,9 +94,9 @@ export function LaunchSiteMenu({
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-full z-50 mt-1 w-72 origin-top-right rounded-md border border-gray-200 bg-white shadow-lg ring-1 ring-black/5"
+          className="absolute right-0 top-full z-50 mt-1 w-72 origin-top-right rounded-md border border-border-warm bg-white shadow-lg ring-1 ring-black/5"
         >
-          <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+          <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-ink-subtle">
             Open in new tab
           </div>
           {vanityUrl && customDomain && (
@@ -106,10 +106,10 @@ export function LaunchSiteMenu({
               rel="noopener noreferrer"
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              className="block px-3 py-2 text-sm text-ink-muted hover:bg-bg-subtle"
             >
-              <div className="font-medium text-gray-900">{customDomain}</div>
-              <div className="text-xs text-gray-500">Custom domain</div>
+              <div className="font-medium text-ink">{customDomain}</div>
+              <div className="text-xs text-ink-subtle">Custom domain</div>
             </a>
           )}
           <a
@@ -118,10 +118,10 @@ export function LaunchSiteMenu({
             rel="noopener noreferrer"
             role="menuitem"
             onClick={() => setOpen(false)}
-            className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            className="block px-3 py-2 text-sm text-ink-muted hover:bg-bg-subtle"
           >
-            <div className="font-medium text-gray-900">{defaultDisplay}</div>
-            <div className="text-xs text-gray-500">Default URL</div>
+            <div className="font-medium text-ink">{defaultDisplay}</div>
+            <div className="text-xs text-ink-subtle">Default URL</div>
           </a>
         </div>
       )}

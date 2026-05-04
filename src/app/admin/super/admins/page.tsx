@@ -27,12 +27,14 @@ export default async function SuperAdminAdminsPage() {
     <div>
       <Link
         href="/admin/super"
-        className="mb-4 inline-block text-sm text-red-700 hover:text-red-800"
+        className="mb-4 inline-block text-sm font-medium text-forest hover:text-forest-deep"
       >
         &larr; Back to super admin
       </Link>
 
-      <h2 className="mb-6 text-2xl font-bold">Manage admins</h2>
+      <h2 className="mb-8 font-serif text-3xl font-light italic text-ink">
+        Manage admins
+      </h2>
 
       <ManageAdminsClient
         reunions={allReunions.map((r) => ({

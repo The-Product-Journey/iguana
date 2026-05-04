@@ -55,8 +55,8 @@ export function SiteModeToggle({
   }
 
   return (
-    <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h3 className="mb-4 text-lg font-semibold text-gray-900">Site Mode</h3>
+    <div className="mb-8 rounded-xl border border-border-warm bg-white p-6 shadow-sm">
+      <h3 className="mb-4 text-lg font-semibold text-ink">Site Mode</h3>
       <div className="flex flex-wrap gap-3">
         {MODES.map((m) => (
           <button
@@ -66,14 +66,14 @@ export function SiteModeToggle({
             className={`rounded-lg border-2 px-4 py-2 text-sm font-semibold transition ${
               mode === m.value
                 ? m.color
-                : "border-gray-200 text-gray-500 hover:bg-gray-50"
+                : "border-border-warm text-ink-subtle hover:bg-bg-subtle"
             } disabled:opacity-50`}
           >
             {m.label}
           </button>
         ))}
       </div>
-      <p className="mt-3 text-sm text-gray-500">
+      <p className="mt-3 text-sm text-ink-subtle">
         {MODES.find((m) => m.value === mode)?.description}
       </p>
     </div>

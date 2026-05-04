@@ -45,18 +45,20 @@ export default async function AdminIndexPage() {
 
   return (
     <div>
-      <h2 className="mb-6 text-2xl font-bold">Choose a reunion</h2>
+      <h2 className="mb-8 font-serif text-3xl font-light italic text-ink">
+        Choose a reunion
+      </h2>
       {myReunions.length === 0 ? (
-        <p className="text-gray-500">No reunions assigned yet.</p>
+        <p className="text-ink-muted">No reunions assigned yet.</p>
       ) : (
         <ul className="space-y-2">
           {myReunions.map((r) => (
             <li key={r.id}>
-              <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:bg-gray-50">
+              <div className="rounded-xl border border-border-warm bg-white p-4 shadow-sm transition hover:border-border-strong hover:shadow-md">
                 <div className="flex items-center gap-2">
                   <Link
                     href={`/admin/${r.slug}`}
-                    className="font-medium text-gray-900 hover:text-red-700"
+                    className="font-medium text-ink hover:text-forest"
                   >
                     {r.name}
                   </Link>
@@ -71,7 +73,7 @@ export default async function AdminIndexPage() {
                     customDomain={r.customDomain}
                   />
                 </div>
-                <div className="mt-1 text-sm text-gray-500">{r.eventDate}</div>
+                <div className="mt-1 text-sm text-ink-muted">{r.eventDate}</div>
               </div>
             </li>
           ))}

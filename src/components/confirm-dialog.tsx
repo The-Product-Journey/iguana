@@ -5,9 +5,9 @@ import { useEffect } from "react";
 type ConfirmVariant = "green" | "red" | "neutral";
 
 const VARIANT_STYLES: Record<ConfirmVariant, string> = {
-  green: "bg-green-700 hover:bg-green-800 focus:ring-green-500",
-  red: "bg-red-700 hover:bg-red-800 focus:ring-red-500",
-  neutral: "bg-gray-700 hover:bg-gray-800 focus:ring-gray-500",
+  green: "bg-forest hover:bg-forest-deep focus:ring-forest",
+  red: "bg-[var(--color-danger)] hover:opacity-90 focus:ring-[var(--color-danger)]",
+  neutral: "bg-ink hover:opacity-90 focus:ring-ink",
 };
 
 /**
@@ -64,17 +64,17 @@ export function ConfirmDialog({
         {title && (
           <h2
             id="confirm-dialog-title"
-            className="mb-2 text-lg font-semibold text-gray-900"
+            className="mb-2 text-lg font-semibold text-ink"
           >
             {title}
           </h2>
         )}
-        <p className="mb-6 text-sm text-gray-600">{message}</p>
+        <p className="mb-6 text-sm text-ink-muted">{message}</p>
         <div className="flex justify-end gap-2">
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300"
+            className="rounded-md border border-border-strong bg-white px-3 py-1.5 text-sm font-medium text-ink-muted transition hover:bg-bg-subtle focus:outline-none"
           >
             {cancelLabel}
           </button>

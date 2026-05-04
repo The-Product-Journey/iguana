@@ -21,7 +21,7 @@ export function SiteCard({ site }: { site: Reunion }) {
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md"
+      className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-xl border border-border-warm bg-white transition-all hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md"
       aria-label={`Open ${site.name}`}
     >
       <div className="h-1.5 bg-gradient-to-r from-red-600 to-red-900" />
@@ -33,20 +33,29 @@ export function SiteCard({ site }: { site: Reunion }) {
             alt=""
             className="h-10 w-10 rounded-md object-contain"
           />
-          <span className="truncate font-mono text-xs text-gray-600">
+          <span className="truncate font-mono text-xs text-ink-muted">
             {displayDomain}
           </span>
         </div>
         <div className="mt-auto">
-          <h3 className="mb-2 text-lg font-bold text-gray-900">{site.name}</h3>
-          <span className="inline-flex items-center gap-1.5 rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-800">
-            <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+          <h3 className="mb-2 text-lg font-semibold text-ink">{site.name}</h3>
+          <span
+            className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium"
+            style={{
+              backgroundColor: "rgb(45 122 95 / 0.12)",
+              color: "var(--color-success)",
+            }}
+          >
+            <span
+              className="h-1.5 w-1.5 rounded-full"
+              style={{ backgroundColor: "var(--color-success)" }}
+            />
             Production
           </span>
         </div>
       </div>
-      <div className="border-t border-gray-100 bg-gray-50/50 px-6 py-3">
-        <span className="text-sm font-medium text-gray-400 transition-colors group-hover:text-gray-900">
+      <div className="border-t border-border-warm bg-bg-subtle px-6 py-3">
+        <span className="text-sm font-medium text-ink-subtle transition-colors group-hover:text-forest">
           Go to site →
         </span>
       </div>
