@@ -4,12 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { LaunchIcon } from "./launch-icon";
 
 /**
- * Resolve the canonical origin client-side. Used to show full URLs in
- * the menu (`app.gladyoumadeit.com/phhs-1996`) instead of relative paths.
- * Computed in useEffect to avoid SSR/CSR hydration mismatch — the menu
- * only renders after click anyway, so the slight delay is invisible.
+ * Resolve the current origin client-side. The displayed URL reflects
+ * whatever host the admin is currently on — `localhost:3003` in dev,
+ * the Vercel preview URL on staging, the canonical app domain in prod.
+ * Computed in useEffect to avoid SSR/CSR hydration mismatch.
  */
-function useCanonicalOrigin() {
+function useCurrentOrigin() {
   const [origin, setOrigin] = useState("");
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -18,13 +18,13 @@ function useCanonicalOrigin() {
 }
 
 /**
- * Launch button for a reunion's public site. When the reunion has a
- * `customDomain` configured, renders a dropdown letting the admin pick
- * between the default canonical URL and the vanity URL — they sometimes
- * want to verify both work. With no customDomain, falls back to a single
- * link to the canonical URL (no dropdown overhead).
+ * Launch button for a reunion's public site. Always renders as a
+ * dropdown — even with a single URL — so admins always know exactly
+ * what they're about to open. When a `customDomain` is configured,
+ * both the vanity URL and the default URL appear so the admin can
+ * verify either one.
  *
- * Both URL choices open in a new tab; the user keeps their place in admin.
+ * URLs open in a new tab; admin keeps their place in the admin panel.
  */
 export function LaunchSiteMenu({
   slug,
@@ -41,7 +41,7 @@ export function LaunchSiteMenu({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const canonicalOrigin = useCanonicalOrigin();
+  const currentOrigin = useCurrentOrigin();
 
   useEffect(() => {
     if (!open) return;
@@ -62,34 +62,14 @@ export function LaunchSiteMenu({
   }, [open]);
 
   const defaultPath = `/${slug}`;
-
-  // No vanity domain — degrade to a plain link, identical to the original
-  // launch icon behavior.
-  if (!customDomain) {
-    return (
-      <a
-        href={defaultPath}
-        target="_blank"
-        rel="noopener noreferrer"
-        title="Open public site in new tab"
-        aria-label={`Open ${reunionName} public site in new tab`}
-        className={
-          triggerClassName ??
-          "inline-flex h-6 w-6 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
-        }
-      >
-        <LaunchIcon className={iconClassName} />
-      </a>
-    );
-  }
-
-  const vanityUrl = `https://${customDomain}`;
-  const defaultUrl = canonicalOrigin
-    ? `${canonicalOrigin}${defaultPath}`
+  const defaultUrl = currentOrigin
+    ? `${currentOrigin}${defaultPath}`
     : defaultPath;
-  const defaultDisplay = canonicalOrigin
-    ? `${new URL(canonicalOrigin).host}${defaultPath}`
+  const defaultDisplay = currentOrigin
+    ? `${new URL(currentOrigin).host}${defaultPath}`
     : defaultPath;
+
+  const vanityUrl = customDomain ? `https://${customDomain}` : null;
 
   return (
     <div ref={ref} className="relative inline-block">
@@ -119,17 +99,19 @@ export function LaunchSiteMenu({
           <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
             Open in new tab
           </div>
-          <a
-            href={vanityUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-          >
-            <div className="font-medium text-gray-900">{customDomain}</div>
-            <div className="text-xs text-gray-500">Custom domain</div>
-          </a>
+          {vanityUrl && customDomain && (
+            <a
+              href={vanityUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            >
+              <div className="font-medium text-gray-900">{customDomain}</div>
+              <div className="text-xs text-gray-500">Custom domain</div>
+            </a>
+          )}
           <a
             href={defaultUrl}
             target="_blank"
