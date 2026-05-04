@@ -37,6 +37,7 @@ export function TeaseLanding({
   showAdminMenu,
   previewMode,
   actualMode,
+  customDomain,
 }: {
   reunion: { id: string; slug: string; name: string; description: string | null; eventDate: string };
   events: Event[];
@@ -45,6 +46,8 @@ export function TeaseLanding({
   showAdminMenu?: boolean;
   previewMode?: SiteMode | null;
   actualMode?: SiteMode;
+  /** Reunion's vanity domain, if configured — passed through to AdminMenu. */
+  customDomain?: string | null;
 }) {
   const [showInterest, setShowInterest] = useState(false);
   const countdown = useCountdown(reunion.eventDate);
@@ -66,6 +69,7 @@ export function TeaseLanding({
             actualMode={actualMode}
             previewMode={previewMode ?? null}
             variant="dark"
+            customDomain={customDomain}
           />
         </div>
       )}

@@ -18,6 +18,8 @@ type NavProps = {
   previewMode?: SiteMode | null;
   /** Actual DB siteMode (what the public sees). */
   actualMode?: SiteMode;
+  /** Reunion's vanity domain, if configured — passed through to AdminMenu. */
+  customDomain?: string | null;
 };
 
 export function SiteNav({
@@ -28,6 +30,7 @@ export function SiteNav({
   showAdminMenu,
   previewMode,
   actualMode,
+  customDomain,
 }: NavProps) {
   const [open, setOpen] = useState(false);
   const adminModeHref = useAdminModeHref(slug);
@@ -85,6 +88,7 @@ export function SiteNav({
               actualMode={actualMode}
               previewMode={previewMode ?? null}
               variant="light"
+              customDomain={customDomain}
             />
           )}
         </div>

@@ -87,6 +87,7 @@ export default async function ReunionLayout({
           previewMode={previewState.previewMode}
           actualMode={previewState.actualMode}
           showAdminMenu={previewState.isAdmin && !showPreviewBanner}
+          customDomain={reunion.customDomain}
         />
       )}
       {children}

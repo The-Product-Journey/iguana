@@ -24,6 +24,7 @@ export function AdminMenu({
   actualMode,
   previewMode,
   variant = "light",
+  customDomain,
 }: {
   actualMode: SiteMode;
   previewMode: SiteMode | null;
@@ -32,6 +33,12 @@ export function AdminMenu({
    * "dark" — light text on dark backgrounds (tease gradient)
    */
   variant?: "light" | "dark";
+  /**
+   * Reunion's vanity domain, if configured. When set, the menu adds a
+   * "Switch to public view" entry that navigates the admin to the vanity
+   * URL — useful for spot-checking what attendees actually see.
+   */
+  customDomain?: string | null;
 }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -162,6 +169,16 @@ export function AdminMenu({
             >
               Admin panel
             </Link>
+            {customDomain && (
+              <a
+                href={`https://${customDomain}`}
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className="block px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                Switch to public view
+              </a>
+            )}
             <button
               type="button"
               role="menuitem"
