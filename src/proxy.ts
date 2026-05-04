@@ -74,19 +74,31 @@ export default clerkMiddleware(async (auth, req) => {
     }
   }
 
-  // 2. Per-tenant vanity-domain rewrite. Only for non-auth, non-API paths
-  //    that don't already include the slug. The rewrite is internal —
-  //    the user keeps seeing the vanity URL in their browser.
+  // 2. Per-tenant vanity-domain handling — two complementary rules.
   const slugForHost = TENANT_DOMAIN_TO_SLUG[host];
-  if (
-    slugForHost &&
-    !isAuthSurface &&
-    !req.nextUrl.pathname.startsWith("/api/") &&
-    !req.nextUrl.pathname.startsWith(`/${slugForHost}`)
-  ) {
+  if (slugForHost && !isAuthSurface && !req.nextUrl.pathname.startsWith("/api/")) {
+    const slugPrefix = `/${slugForHost}`;
     const path = req.nextUrl.pathname;
+    const hasSlugPrefix = path === slugPrefix || path.startsWith(`${slugPrefix}/`);
+
+    if (hasSlugPrefix) {
+      // 2a. Strip the slug. Server components inside /[slug]/* often redirect
+      //     to absolute paths like `/${slug}` or `/${slug}/sponsors` (e.g.
+      //     yearbook redirects to the reunion homepage when site mode is
+      //     tease). Those redirects come back to the browser and would
+      //     expose the slug in the URL bar on the vanity domain. We catch
+      //     them on the next request and 307 to the slug-less equivalent.
+      const stripped = path.slice(slugPrefix.length) || "/";
+      const target = req.nextUrl.clone();
+      target.pathname = stripped;
+      return NextResponse.redirect(target, 307);
+    }
+
+    // 2b. Inbound clean URL → rewrite to add the slug internally.
+    //     `/yearbook` becomes `/phhs-1996/yearbook` for routing, but the
+    //     visible URL stays clean.
     const rewritten = req.nextUrl.clone();
-    rewritten.pathname = `/${slugForHost}${path === "/" ? "" : path}`;
+    rewritten.pathname = `${slugPrefix}${path === "/" ? "" : path}`;
     return NextResponse.rewrite(rewritten);
   }
 
