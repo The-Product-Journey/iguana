@@ -83,7 +83,7 @@ export default async function SponsorsPage({
                     return (
                       <div
                         key={sponsor.id}
-                        className="rounded-xl border-2 border-tenant-border-soft bg-tenant-tint p-6 shadow-sm"
+                        className="rounded-xl border-2 border-tenant-border-soft bg-white p-6 shadow-sm"
                       >
                         {showLogo && (
                           <div className="mb-4 flex h-24 items-center justify-center">
