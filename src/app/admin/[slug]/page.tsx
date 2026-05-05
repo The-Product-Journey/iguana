@@ -166,9 +166,11 @@ export default async function AdminReunionPage({
     <div>
       <BackLink fallbackHref={`/${slug}`} />
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <EditableSiteName reunionId={reunion.id} initialName={reunion.name} />
-        {slug.endsWith("-test") && <TestTag size="md" />}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <EditableSiteName reunionId={reunion.id} initialName={reunion.name} />
+          {slug.endsWith("-test") && <TestTag size="md" />}
+        </div>
         <LaunchSiteMenu
           slug={slug}
           reunionName={reunion.name}
