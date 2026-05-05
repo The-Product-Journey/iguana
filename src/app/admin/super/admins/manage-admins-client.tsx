@@ -186,7 +186,11 @@ function ReunionAdminsTab({
         setError(j.error || `Failed (${res.status})`);
       } else {
         setEmail("");
-        if (j.inviteError) {
+        if (j.inviteStatus === "user-exists") {
+          setNotice(
+            `Added. ${email} already has an account — they'll see this reunion the next time they sign in.`
+          );
+        } else if (j.inviteError) {
           setNotice(
             `Added to allowlist, but invite email failed: ${j.inviteError}. Use Resend to retry.`
           );
@@ -239,7 +243,11 @@ function ReunionAdminsTab({
       if (!res.ok) {
         setError(j.error || `Failed (${res.status})`);
       } else {
-        setNotice(`Invite sent to ${email}.`);
+        if (j.inviteStatus === "user-exists") {
+          setNotice(`${email} already has an account — they're set as Active now.`);
+        } else {
+          setNotice(`Invite sent to ${email}.`);
+        }
         router.refresh();
       }
     } catch (err) {
@@ -418,7 +426,11 @@ function SuperAdminsTab({
         setError(j.error || `Failed (${res.status})`);
       } else {
         setEmail("");
-        if (j.inviteError) {
+        if (j.inviteStatus === "user-exists") {
+          setNotice(
+            `Added. ${email} already has an account — they'll have super-admin access the next time they sign in.`
+          );
+        } else if (j.inviteError) {
           setNotice(
             `Added to allowlist, but invite email failed: ${j.inviteError}. Use Resend to retry.`
           );
@@ -471,7 +483,11 @@ function SuperAdminsTab({
       if (!res.ok) {
         setError(j.error || `Failed (${res.status})`);
       } else {
-        setNotice(`Invite sent to ${targetEmail}.`);
+        if (j.inviteStatus === "user-exists") {
+          setNotice(`${targetEmail} already has an account — they're set as Active now.`);
+        } else {
+          setNotice(`Invite sent to ${targetEmail}.`);
+        }
         router.refresh();
       }
     } catch (err) {

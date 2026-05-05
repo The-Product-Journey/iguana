@@ -77,15 +77,28 @@ export async function POST(req: NextRequest) {
   // Best-effort Clerk invite. See same-shaped comment in
   // /api/admin/super/admins for rationale.
   let inviteError: string | null = null;
+  let inviteStatus: "sent" | "user-exists" | null = null;
   try {
-    await sendAdminInvite(email, "/admin/super");
+    const result = await sendAdminInvite(email, "/admin/super");
+    inviteStatus = result.kind;
+    if (result.kind === "user-exists") {
+      await db
+        .update(superAdmins)
+        .set({ clerkUserId: result.clerkUserId })
+        .where(eq(superAdmins.id, row.id));
+    }
   } catch (err) {
     inviteError =
       err instanceof Error ? err.message : "Unknown invite error";
     console.error("[super/super-admins] invite send failed", err);
   }
 
-  return NextResponse.json({ ok: true, admin: row, inviteError });
+  return NextResponse.json({
+    ok: true,
+    admin: row,
+    inviteStatus,
+    inviteError,
+  });
 }
 
 export async function DELETE(req: NextRequest) {
