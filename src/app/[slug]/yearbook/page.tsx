@@ -36,7 +36,7 @@ export default async function YearbookPage({
     .where(eq(profiles.isPublished, true));
 
   return (
-    <div className="min-h-screen bg-bg-subtle py-12">
+    <div className="min-h-screen bg-tenant-tint py-12">
       <div className="mx-auto max-w-4xl px-6">
         <Link
           href={`/${slug}`}
@@ -56,7 +56,7 @@ export default async function YearbookPage({
           </div>
           <Link
             href={`/${slug}/yearbook/print`}
-            className="rounded-lg border border-border-strong px-4 py-2 text-sm font-medium text-ink-muted transition hover:bg-bg-subtle"
+            className="rounded-lg border border-border-strong px-4 py-2 text-sm font-medium text-ink-muted transition hover:bg-tenant-tint"
           >
             Print / PDF
           </Link>

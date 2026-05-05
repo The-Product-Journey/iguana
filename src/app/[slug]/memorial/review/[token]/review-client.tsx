@@ -80,7 +80,7 @@ export function MemorialReviewClient({
           className={`flex-1 rounded-lg border-2 px-4 py-3 font-semibold transition ${
             action === "approved"
               ? "border-success bg-success/10 text-success"
-              : "border-border-warm text-ink-muted hover:bg-bg-subtle"
+              : "border-border-warm text-ink-muted hover:bg-tenant-tint"
           }`}
         >
           Looks Good — Publish It
@@ -91,7 +91,7 @@ export function MemorialReviewClient({
           className={`flex-1 rounded-lg border-2 px-4 py-3 font-semibold transition ${
             action === "changes"
               ? "border-warning bg-warning/10 text-warning"
-              : "border-border-warm text-ink-muted hover:bg-bg-subtle"
+              : "border-border-warm text-ink-muted hover:bg-tenant-tint"
           }`}
         >
           Request Changes

@@ -52,7 +52,7 @@ export default async function YearbookPrintPage({
         }}
       />
 
-      <div className="no-print mb-8 rounded-lg border border-border-warm bg-bg-subtle p-4 text-sm text-ink-muted">
+      <div className="no-print mb-8 rounded-lg border border-border-warm bg-tenant-tint p-4 text-sm text-ink-muted">
         Use your browser&apos;s Print function (Ctrl+P / Cmd+P) to save this as
         a PDF.
         <PrintButton />

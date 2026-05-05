@@ -35,7 +35,7 @@ export default async function MemorialPage({
     );
 
   return (
-    <div className="min-h-screen bg-bg-subtle py-12">
+    <div className="min-h-screen bg-tenant-tint py-12">
       <div className="mx-auto max-w-3xl px-6">
         <Link
           href={`/${slug}`}
@@ -111,7 +111,7 @@ export default async function MemorialPage({
           </p>
           <Link
             href={`/${slug}/memorial/submit`}
-            className="inline-block rounded-full border border-border-strong px-6 py-2 text-sm font-medium text-ink-muted transition hover:bg-bg-subtle"
+            className="inline-block rounded-full border border-border-strong px-6 py-2 text-sm font-medium text-ink-muted transition hover:bg-tenant-tint"
           >
             Submit a Memorial
           </Link>

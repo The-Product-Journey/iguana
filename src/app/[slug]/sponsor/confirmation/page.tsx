@@ -30,7 +30,7 @@ export default async function SponsorConfirmationPage({
   }
 
   return (
-    <div className="min-h-screen bg-bg-subtle px-6 py-12">
+    <div className="min-h-screen bg-tenant-tint px-6 py-12">
       <div className="mx-auto max-w-md">
         <div className="rounded-xl border border-border-warm bg-white p-8 text-center shadow-sm">
           <div className="mb-4 text-5xl">🙏</div>

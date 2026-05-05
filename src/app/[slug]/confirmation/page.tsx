@@ -76,7 +76,7 @@ export default async function ConfirmationPage({
   const isPaid = rsvp?.paymentMethod === "online";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg-subtle px-6 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-tenant-tint px-6 py-12">
       <div className="mx-auto max-w-md text-center">
         <div className="mb-6 text-6xl">🎉</div>
         <h1 className="mb-4 text-3xl font-bold text-ink">

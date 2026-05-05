@@ -22,7 +22,7 @@ export default async function MemorialReviewPage({
   // Only show review page when in pending_review status
   if (memorial.status !== "pending_review") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-bg-subtle px-6">
+      <div className="flex min-h-screen items-center justify-center bg-tenant-tint px-6">
         <div className="max-w-md text-center">
           <h1 className="mb-4 text-2xl font-bold text-ink">
             {memorial.status === "published"
@@ -50,7 +50,7 @@ export default async function MemorialReviewPage({
   const display = draft || memorial;
 
   return (
-    <div className="min-h-screen bg-bg-subtle py-12">
+    <div className="min-h-screen bg-tenant-tint py-12">
       <div className="mx-auto max-w-2xl px-6">
         <h1 className="mb-2 text-3xl font-bold text-ink">
           Review Memorial Entry

@@ -38,7 +38,7 @@ export default async function RsvpPage({
   // Pre-register mode — show interest form inline
   if (effectiveMode === "pre_register") {
     return (
-      <div className="min-h-screen bg-bg-subtle py-12">
+      <div className="min-h-screen bg-tenant-tint py-12">
         <div className="mx-auto max-w-xl px-6">
           <Link
             href={`/${slug}`}
@@ -67,7 +67,7 @@ export default async function RsvpPage({
   const connect = await loadConnectAccount(reunion.id);
 
   return (
-    <div className="min-h-screen bg-bg-subtle py-12">
+    <div className="min-h-screen bg-tenant-tint py-12">
       <div className="mx-auto max-w-xl px-6">
         <Link
           href={`/${slug}`}

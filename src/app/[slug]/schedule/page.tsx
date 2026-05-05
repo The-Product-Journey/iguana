@@ -57,7 +57,7 @@ export default async function SchedulePage({
   );
 
   return (
-    <div className="min-h-screen bg-bg-subtle py-12">
+    <div className="min-h-screen bg-tenant-tint py-12">
       <div className="mx-auto max-w-3xl px-6">
         <Link
           href={`/${slug}`}

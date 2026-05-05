@@ -23,7 +23,7 @@ export default async function CommunityServicePage({
   const wishlistUrl = process.env.NEXT_PUBLIC_AMAZON_WISHLIST_URL;
 
   return (
-    <div className="min-h-screen bg-bg-subtle py-12">
+    <div className="min-h-screen bg-tenant-tint py-12">
       <div className="mx-auto max-w-2xl px-6">
         <Link
           href={`/${slug}`}
