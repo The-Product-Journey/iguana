@@ -353,7 +353,7 @@ function FaviconSection({
 // ---------------------------------------------------------------------------
 
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
-const PLATFORM_DEFAULT_BRAND = "#475569"; // Slate — matches the @theme fallback in globals.css
+const PLATFORM_DEFAULT_BRAND = "#23549a"; // Calm blue — matches the @theme fallback in globals.css
 
 function BrandColorSection({
   reunionId,

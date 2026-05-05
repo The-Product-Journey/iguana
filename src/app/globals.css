@@ -77,7 +77,7 @@
    * expressions at BUILD time and outputs static colors. So if the
    * derived shades were declared here, runtime overrides of
    * --color-tenant-primary would only affect the primary — the
-   * derived shades would stay frozen at their build-time PHHS-red
+   * derived shades would stay frozen at their build-time default
    * values. We declare ONLY the primary in @theme (so Tailwind
    * registers all the tenant-* utility class names) and redeclare
    * the derivations inside the [data-theme="tenant"] block below as
@@ -85,16 +85,19 @@
    * expressions and evaluates them at use site against the local
    * --color-tenant-primary override.
    *
-   * Defaults reflect the historic PHHS Park Hill red so existing
-   * reunions render identically to before this feature shipped.
+   * Defaults are a calm, non-platform blue — applied to any reunion that
+   * hasn't picked a brand color yet. Static values below approximate the
+   * runtime color-mix derivations for non-tenant contexts (e.g. site
+   * cards on the platform homepage that use var(--color-tenant-primary)
+   * as a fallback stripe color).
    */
-  --color-tenant-primary: #475569;
-  --color-tenant-primary-deep: #38424f;
-  --color-tenant-darkest: #232a35;
-  --color-tenant-tint: #eef0f2;
-  --color-tenant-tint-strong: #dadde1;
-  --color-tenant-border-soft: #b6bbc1;
-  --color-tenant-on-dark: #c1c5cb;
+  --color-tenant-primary: #23549a;
+  --color-tenant-primary-deep: #1c437b;
+  --color-tenant-darkest: #122a4d;
+  --color-tenant-tint: #f4f6fa;
+  --color-tenant-tint-strong: #d8e0ed;
+  --color-tenant-border-soft: #b2c3db;
+  --color-tenant-on-dark: #bdcce0;
 }
 
 /*

@@ -9,9 +9,9 @@ import type { Reunion } from "@/lib/db/schema";
  * The top color stripe uses the reunion's configured brand color so each
  * card carries a small visual cue of the tenant's identity. Without a
  * brand color set, falls back to the platform's default tenant token
- * (slate). Deliberately NOT the platform cream — these site cards live
- * in the admin's workspace and we don't want Glad-You-Made-It branding
- * leaking into the surface they use to manage their own tenants.
+ * (a calm blue). Deliberately NOT the platform cream — these site cards
+ * live in the admin's workspace and we don't want Glad-You-Made-It
+ * branding leaking into the surface they use to manage their own tenants.
  *
  * Multiple clickable areas:
  * - The displayed URLs (custom domain when set, plus the platform path)
@@ -30,9 +30,10 @@ export function SiteCard({ site }: { site: Reunion }) {
 
   // The brand color stripe at the top. Inline style so each card uses
   // its own reunion's brand color (rather than a single shared CSS var).
-  // Falls back to the platform's neutral tenant default (slate) when
-  // brandColor is NULL — deliberately neutral rather than platform-cream
-  // so the admin workspace doesn't carry our brand into theirs.
+  // Falls back to the platform's neutral tenant default (a calm blue)
+  // when brandColor is NULL — deliberately neutral rather than
+  // platform-cream so the admin workspace doesn't carry our brand into
+  // theirs.
   const stripeColor = site.brandColor ?? "var(--color-tenant-primary)";
 
   return (
