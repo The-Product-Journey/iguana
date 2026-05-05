@@ -38,28 +38,19 @@ export type InviteStatus =
  * revokePendingInvite). On Clerk failure this throws — callers wrap so
  * a Clerk outage doesn't block the DB-allowlist write.
  *
- * The redirectUrl is what Clerk sends the user to AFTER they click the
- * invitation link in the email — with `__clerk_ticket` appended. We
- * always send them to /sign-up so Clerk's <SignUp> component reads the
- * ticket, validates it, and presents the sign-up form. The original
- * target (e.g. /admin/<slug>) is encoded as `next` so the sign-up page
- * can redirect there after the user finishes onboarding.
- *
- * Why not pass the admin URL directly as redirectUrl?
- *   - The user isn't authenticated yet, so middleware redirects them
- *     to /sign-in. <SignIn> doesn't reliably switch into invitation
- *     flow when the ticket query is preserved through the redirect.
- *   - /sign-up + <SignUp> handles the ticket explicitly.
+ * The redirectUrl is the page the user lands on AFTER completing
+ * sign-up via Clerk's Account Portal. The Account Portal handles the
+ * __clerk_ticket query param itself (we don't host a SignUp component
+ * locally), so we can just pass the final admin destination here.
  */
 export async function sendAdminInvite(
   email: string,
   redirectPath: string = "/admin"
 ): Promise<{ id: string }> {
   const client = await clerkClient();
-  const next = encodeURIComponent(redirectPath);
   const inv = await client.invitations.createInvitation({
     emailAddress: email,
-    redirectUrl: `${redirectOrigin()}/sign-up?next=${next}`,
+    redirectUrl: `${redirectOrigin()}${redirectPath}`,
     notify: true,
     ignoreExisting: false,
   });
