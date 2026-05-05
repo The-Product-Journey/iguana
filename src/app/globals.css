@@ -53,12 +53,18 @@
 }
 
 /*
- * Persimmon focus ring across the app. Tenant pages currently inherit
- * this too — acceptable since persimmon is only used on focus, not as a
- * surface, so it doesn't compete with the tenant's brand.
+ * Persimmon focus ring across PLATFORM pages only. Tenant pages
+ * (the public reunion site under /[slug]/*) opt out via
+ * `data-theme="tenant"` on the reunion layout so their own
+ * brand-red focus rings on form inputs aren't overlaid with a
+ * second persimmon outline.
  */
 :focus-visible {
   outline: 2px solid var(--color-persimmon);
   outline-offset: 2px;
   border-radius: inherit;
+}
+
+[data-theme="tenant"] :focus-visible {
+  outline: revert;
 }

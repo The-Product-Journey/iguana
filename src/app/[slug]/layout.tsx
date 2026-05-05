@@ -70,8 +70,23 @@ export default async function ReunionLayout({
     previewState.previewMode !== null &&
     previewState.previewMode !== previewState.actualMode;
 
+  // `data-theme="tenant"` opts this subtree out of the platform's
+  // persimmon focus ring (set globally in app/globals.css). Tenant
+  // forms have their own red focus styles; we don't want a second
+  // persimmon outline stacked on top.
+  // The tenant font stack is set via inline styles to override the
+  // platform's --font-sans (Bricolage Grotesque) on the public reunion
+  // site. We use the same Geist + system stack the site shipped with
+  // pre-rebrand so it reads as a normal consumer site, not as platform
+  // chrome. Brand identity here is the PHHS red, not the type.
   return (
-    <>
+    <div
+      data-theme="tenant"
+      style={{
+        fontFamily:
+          'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      }}
+    >
       {showPreviewBanner && (
         <AdminPreviewBanner
           previewMode={previewState.previewMode!}
@@ -91,6 +106,6 @@ export default async function ReunionLayout({
         />
       )}
       {children}
-    </>
+    </div>
   );
 }
