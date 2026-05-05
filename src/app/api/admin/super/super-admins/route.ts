@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { superAdmins } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { requireSuperAdmin } from "@/lib/admin-auth";
+import { sendAdminInvite, revokePendingInvite } from "@/lib/clerk-invites";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -33,12 +34,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  let row;
   try {
-    const [row] = await db
+    [row] = await db
       .insert(superAdmins)
       .values({ email, invitedByEmail: guard.email })
       .returning();
-    return NextResponse.json({ ok: true, admin: row });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("UNIQUE") || msg.includes("idx_super_admins")) {
@@ -53,6 +54,19 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+
+  // Best-effort Clerk invite. See same-shaped comment in
+  // /api/admin/super/admins for rationale.
+  let inviteError: string | null = null;
+  try {
+    await sendAdminInvite(email, "/admin/super");
+  } catch (err) {
+    inviteError =
+      err instanceof Error ? err.message : "Unknown invite error";
+    console.error("[super/super-admins] invite send failed", err);
+  }
+
+  return NextResponse.json({ ok: true, admin: row, inviteError });
 }
 
 export async function DELETE(req: NextRequest) {
@@ -100,5 +114,14 @@ export async function DELETE(req: NextRequest) {
   }
 
   await db.delete(superAdmins).where(eq(superAdmins.id, id));
+
+  // Revoke any pending Clerk invitation for this email (if one exists)
+  // so a stale invite link can't onboard a removed super admin.
+  try {
+    await revokePendingInvite(target.email);
+  } catch (err) {
+    console.error("[super/super-admins] invite revoke failed", err);
+  }
+
   return NextResponse.json({ ok: true });
 }

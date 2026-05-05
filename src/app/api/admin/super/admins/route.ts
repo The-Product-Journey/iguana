@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { reunionAdmins } from "@/lib/db/schema";
+import { reunionAdmins, reunions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { requireSuperAdmin } from "@/lib/admin-auth";
+import { sendAdminInvite, revokePendingInvite } from "@/lib/clerk-invites";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -34,8 +35,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  let row;
   try {
-    const [row] = await db
+    [row] = await db
       .insert(reunionAdmins)
       .values({
         reunionId,
@@ -43,7 +45,6 @@ export async function POST(req: NextRequest) {
         invitedByEmail: guard.email,
       })
       .returning();
-    return NextResponse.json({ ok: true, admin: row });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("UNIQUE") || msg.includes("idx_reunion_admins")) {
@@ -64,6 +65,30 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+
+  // DB row created. Send a Clerk invitation as a separate step — best
+  // effort. If Clerk fails (rate limit, env not set, etc.), the admin
+  // row still exists and we surface the failure in the response so the
+  // UI can offer a Resend action. The fallback "passive" path also
+  // still works: the user can sign up manually and getCurrentAdminContext
+  // will backfill on first sign-in.
+  const reunion = await db
+    .select({ slug: reunions.slug })
+    .from(reunions)
+    .where(eq(reunions.id, reunionId))
+    .get();
+  const redirectPath = reunion ? `/admin/${reunion.slug}` : "/admin";
+
+  let inviteError: string | null = null;
+  try {
+    await sendAdminInvite(email, redirectPath);
+  } catch (err) {
+    inviteError =
+      err instanceof Error ? err.message : "Unknown invite error";
+    console.error("[super/admins] invite send failed", err);
+  }
+
+  return NextResponse.json({ ok: true, admin: row, inviteError });
 }
 
 export async function DELETE(req: NextRequest) {
@@ -75,6 +100,28 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
 
+  // Look up the row first so we have the email to revoke any pending
+  // Clerk invitation. If we don't revoke, an outstanding invite would
+  // still let someone sign up after we removed them from the allowlist
+  // (they'd still bounce off the auth check, but it's noisier than
+  // necessary).
+  const row = await db
+    .select({ email: reunionAdmins.email })
+    .from(reunionAdmins)
+    .where(eq(reunionAdmins.id, id))
+    .get();
+
   await db.delete(reunionAdmins).where(eq(reunionAdmins.id, id));
+
+  if (row?.email) {
+    try {
+      await revokePendingInvite(row.email);
+    } catch (err) {
+      // Don't fail the delete — the DB row is gone, which is the source
+      // of truth for access. Log and move on.
+      console.error("[super/admins] invite revoke failed", err);
+    }
+  }
+
   return NextResponse.json({ ok: true });
 }
