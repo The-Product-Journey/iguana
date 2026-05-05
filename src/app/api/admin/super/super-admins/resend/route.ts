@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
 
   let inviteStatus: "sent" | "user-exists";
   try {
-    const result = await sendAdminInvite(row.email, "/admin/super");
+    const result = await sendAdminInvite(row.email, "/admin");
     inviteStatus = result.kind;
     if (result.kind === "user-exists") {
       await db

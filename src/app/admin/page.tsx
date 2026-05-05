@@ -1,7 +1,6 @@
 import { db } from "@/lib/db";
-import { reunions } from "@/lib/db/schema";
-import { inArray } from "drizzle-orm";
-import { redirect } from "next/navigation";
+import { reunions, reunionAdmins } from "@/lib/db/schema";
+import { sql, eq, asc, inArray } from "drizzle-orm";
 import Link from "next/link";
 import { requireAnyAdminPage } from "@/lib/admin-auth";
 import { LaunchSiteMenu } from "@/components/launch-site-menu";
@@ -10,65 +9,102 @@ import { TestTag } from "@/components/test-tag";
 export const dynamic = "force-dynamic";
 
 /**
- * Top-level /admin landing — a router that sends each user to the right place
- * based on their role:
- *   - Super admin → /admin/super
- *   - Reunion admin with one reunion → /admin/<slug>
- *   - Reunion admin with multiple → small picker page (shown below)
- *   - Anything else → /admin/forbidden (proxy already filters; defense in depth)
+ * Unified admin landing.
+ *
+ * Same layout for super admins and reunion admins. Differences:
+ *   - Heading reads "Super Admin" vs "Admin"
+ *   - "Manage admins" button only shows for super admins
+ *   - Super admins see every active+inactive reunion + admin counts
+ *   - Reunion admins see only the reunions they're attached to (no
+ *     admin counts — they don't manage other admins)
+ *
+ * Single-reunion admins used to be auto-redirected straight to
+ * /admin/<slug>. We now always render the list so the surface is
+ * predictable and consistent across roles.
  */
-export default async function AdminIndexPage() {
+export default async function AdminLandingPage() {
   const ctx = await requireAnyAdminPage();
 
-  if (ctx.isSuper) {
-    redirect("/admin/super");
-  }
-
-  // Reunion admin
-  if (ctx.reunionIds.length === 1) {
-    const reunion = await db
-      .select({ slug: reunions.slug })
-      .from(reunions)
-      .where(inArray(reunions.id, ctx.reunionIds))
-      .get();
-    if (reunion) redirect(`/admin/${reunion.slug}`);
-  }
-
-  // Multiple reunions — picker
-  const myReunions =
-    ctx.reunionIds.length > 0
+  const sites = ctx.isSuper
+    ? await db.select().from(reunions).orderBy(asc(reunions.name)).all()
+    : ctx.reunionIds.length > 0
       ? await db
           .select()
           .from(reunions)
           .where(inArray(reunions.id, ctx.reunionIds))
+          .orderBy(asc(reunions.name))
           .all()
       : [];
 
+  // Admin counts only matter (and are loaded) for super admins.
+  const counts: { reunion: (typeof sites)[number]; adminCount: number }[] =
+    ctx.isSuper
+      ? await Promise.all(
+          sites.map(async (r) => {
+            const c = await db
+              .select({ n: sql<number>`count(*)` })
+              .from(reunionAdmins)
+              .where(eq(reunionAdmins.reunionId, r.id))
+              .get();
+            return { reunion: r, adminCount: c?.n ?? 0 };
+          })
+        )
+      : sites.map((r) => ({ reunion: r, adminCount: 0 }));
+
   return (
     <div>
-      <h2 className="mb-8 text-3xl font-semibold text-ink">Choose a reunion</h2>
-      {myReunions.length === 0 ? (
-        <p className="text-ink-muted">No reunions assigned yet.</p>
+      <div className="mb-8 flex items-center justify-between">
+        <h2 className="text-3xl font-semibold text-ink">
+          {ctx.isSuper ? "Super Admin" : "Admin"}
+        </h2>
+        {ctx.isSuper && (
+          <Link
+            href="/admin/super/admins"
+            className="rounded-lg bg-forest px-4 py-2 text-sm font-medium text-on-forest transition hover:bg-forest-deep"
+          >
+            Manage admins →
+          </Link>
+        )}
+      </div>
+
+      <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink-subtle">
+        {ctx.isSuper ? "All sites" : "Your sites"}
+      </h3>
+
+      {sites.length === 0 ? (
+        <p className="text-sm text-ink-subtle">No sites assigned yet.</p>
       ) : (
         <ul className="space-y-2">
-          {myReunions.map((r) => (
-            <li key={r.id}>
-              <div className="rounded-xl border border-border-warm bg-white p-4 shadow-sm transition hover:border-border-strong hover:shadow-md">
+          {counts.map(({ reunion, adminCount }) => (
+            <li
+              key={reunion.id}
+              className="flex items-center justify-between gap-3 rounded-xl border border-border-warm bg-white p-4 shadow-sm"
+            >
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <Link
-                    href={`/admin/${r.slug}`}
+                    href={`/admin/${reunion.slug}`}
                     className="font-medium text-ink hover:text-forest"
                   >
-                    {r.name}
+                    {reunion.name}
                   </Link>
-                  {r.slug.endsWith("-test") && <TestTag />}
-                  <LaunchSiteMenu
-                    slug={r.slug}
-                    reunionName={r.name}
-                    customDomain={r.customDomain}
-                  />
+                  {reunion.slug.endsWith("-test") && <TestTag />}
                 </div>
-                <div className="mt-1 text-sm text-ink-muted">{r.eventDate}</div>
+                <div className="text-sm text-ink-muted">
+                  {reunion.eventDate} · mode: {reunion.siteMode}
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center gap-3">
+                {ctx.isSuper && (
+                  <span className="text-sm text-ink-muted">
+                    {adminCount} {adminCount === 1 ? "admin" : "admins"}
+                  </span>
+                )}
+                <LaunchSiteMenu
+                  slug={reunion.slug}
+                  reunionName={reunion.name}
+                  customDomain={reunion.customDomain}
+                />
               </div>
             </li>
           ))}
