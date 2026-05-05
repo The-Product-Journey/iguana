@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img">
+  <title>Glad you Made It — Favicon</title>
+  <desc>Favicon mark: forest green exclamation point on persimmon rounded square background. Brand colors: persimmon #F2A065, forest #2B5747. Typeface: Bricolage Grotesque ExtraBold.</desc>
+  <defs>
+    <style>
+      @import url('https://cdn.jsdelivr.net/npm/@fontsource-variable/bricolage-grotesque@latest/index.css');
+    </style>
+  </defs>
+  <rect width="256" height="256" rx="52" fill="#F2A065"/>
+  <text x="128" y="200" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-size="200" font-weight="800" fill="#2B5747">!</text>
+</svg>
