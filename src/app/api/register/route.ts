@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { rsvps, registrationEvents, events, reunions } from "@/lib/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -85,6 +86,20 @@ export async function POST(req: NextRequest) {
         }))
       );
     }
+
+    const posthog = getPostHogClient();
+    posthog.identify({ distinctId: email, properties: { name: `${firstName} ${lastName}`, email } });
+    posthog.capture({
+      distinctId: email,
+      event: "rsvp_registered",
+      properties: {
+        reunion_id: reunionId,
+        rsvp_id: rsvp.id,
+        payment_method: "door",
+        guest_count: guestCount || 1,
+        event_count: Array.isArray(eventIds) ? eventIds.length : 0,
+      },
+    });
 
     return NextResponse.json({ success: true, editToken });
   } catch (error) {

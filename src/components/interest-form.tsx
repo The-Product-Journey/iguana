@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Event } from "@/lib/db/schema";
 import { formatTentativeWhen } from "@/lib/utils";
+import posthog from "posthog-js";
 
 type Response = "yes" | "maybe" | "no";
 
@@ -64,6 +65,13 @@ export function InterestForm({
         return;
       }
 
+      posthog.identify(email, { name, email });
+      posthog.capture("interest_signup_submitted", {
+        reunion_id: reunionId,
+        slug,
+        has_maiden_name: !!maidenName,
+        event_response_count: Object.keys(responses).length,
+      });
       setSuccess(true);
     } catch {
       setError("Something went wrong. Please try again.");

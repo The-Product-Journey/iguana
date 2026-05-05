@@ -5,6 +5,7 @@ import { reunions, sponsors } from "@/lib/db/schema";
 import { getStripe, getBaseUrl, loadConnectAccount } from "@/lib/stripe";
 import { getSponsorTier, computeApplicationFeeCents } from "@/lib/constants";
 import { uploadImage } from "@/lib/upload";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -130,6 +131,23 @@ export async function POST(req: NextRequest) {
         updatedAt: new Date().toISOString(),
       })
       .where(eq(sponsors.id, sponsor.id));
+
+    const posthog = getPostHogClient();
+    posthog.identify({ distinctId: contactEmail, properties: { name: contactName, email: contactEmail } });
+    posthog.capture({
+      distinctId: contactEmail,
+      event: "sponsor_checkout_created",
+      properties: {
+        reunion_id: reunionId,
+        slug,
+        sponsor_id: sponsor.id,
+        amount_cents: amountCents,
+        tier,
+        has_company: !!companyName,
+        has_logo: !!logoUrl,
+        stripe_session_id: session.id,
+      },
+    });
 
     return NextResponse.json({ url: session.url });
   } catch (error) {

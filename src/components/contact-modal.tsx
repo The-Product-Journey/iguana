@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import posthog from "posthog-js";
 
 const CATEGORIES = [
   { value: "volunteer", label: "I want to volunteer to help" },
@@ -50,6 +51,14 @@ export function ContactModal({
         return;
       }
 
+      const email = form.get("email") as string;
+      const name = form.get("name") as string;
+      const category = form.get("category") as string;
+      posthog.identify(email, { name, email });
+      posthog.capture("contact_message_sent", {
+        reunion_id: reunionId,
+        category,
+      });
       setSent(true);
     } catch {
       setError("Something went wrong. Please try again.");

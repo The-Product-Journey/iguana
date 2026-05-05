@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { getSponsorTier, REFUND_POLICY_TEXT } from "@/lib/constants";
+import posthog from "posthog-js";
 
 export function SponsorForm({
   reunionId,
@@ -54,6 +55,13 @@ export function SponsorForm({
         return;
       }
 
+      posthog.identify(contactEmail, { name: contactName, email: contactEmail });
+      posthog.capture("sponsor_checkout_initiated", {
+        reunion_id: reunionId,
+        slug,
+        amount_cents: amountCents,
+        tier: getSponsorTier(amountCents),
+      });
       window.location.href = data.url;
     } catch {
       setError("Something went wrong. Please try again.");

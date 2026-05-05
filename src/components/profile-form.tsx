@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import posthog from "posthog-js";
 
 type ProfileData = {
   currentCity: string | null;
@@ -62,6 +63,11 @@ export function ProfileForm({
         return;
       }
 
+      posthog.capture("yearbook_profile_saved", {
+        rsvp_id: rsvpId,
+        has_photo: !!photoFile,
+        is_update: !!existingProfile,
+      });
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch {

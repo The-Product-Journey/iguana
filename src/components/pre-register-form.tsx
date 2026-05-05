@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import posthog from "posthog-js";
 
 export function PreRegisterForm({
   reunionId,
@@ -46,6 +47,15 @@ export function PreRegisterForm({
         return;
       }
 
+      const email = form.get("email") as string;
+      const firstName = form.get("firstName") as string;
+      const lastName = form.get("lastName") as string;
+      posthog.identify(email, { name: `${firstName} ${lastName}`, email });
+      posthog.capture("pre_registration_submitted", {
+        reunion_id: reunionId,
+        slug,
+        guest_count: guestCount,
+      });
       setSuccess(true);
     } catch {
       setError("Something went wrong. Please try again.");

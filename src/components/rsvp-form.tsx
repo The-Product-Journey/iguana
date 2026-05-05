@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { formatCents } from "@/lib/utils";
+import posthog from "posthog-js";
 
 const FEE_PRESETS = [
   { label: "No thanks", pct: 0 },
@@ -69,6 +70,18 @@ export function RsvpForm({
         return;
       }
 
+      const email = form.get("email") as string;
+      const firstName = form.get("firstName") as string;
+      const lastName = form.get("lastName") as string;
+      posthog.identify(email, { name: `${firstName} ${lastName}`, email });
+      posthog.capture("rsvp_checkout_initiated", {
+        reunion_id: reunionId,
+        slug,
+        guest_count: guestCount,
+        registration_total_cents: registrationTotal,
+        donation_cents: donationCents,
+        grand_total_cents: grandTotal,
+      });
       window.location.href = data.url;
     } catch {
       setError("Something went wrong. Please try again.");
