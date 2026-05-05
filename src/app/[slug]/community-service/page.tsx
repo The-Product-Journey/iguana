@@ -23,7 +23,7 @@ export default async function CommunityServicePage({
   const wishlistUrl = process.env.NEXT_PUBLIC_AMAZON_WISHLIST_URL;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-bg-subtle py-12">
       <div className="mx-auto max-w-2xl px-6">
         <Link
           href={`/${slug}`}
@@ -33,23 +33,23 @@ export default async function CommunityServicePage({
         </Link>
 
         <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">
+          <h1 className="mb-2 text-3xl font-bold text-ink">
             Community Service Project: {PROJECT_NAME}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-ink-muted">
             Saturday morning, we&apos;re giving back to the Park Hill community
             that shaped us.
           </p>
         </div>
 
-        <div className="mb-8 space-y-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <p className="text-gray-700">
+        <div className="mb-8 space-y-4 rounded-xl border border-border-warm bg-white p-6 shadow-sm">
+          <p className="text-ink-muted">
             On Saturday morning of reunion weekend, we&apos;re assembling{" "}
             <strong>96 backpacks</strong> filled with school supplies for Park
             Hill students. It&apos;s a hands-on way to start the day together
             and leave the community a little better than we found it.
           </p>
-          <p className="text-gray-700">
+          <p className="text-ink-muted">
             We&apos;re partnering with{" "}
             <strong>Replenish KC</strong>, who will deliver the filled backpacks
             to Park Hill schools.
@@ -80,7 +80,7 @@ export default async function CommunityServicePage({
           )}
         </div>
 
-        <div className="mb-8 rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-600">
+        <div className="mb-8 rounded-lg border border-border-warm bg-white p-4 text-sm text-ink-muted">
           <p>
             <strong>Tax receipts:</strong> Tax receipt eligibility for
             charitable contributions and donated items is being confirmed with
@@ -89,8 +89,8 @@ export default async function CommunityServicePage({
           </p>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-white p-6 text-center shadow-sm">
-          <p className="mb-3 text-gray-700">
+        <div className="rounded-xl border border-border-warm bg-white p-6 text-center shadow-sm">
+          <p className="mb-3 text-ink-muted">
             Want to sponsor the project directly?
           </p>
           <Link

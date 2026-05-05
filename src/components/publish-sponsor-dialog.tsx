@@ -189,7 +189,7 @@ export function PublishSponsorDialog({
           <div className="mt-4">
             <p className="mb-1 text-xs font-medium text-ink-muted">Logo</p>
             {removeLogo ? (
-              <p className="text-xs text-amber-700">
+              <p className="text-xs text-warning">
                 Logo will be removed on save.{" "}
                 <button
                   type="button"
@@ -249,7 +249,7 @@ export function PublishSponsorDialog({
             type="button"
             onClick={handleConfirm}
             disabled={busy}
-            className="rounded-md bg-green-700 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-green-800 disabled:opacity-50"
+            className="rounded-md bg-forest px-3 py-1.5 text-sm font-medium text-white transition hover:bg-forest-deep disabled:opacity-50"
           >
             {busy ? "Publishing…" : "Save & publish"}
           </button>

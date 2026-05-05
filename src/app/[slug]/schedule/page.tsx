@@ -57,7 +57,7 @@ export default async function SchedulePage({
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-bg-subtle py-12">
       <div className="mx-auto max-w-3xl px-6">
         <Link
           href={`/${slug}`}
@@ -67,16 +67,16 @@ export default async function SchedulePage({
         </Link>
 
         <div className="mb-10">
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">
+          <h1 className="mb-2 text-3xl font-bold text-ink">
             Event Schedule
           </h1>
-          <p className="text-gray-600">
+          <p className="text-ink-muted">
             A full weekend of reconnecting, celebrating, and giving back.
           </p>
         </div>
 
         {detailsFinalizing && (
-          <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <div className="mb-8 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-ink">
             Details for these events are still being finalized — check back as
             we lock in the schedule.
           </div>
@@ -97,20 +97,20 @@ export default async function SchedulePage({
                 {dayEvents.map((event) => (
                   <div
                     key={event.id}
-                    className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+                    className="rounded-xl border border-border-warm bg-white p-6 shadow-sm"
                   >
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">
+                        <h3 className="text-lg font-bold text-ink">
                           {event.name}
                         </h3>
                         {event.eventTime && (
-                          <p className="mt-1 text-sm text-gray-500">
+                          <p className="mt-1 text-sm text-ink-subtle">
                             {event.eventTime}
                           </p>
                         )}
                         {event.eventLocation && (
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-ink-subtle">
                             {event.eventLocation}
                             {event.eventAddress && ` — ${event.eventAddress}`}
                           </p>
@@ -131,7 +131,7 @@ export default async function SchedulePage({
                       </span>
                     </div>
                     {event.description && (
-                      <p className="mt-3 text-sm text-gray-600">
+                      <p className="mt-3 text-sm text-ink-muted">
                         {event.description}
                       </p>
                     )}

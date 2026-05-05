@@ -36,7 +36,7 @@ export default async function YearbookPage({
     .where(eq(profiles.isPublished, true));
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-bg-subtle py-12">
       <div className="mx-auto max-w-4xl px-6">
         <Link
           href={`/${slug}`}
@@ -47,24 +47,24 @@ export default async function YearbookPage({
 
         <div className="mb-10 flex items-center justify-between">
           <div>
-            <h1 className="mb-2 text-3xl font-bold text-gray-900">
+            <h1 className="mb-2 text-3xl font-bold text-ink">
               Digital Yearbook
             </h1>
-            <p className="text-gray-600">
+            <p className="text-ink-muted">
               See what your classmates have been up to since &apos;96.
             </p>
           </div>
           <Link
             href={`/${slug}/yearbook/print`}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+            className="rounded-lg border border-border-strong px-4 py-2 text-sm font-medium text-ink-muted transition hover:bg-bg-subtle"
           >
             Print / PDF
           </Link>
         </div>
 
         {allProfiles.length === 0 ? (
-          <div className="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-sm">
-            <p className="text-gray-500">
+          <div className="rounded-xl border border-border-warm bg-white p-12 text-center shadow-sm">
+            <p className="text-ink-subtle">
               No profiles yet — be the first to fill yours out!
             </p>
           </div>
@@ -74,7 +74,7 @@ export default async function YearbookPage({
               <Link
                 key={profile.id}
                 href={`/${slug}/yearbook/${profile.id}`}
-                className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md"
+                className="rounded-xl border border-border-warm bg-white p-6 shadow-sm transition hover:shadow-md"
               >
                 {profile.photoUrl ? (
                   <Image
@@ -90,16 +90,16 @@ export default async function YearbookPage({
                     {lastName[0]}
                   </div>
                 )}
-                <h3 className="text-center text-lg font-bold text-gray-900">
+                <h3 className="text-center text-lg font-bold text-ink">
                   {firstName} {lastName}
                 </h3>
                 {profile.currentCity && (
-                  <p className="text-center text-sm text-gray-500">
+                  <p className="text-center text-sm text-ink-subtle">
                     {profile.currentCity}
                   </p>
                 )}
                 {profile.occupation && (
-                  <p className="mt-1 text-center text-sm text-gray-600">
+                  <p className="mt-1 text-center text-sm text-ink-muted">
                     {profile.occupation}
                   </p>
                 )}

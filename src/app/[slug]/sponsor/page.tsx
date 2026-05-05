@@ -26,7 +26,7 @@ export default async function SponsorPage({
   const canTakePayments = !!connect?.chargesEnabled;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-bg-subtle py-12">
       <div className="mx-auto max-w-2xl px-6">
         <Link
           href={`/${slug}`}
@@ -36,10 +36,10 @@ export default async function SponsorPage({
         </Link>
 
         <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">
+          <h1 className="mb-2 text-3xl font-bold text-ink">
             Sponsor the Reunion
           </h1>
-          <p className="text-gray-600">
+          <p className="text-ink-muted">
             Help make our 30-year reunion unforgettable. Your sponsorship
             directly supports the event and our classmates.
           </p>
@@ -59,14 +59,14 @@ export default async function SponsorPage({
               offset event costs to keep ticket prices low for everyone.
             </p>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-6">
-            <h3 className="mb-1 text-lg font-bold text-gray-900">
+          <div className="rounded-xl border border-border-warm bg-white p-6">
+            <h3 className="mb-1 text-lg font-bold text-ink">
               Community Service Project Sponsor
             </h3>
-            <p className="mb-2 text-sm font-medium text-gray-500">
+            <p className="mb-2 text-sm font-medium text-ink-subtle">
               Under {formatCents(SPONSOR_TIER_THRESHOLD_CENTS)}
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-ink-muted">
               Recognized online. Funds the 96 Backpacks community service
               project — giving back to Park Hill schools.{" "}
               <Link
@@ -79,7 +79,7 @@ export default async function SponsorPage({
           </div>
         </div>
 
-        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <div className="mb-6 rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-warning">
           <strong>Note:</strong> This is not a tax-deductible donation. Sponsor
           contributions are sent directly to the reunion organizers via
           Stripe. You will receive a receipt from Stripe for your records.
@@ -88,11 +88,11 @@ export default async function SponsorPage({
         {canTakePayments ? (
           <SponsorForm reunionId={reunion.id} slug={slug} />
         ) : (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-8 text-center">
-            <p className="text-lg font-semibold text-amber-900">
+          <div className="rounded-xl border border-warning/30 bg-warning/10 p-8 text-center">
+            <p className="text-lg font-semibold text-ink">
               Sponsorships coming soon
             </p>
-            <p className="mt-2 text-sm text-amber-700">
+            <p className="mt-2 text-sm text-ink-muted">
               Online payments are being set up. Check back shortly to submit your sponsorship.
             </p>
           </div>

@@ -38,7 +38,7 @@ export default async function SponsorsPage({
   const communitySponsors = allSponsors.filter((s) => s.tier === "community");
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-bg-subtle py-12">
       <div className="mx-auto max-w-3xl px-6">
         <Link
           href={`/${slug}`}
@@ -48,17 +48,17 @@ export default async function SponsorsPage({
         </Link>
 
         <div className="mb-10 text-center">
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">
+          <h1 className="mb-2 text-3xl font-bold text-ink">
             Our Sponsors
           </h1>
-          <p className="text-gray-600">
+          <p className="text-ink-muted">
             Thank you to these generous sponsors who make our reunion possible.
           </p>
         </div>
 
         {allSponsors.length === 0 ? (
-          <div className="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-sm">
-            <p className="text-gray-500">No sponsors yet — be the first!</p>
+          <div className="rounded-xl border border-border-warm bg-white p-12 text-center shadow-sm">
+            <p className="text-ink-subtle">No sponsors yet — be the first!</p>
             <Link
               href={`/${slug}/sponsor`}
               className="mt-4 inline-block rounded-full bg-tenant-primary px-6 py-2 font-semibold text-white transition hover:bg-tenant-primary-deep"
@@ -96,7 +96,7 @@ export default async function SponsorsPage({
                             />
                           </div>
                         )}
-                        <h3 className="text-lg font-bold text-gray-900">
+                        <h3 className="text-lg font-bold text-ink">
                           {showLink ? (
                             <a
                               href={sponsor.websiteUrl!}
@@ -111,7 +111,7 @@ export default async function SponsorsPage({
                           )}
                         </h3>
                         {!sponsor.isAnonymous && sponsor.message && (
-                          <p className="mt-2 text-sm text-gray-600">
+                          <p className="mt-2 text-sm text-ink-muted">
                             {sponsor.message}
                           </p>
                         )}
@@ -125,7 +125,7 @@ export default async function SponsorsPage({
             {/* Community Service Project Sponsors */}
             {communitySponsors.length > 0 && (
               <div>
-                <h2 className="mb-4 text-lg font-semibold text-gray-700 uppercase tracking-wide">
+                <h2 className="mb-4 text-lg font-semibold text-ink-muted uppercase tracking-wide">
                   Community Service Project Sponsors
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-3">
@@ -137,7 +137,7 @@ export default async function SponsorsPage({
                     return (
                       <div
                         key={sponsor.id}
-                        className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+                        className="rounded-lg border border-border-warm bg-white p-4 shadow-sm"
                       >
                         {showLogo && (
                           <div className="mb-3 flex h-16 items-center justify-center">
@@ -150,7 +150,7 @@ export default async function SponsorsPage({
                             />
                           </div>
                         )}
-                        <h3 className="text-sm font-semibold text-gray-900">
+                        <h3 className="text-sm font-semibold text-ink">
                           {showLink ? (
                             <a
                               href={sponsor.websiteUrl!}

@@ -48,7 +48,7 @@ export function SiteNav({
   const visibleLinks = links.filter((l) => l.modes.includes(siteMode));
 
   return (
-    <nav className="border-b border-gray-200 bg-white">
+    <nav className="border-b border-border-warm bg-white">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
         <Link
           href={`/${slug}`}
@@ -63,7 +63,7 @@ export function SiteNav({
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-gray-600 transition hover:text-tenant-primary"
+              className="text-sm font-medium text-ink-muted transition hover:text-tenant-primary"
             >
               {link.label}
             </Link>
@@ -79,7 +79,7 @@ export function SiteNav({
           {!isAdmin && (
             <a
               href={adminModeHref}
-              className="text-xs text-gray-400 hover:text-gray-600"
+              className="text-xs text-ink-subtle hover:text-ink-muted"
             >
               Admin Mode
             </a>
@@ -106,7 +106,7 @@ export function SiteNav({
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
         >
-          <svg className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-6 w-6 text-ink-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             {open ? (
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             ) : (
@@ -118,13 +118,13 @@ export function SiteNav({
 
       {/* Mobile menu */}
       {open && (
-        <div className="border-t border-gray-100 px-6 py-4 sm:hidden">
+        <div className="border-t border-border-warm px-6 py-4 sm:hidden">
           <div className="flex flex-col gap-3">
             {visibleLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-gray-600 hover:text-tenant-primary"
+                className="text-sm font-medium text-ink-muted hover:text-tenant-primary"
                 onClick={() => setOpen(false)}
               >
                 {link.label}

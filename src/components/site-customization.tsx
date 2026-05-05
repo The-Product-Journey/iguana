@@ -318,7 +318,7 @@ function FaviconSection({
             accept=".svg,.png,.ico,image/svg+xml,image/png,image/x-icon,image/vnd.microsoft.icon"
             disabled={busy}
             onChange={(e) => onFileSelected(e.target.files?.[0] ?? null)}
-            className="text-sm text-ink-muted file:mr-3 file:rounded-md file:border-0 file:bg-bg-subtle file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-ink-muted hover:file:bg-gray-200"
+            className="text-sm text-ink-muted file:mr-3 file:rounded-md file:border-0 file:bg-bg-subtle file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-ink-muted hover:file:bg-border-warm"
           />
           <div className="flex gap-2">
             <button

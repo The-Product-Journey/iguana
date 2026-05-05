@@ -76,15 +76,15 @@ export default async function ConfirmationPage({
   const isPaid = rsvp?.paymentMethod === "online";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-6 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-bg-subtle px-6 py-12">
       <div className="mx-auto max-w-md text-center">
         <div className="mb-6 text-6xl">🎉</div>
-        <h1 className="mb-4 text-3xl font-bold text-gray-900">
+        <h1 className="mb-4 text-3xl font-bold text-ink">
           You&apos;re All Set, Trojan!
         </h1>
 
         {rsvp ? (
-          <div className="mb-8 space-y-2 text-gray-600">
+          <div className="mb-8 space-y-2 text-ink-muted">
             <p>
               Thanks, <strong>{rsvp.firstName}</strong>! Your registration for the
               PHHS Class of &apos;96 reunion has been confirmed.
@@ -109,7 +109,7 @@ export default async function ConfirmationPage({
             )}
           </div>
         ) : (
-          <p className="mb-8 text-gray-600">
+          <p className="mb-8 text-ink-muted">
             Your payment is being processed. You&apos;ll receive a confirmation
             email from Stripe shortly.
           </p>
@@ -117,15 +117,15 @@ export default async function ConfirmationPage({
 
         {/* Selected events */}
         {selectedEvents.length > 0 && (
-          <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6 text-left shadow-sm">
-            <h3 className="mb-3 font-semibold text-gray-900">
+          <div className="mb-6 rounded-xl border border-border-warm bg-white p-6 text-left shadow-sm">
+            <h3 className="mb-3 font-semibold text-ink">
               Your Events
             </h3>
             <ul className="space-y-2">
               {selectedEvents.map((event, i) => (
-                <li key={i} className="text-sm text-gray-700">
+                <li key={i} className="text-sm text-ink-muted">
                   <span className="font-medium">{event.name}</span>
-                  <span className="ml-2 text-gray-500">
+                  <span className="ml-2 text-ink-subtle">
                     {event.eventDate}
                     {event.eventTime && ` · ${event.eventTime}`}
                   </span>
@@ -157,19 +157,19 @@ export default async function ConfirmationPage({
           </div>
         )}
 
-        <div className="rounded-xl border border-gray-200 bg-white p-6 text-left shadow-sm">
-          <h3 className="mb-3 font-semibold text-gray-900">Event Details</h3>
-          <p className="text-gray-700">August 28–29, 2026</p>
-          <p className="text-gray-600">Friday &amp; Saturday</p>
-          <p className="mt-2 text-gray-700">
+        <div className="rounded-xl border border-border-warm bg-white p-6 text-left shadow-sm">
+          <h3 className="mb-3 font-semibold text-ink">Event Details</h3>
+          <p className="text-ink-muted">August 28–29, 2026</p>
+          <p className="text-ink-muted">Friday &amp; Saturday</p>
+          <p className="mt-2 text-ink-muted">
             Saturday Banquet: {reunion.eventLocation}
           </p>
           {reunion.eventAddress && (
-            <p className="text-gray-600">{reunion.eventAddress}</p>
+            <p className="text-ink-muted">{reunion.eventAddress}</p>
           )}
         </div>
 
-        <p className="mt-6 text-sm text-gray-500">
+        <p className="mt-6 text-sm text-ink-subtle">
           Questions? Email{" "}
           <a
             href="mailto:parkhill1996reunion@gmail.com"
@@ -187,7 +187,7 @@ export default async function ConfirmationPage({
         </Link>
 
         {isPaid && (
-          <p className="mt-6 text-xs text-gray-400">{REFUND_POLICY_TEXT}</p>
+          <p className="mt-6 text-xs text-ink-subtle">{REFUND_POLICY_TEXT}</p>
         )}
       </div>
     </div>

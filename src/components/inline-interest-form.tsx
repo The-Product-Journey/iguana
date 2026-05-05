@@ -71,12 +71,12 @@ export function InlineInterestForm({
 
   if (success) {
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+      <div className="rounded-xl border border-border-warm bg-white p-8 text-center shadow-sm">
         <div className="mb-4 text-5xl">🎉</div>
-        <h2 className="mb-2 text-2xl font-bold text-gray-900">
+        <h2 className="mb-2 text-2xl font-bold text-ink">
           You&apos;re on the list!
         </h2>
-        <p className="mb-4 text-gray-600">
+        <p className="mb-4 text-ink-muted">
           We&apos;ll reach out when registration opens. Start making your travel
           plans!
         </p>
@@ -93,7 +93,7 @@ export function InlineInterestForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-sm"
+      className="space-y-6 rounded-xl border border-border-warm bg-white p-8 shadow-sm"
     >
       {error && (
         <div className="rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">
@@ -102,7 +102,7 @@ export function InlineInterestForm({
       )}
 
       <div>
-        <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="name" className="mb-1 block text-sm font-medium text-ink-muted">
           Full Name *
         </label>
         <input
@@ -111,13 +111,13 @@ export function InlineInterestForm({
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
       <div>
-        <label htmlFor="maidenName" className="mb-1 block text-sm font-medium text-gray-700">
-          Maiden / Previous Last Name <span className="text-gray-400">(optional)</span>
+        <label htmlFor="maidenName" className="mb-1 block text-sm font-medium text-ink-muted">
+          Maiden / Previous Last Name <span className="text-ink-subtle">(optional)</span>
         </label>
         <input
           id="maidenName"
@@ -125,12 +125,12 @@ export function InlineInterestForm({
           value={maidenName}
           onChange={(e) => setMaidenName(e.target.value)}
           placeholder="So classmates can find you"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
       <div>
-        <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="mb-1 block text-sm font-medium text-ink-muted">
           Email *
         </label>
         <input
@@ -140,13 +140,13 @@ export function InlineInterestForm({
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
       {events.length > 0 && (
         <div>
-          <p className="mb-2 text-sm font-medium text-gray-700">
+          <p className="mb-2 text-sm font-medium text-ink-muted">
             Which events are you interested in?
           </p>
           <div className="space-y-2">
@@ -155,11 +155,11 @@ export function InlineInterestForm({
               return (
                 <div
                   key={event.id}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 p-3"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-border-warm p-3"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="text-sm font-medium">{event.name}</div>
-                    <div className="whitespace-pre-line text-xs italic text-gray-500">
+                    <div className="whitespace-pre-line text-xs italic text-ink-subtle">
                       {event.tentativeLabel ||
                         formatTentativeWhen(event.eventDate, event.eventTime)}
                     </div>
@@ -167,7 +167,7 @@ export function InlineInterestForm({
                   <div
                     role="radiogroup"
                     aria-label={`${event.name} response`}
-                    className="inline-flex shrink-0 overflow-hidden rounded-md border border-gray-300"
+                    className="inline-flex shrink-0 overflow-hidden rounded-md border border-border-strong"
                   >
                     {RESPONSE_OPTIONS.map((opt) => {
                       const active = current === opt.value;
@@ -181,8 +181,8 @@ export function InlineInterestForm({
                           className={`px-3 py-1 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-tenant-primary ${
                             active
                               ? "bg-tenant-primary text-white"
-                              : "bg-white text-gray-700 hover:bg-gray-50"
-                          } ${opt.value !== "yes" ? "border-l border-gray-300" : ""}`}
+                              : "bg-white text-ink-muted hover:bg-bg-subtle"
+                          } ${opt.value !== "yes" ? "border-l border-border-strong" : ""}`}
                         >
                           {opt.label}
                         </button>

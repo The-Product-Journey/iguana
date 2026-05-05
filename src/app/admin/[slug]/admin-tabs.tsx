@@ -447,7 +447,7 @@ function MemorialsTab({
                       navigator.clipboard.writeText(url);
                       alert("Review link copied to clipboard!");
                     }}
-                    className="text-xs text-blue-600 hover:text-blue-800"
+                    className="text-xs text-forest hover:text-forest-deep"
                   >
                     Copy Link
                   </button>
@@ -549,7 +549,7 @@ function ProfilesTab({
                           navigator.clipboard.writeText(url);
                           alert("Profile edit link copied!");
                         }}
-                        className="text-xs text-blue-600 hover:text-blue-800"
+                        className="text-xs text-forest hover:text-forest-deep"
                       >
                         Copy Link
                       </button>

@@ -74,10 +74,10 @@ export function InterestForm({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="relative w-full max-w-md rounded-2xl bg-white p-8 text-gray-900 shadow-2xl">
+      <div className="relative w-full max-w-md rounded-2xl bg-white p-8 text-ink shadow-2xl">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+          className="absolute right-4 top-4 text-ink-subtle hover:text-ink-muted"
           aria-label="Close"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -89,7 +89,7 @@ export function InterestForm({
           <div className="text-center">
             <div className="mb-4 text-5xl">🎉</div>
             <h2 className="mb-2 text-2xl font-bold">You&apos;re on the list!</h2>
-            <p className="mb-6 text-gray-600">
+            <p className="mb-6 text-ink-muted">
               We&apos;ll reach out when registration opens. Start making your travel plans!
             </p>
             <button
@@ -102,7 +102,7 @@ export function InterestForm({
         ) : (
           <>
             <h2 className="mb-1 text-2xl font-bold">I&apos;m Interested!</h2>
-            <p className="mb-6 text-sm text-gray-600">
+            <p className="mb-6 text-sm text-ink-muted">
               Sign up to get notified when registration opens.
             </p>
 
@@ -112,7 +112,7 @@ export function InterestForm({
               )}
 
               <div>
-                <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="mb-1 block text-sm font-medium text-ink-muted">
                   Email *
                 </label>
                 <input
@@ -122,12 +122,12 @@ export function InterestForm({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+                  className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 />
               </div>
 
               <div>
-                <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
+                <label htmlFor="name" className="mb-1 block text-sm font-medium text-ink-muted">
                   Full Name *
                 </label>
                 <input
@@ -136,13 +136,13 @@ export function InterestForm({
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+                  className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 />
               </div>
 
               <div>
-                <label htmlFor="maidenName" className="mb-1 block text-sm font-medium text-gray-700">
-                  Maiden / Previous Last Name <span className="text-gray-400">(optional)</span>
+                <label htmlFor="maidenName" className="mb-1 block text-sm font-medium text-ink-muted">
+                  Maiden / Previous Last Name <span className="text-ink-subtle">(optional)</span>
                 </label>
                 <input
                   id="maidenName"
@@ -150,13 +150,13 @@ export function InterestForm({
                   value={maidenName}
                   onChange={(e) => setMaidenName(e.target.value)}
                   placeholder="So classmates can find you"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+                  className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 />
               </div>
 
               {events.length > 0 && (
                 <div>
-                  <p className="mb-2 text-sm font-medium text-gray-700">
+                  <p className="mb-2 text-sm font-medium text-ink-muted">
                     Which events are you interested in?
                   </p>
                   <div className="space-y-2">
@@ -165,11 +165,11 @@ export function InterestForm({
                       return (
                         <div
                           key={event.id}
-                          className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 p-3"
+                          className="flex items-center justify-between gap-3 rounded-lg border border-border-warm p-3"
                         >
                           <div className="min-w-0 flex-1">
                             <div className="text-sm font-medium">{event.name}</div>
-                            <div className="whitespace-pre-line text-xs italic text-gray-500">
+                            <div className="whitespace-pre-line text-xs italic text-ink-subtle">
                               {event.tentativeLabel ||
                                 formatTentativeWhen(event.eventDate, event.eventTime)}
                             </div>
@@ -177,7 +177,7 @@ export function InterestForm({
                           <div
                             role="radiogroup"
                             aria-label={`${event.name} response`}
-                            className="inline-flex shrink-0 overflow-hidden rounded-md border border-gray-300"
+                            className="inline-flex shrink-0 overflow-hidden rounded-md border border-border-strong"
                           >
                             {RESPONSE_OPTIONS.map((opt) => {
                               const active = current === opt.value;
@@ -191,8 +191,8 @@ export function InterestForm({
                                   className={`px-3 py-1 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-tenant-primary ${
                                     active
                                       ? "bg-tenant-primary text-white"
-                                      : "bg-white text-gray-700 hover:bg-gray-50"
-                                  } ${opt.value !== "yes" ? "border-l border-gray-300" : ""}`}
+                                      : "bg-white text-ink-muted hover:bg-bg-subtle"
+                                  } ${opt.value !== "yes" ? "border-l border-border-strong" : ""}`}
                                 >
                                   {opt.label}
                                 </button>

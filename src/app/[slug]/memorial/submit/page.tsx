@@ -23,7 +23,7 @@ export default async function MemorialSubmitPage({
   if (effectiveMode === "tease") redirect(`/${slug}`);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-bg-subtle py-12">
       <div className="mx-auto max-w-2xl px-6">
         <Link
           href={`/${slug}/memorial`}
@@ -33,10 +33,10 @@ export default async function MemorialSubmitPage({
         </Link>
 
         <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">
+          <h1 className="mb-2 text-3xl font-bold text-ink">
             Submit a Memorial
           </h1>
-          <p className="text-gray-600">
+          <p className="text-ink-muted">
             Help us remember a classmate who is no longer with us. All
             submissions are reviewed by the reunion committee before being
             published.

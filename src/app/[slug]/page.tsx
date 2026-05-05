@@ -93,30 +93,30 @@ export default async function ReunionPage({
       {/* Details */}
       <div className="mx-auto max-w-3xl px-6 py-16">
         <div className="grid gap-8 sm:grid-cols-3">
-          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-500">
+          <div className="rounded-xl border border-border-warm bg-white p-6 shadow-sm">
+            <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-ink-subtle">
               When
             </h3>
             <p className="text-lg font-medium">August 28–29, 2026</p>
-            <p className="mt-1 text-gray-600">Friday &amp; Saturday</p>
+            <p className="mt-1 text-ink-muted">Friday &amp; Saturday</p>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-500">
+          <div className="rounded-xl border border-border-warm bg-white p-6 shadow-sm">
+            <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-ink-subtle">
               Saturday Banquet
             </h3>
             <p className="text-lg font-medium">{reunion.eventLocation}</p>
             {reunion.eventAddress && (
-              <p className="mt-1 text-gray-600">{reunion.eventAddress}</p>
+              <p className="mt-1 text-ink-muted">{reunion.eventAddress}</p>
             )}
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-500">
+          <div className="rounded-xl border border-border-warm bg-white p-6 shadow-sm">
+            <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-ink-subtle">
               Registration
             </h3>
             <p className="text-lg font-medium">
               {formatCents(reunion.registrationFeeCents)} per person
             </p>
-            <p className="mt-1 text-gray-600">
+            <p className="mt-1 text-ink-muted">
               {isOpen ? "Banquet & festivities" : "Pre-register now, pay later"}
             </p>
           </div>
@@ -130,10 +130,10 @@ export default async function ReunionPage({
           <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-tenant-primary">
             Community Service Project
           </p>
-          <h3 className="mb-2 text-2xl font-bold text-gray-900">
+          <h3 className="mb-2 text-2xl font-bold text-ink">
             96 Backpacks
           </h3>
-          <p className="mb-4 text-gray-700">
+          <p className="mb-4 text-ink-muted">
             Saturday morning, we&apos;re assembling 96 backpacks of school
             supplies for Park Hill students — partnering with Replenish KC.
           </p>
@@ -154,7 +154,7 @@ export default async function ReunionPage({
               ? "Register & Pay"
               : "Pre-Register — Save Your Spot"}
           </Link>
-          <p className="mt-4 text-gray-500">
+          <p className="mt-4 text-ink-subtle">
             Start making your arrangements and travel plans now!
           </p>
         </div>
