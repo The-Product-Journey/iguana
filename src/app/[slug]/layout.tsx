@@ -99,6 +99,7 @@ export default async function ReunionLayout({
     <div data-theme="tenant" style={tenantStyle}>
       {showPreviewBanner && (
         <AdminPreviewBanner
+          slug={slug}
           previewMode={previewState.previewMode!}
           actualMode={previewState.actualMode}
         />

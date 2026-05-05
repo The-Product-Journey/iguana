@@ -21,11 +21,13 @@ const MODES_IN_ORDER: { value: SiteMode; label: string }[] = [
  *   - Sign out
  */
 export function AdminMenu({
+  slug,
   actualMode,
   previewMode,
   variant = "light",
-  customDomain,
 }: {
+  /** Reunion slug — used to deep-link the "Site settings" menu entry. */
+  slug: string;
   actualMode: SiteMode;
   previewMode: SiteMode | null;
   /**
@@ -33,12 +35,6 @@ export function AdminMenu({
    * "dark" — light text on dark backgrounds (tease gradient)
    */
   variant?: "light" | "dark";
-  /**
-   * Reunion's vanity domain, if configured. When set, the menu adds a
-   * "Switch to public view" entry that navigates the admin to the vanity
-   * URL — useful for spot-checking what attendees actually see.
-   */
-  customDomain?: string | null;
 }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -162,12 +158,12 @@ export function AdminMenu({
             })}
             <div className="my-1 border-t border-gray-100" />
             <Link
-              href="/admin"
+              href={`/admin/${slug}`}
               role="menuitem"
               onClick={() => setOpen(false)}
               className="block px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
             >
-              Admin panel
+              Site settings
             </Link>
             <button
               type="button"

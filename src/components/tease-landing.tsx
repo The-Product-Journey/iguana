@@ -71,10 +71,10 @@ export function TeaseLanding({
             variant="dark"
           />
           <AdminMenu
+            slug={reunion.slug}
             actualMode={actualMode}
             previewMode={previewMode ?? null}
             variant="dark"
-            customDomain={customDomain}
           />
         </div>
       )}

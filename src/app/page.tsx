@@ -20,14 +20,12 @@ export const dynamic = "force-dynamic";
  * straight to the reunion site.
  */
 export default async function Home() {
-  const all = await db
+  const sites = await db
     .select()
     .from(reunions)
     .where(eq(reunions.isActive, true))
     .orderBy(asc(reunions.name))
     .all();
-
-  const sites = all.filter((r) => !r.slug.endsWith("-test"));
 
   return (
     <div className="min-h-screen bg-white">
