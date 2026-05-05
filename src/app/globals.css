@@ -48,17 +48,42 @@
 
   /*
    * Tenant brand tokens — apply only on the public reunion site
-   * (/[slug]/*). The primary value is overridden per-reunion via an
-   * inline `--color-tenant-primary` style on the [slug]/layout.tsx
-   * wrapping div. Secondary shades derive from primary via color-mix
-   * in OKLCH so a tenant who configures (say) dark teal gets sensible
-   * deep / darkest / tint / border-soft variants without configuring
-   * every shade themselves.
+   * (/[slug]/*). The primary is overridden per-reunion via an inline
+   * `--color-tenant-primary` style on the [slug]/layout.tsx wrapping
+   * div; secondary shades derive from primary via color-mix in OKLCH.
+   *
+   * IMPORTANT: Tailwind v4's @theme block evaluates color-mix()
+   * expressions at BUILD time and outputs static colors. So if the
+   * derived shades were declared here, runtime overrides of
+   * --color-tenant-primary would only affect the primary — the
+   * derived shades would stay frozen at their build-time PHHS-red
+   * values. We declare ONLY the primary in @theme (so Tailwind
+   * registers all the tenant-* utility class names) and redeclare
+   * the derivations inside the [data-theme="tenant"] block below as
+   * plain CSS, where the browser stores them as deferred color-mix()
+   * expressions and evaluates them at use site against the local
+   * --color-tenant-primary override.
    *
    * Defaults reflect the historic PHHS Park Hill red so existing
    * reunions render identically to before this feature shipped.
    */
   --color-tenant-primary: #b91c1c;
+  --color-tenant-primary-deep: #7a1313;
+  --color-tenant-darkest: #4a0a0a;
+  --color-tenant-tint: #fdf3f3;
+  --color-tenant-tint-strong: #f5d6d6;
+  --color-tenant-border-soft: #d99393;
+  --color-tenant-on-dark: #f0c1c1;
+}
+
+/*
+ * Runtime tenant brand derivations. Lives outside @theme so the
+ * color-mix() expressions are stored verbatim and evaluated lazily
+ * — when the utility (e.g. bg-tenant-darkest) is applied to an
+ * element, color-mix resolves --color-tenant-primary in the local
+ * scope, picking up the tenant's inline override.
+ */
+[data-theme="tenant"] {
   --color-tenant-primary-deep: color-mix(in oklch, var(--color-tenant-primary) 80%, black);
   --color-tenant-darkest: color-mix(in oklch, var(--color-tenant-primary) 50%, black);
   --color-tenant-tint: color-mix(in oklch, var(--color-tenant-primary) 8%, white);
