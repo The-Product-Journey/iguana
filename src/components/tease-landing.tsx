@@ -54,7 +54,7 @@ export function TeaseLanding({
   const adminModeHref = useAdminModeHref(reunion.slug);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-tenant-primary-deep via-tenant-darkest to-tenant-darkest text-white">
+    <div className="relative min-h-screen bg-gradient-to-br from-tenant-primary via-tenant-primary-deep to-tenant-darkest text-white">
       {!isAdmin && (
         <a
           href={adminModeHref}
