@@ -362,14 +362,25 @@ function InterestsTab({
 }
 
 /**
- * Build a Stripe Dashboard URL for a checkout session. The session ID
- * prefix (`cs_test_` vs `cs_live_`) decides whether the URL points
- * at the test or live dashboard, so this works correctly regardless
- * of which Stripe environment the row was created in.
+ * Best Stripe Dashboard URL for a sponsor row. Prefers the resolved
+ * PaymentIntent URL — that lands directly on the completed payment
+ * record. Falls back to the Checkout Session URL when the payment
+ * intent isn't known yet (pending sessions, or rows that pre-date
+ * the backfill). Test/live env is auto-detected from the id prefix.
  */
-function stripeSessionUrl(sessionId: string): string {
-  const isTest = sessionId.startsWith("cs_test_");
-  return `https://dashboard.stripe.com/${isTest ? "test/" : ""}checkout/sessions/${sessionId}`;
+function bestSponsorStripeLink(
+  paymentIntentId: string | null,
+  sessionId: string | null
+): string | null {
+  if (paymentIntentId) {
+    const isTest = paymentIntentId.startsWith("pi_test_");
+    return `https://dashboard.stripe.com/${isTest ? "test/" : ""}payments/${paymentIntentId}`;
+  }
+  if (sessionId) {
+    const isTest = sessionId.startsWith("cs_test_");
+    return `https://dashboard.stripe.com/${isTest ? "test/" : ""}checkout/sessions/${sessionId}`;
+  }
+  return null;
 }
 
 function SponsorsTab({
@@ -491,17 +502,25 @@ function SponsorsTab({
                         {refreshing === s.id ? "Syncing…" : "Refresh"}
                       </button>
                     )}
-                    {isSuper && s.stripeCheckoutSessionId && (
-                      <a
-                        href={stripeSessionUrl(s.stripeCheckoutSessionId)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title="Open the corresponding Checkout Session in the Stripe dashboard"
-                        className="text-xs font-medium text-forest underline decoration-forest/40 underline-offset-2 hover:text-forest-deep hover:decoration-forest"
-                      >
-                        View in Stripe →
-                      </a>
-                    )}
+                    {isSuper &&
+                      (() => {
+                        const url = bestSponsorStripeLink(
+                          s.stripePaymentIntentId,
+                          s.stripeCheckoutSessionId
+                        );
+                        if (!url) return null;
+                        return (
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Open the corresponding payment in the Stripe dashboard"
+                            className="text-xs font-medium text-forest underline decoration-forest/40 underline-offset-2 hover:text-forest-deep hover:decoration-forest"
+                          >
+                            View in Stripe →
+                          </a>
+                        );
+                      })()}
                   </div>
                 </td>
                 <td className="px-4 py-3">

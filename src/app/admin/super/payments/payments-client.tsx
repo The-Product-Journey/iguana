@@ -28,6 +28,7 @@ type RsvpRow = {
   amountPaidCents: number | null;
   paymentStatus: string | null;
   stripeCheckoutSessionId: string | null;
+  stripePaymentIntentId: string | null;
   createdAt: string;
   reunionId: string;
   reunionName: string;
@@ -42,6 +43,7 @@ type SponsorRow = {
   amountCents: number;
   paymentStatus: string;
   stripeCheckoutSessionId: string | null;
+  stripePaymentIntentId: string | null;
   createdAt: string;
   reunionId: string;
   reunionName: string;
@@ -58,12 +60,34 @@ const RANGE_OPTIONS: { value: RangeKey; label: string }[] = [
   { value: "all", label: "All time" },
 ];
 
-// Stripe dashboard URL for a checkout session — the cs_test_/cs_live_
-// prefix decides which environment we link to so each row's link
-// always lands in the right dashboard regardless of current deploy.
+// Stripe dashboard URLs — the *_test_/*_live_ id prefix decides which
+// environment we link to so each row's link always lands in the right
+// dashboard regardless of current deploy. We use destination charges,
+// so payment intents live on the platform and the platform-side
+// /payments/<pi> URL works directly (no Connect-account scoping).
 function stripeSessionUrl(sessionId: string): string {
   const isTest = sessionId.startsWith("cs_test_");
   return `https://dashboard.stripe.com/${isTest ? "test/" : ""}checkout/sessions/${sessionId}`;
+}
+
+function stripePaymentUrl(paymentIntentId: string): string {
+  const isTest = paymentIntentId.startsWith("pi_test_");
+  return `https://dashboard.stripe.com/${isTest ? "test/" : ""}payments/${paymentIntentId}`;
+}
+
+/**
+ * Best link for a row: prefer the resolved PaymentIntent URL (lands
+ * directly on the completed payment). Fall back to the Checkout
+ * Session URL when we don't have the payment intent yet (pending or
+ * not-yet-backfilled rows).
+ */
+function bestStripeLink(
+  paymentIntentId: string | null,
+  sessionId: string | null
+): string | null {
+  if (paymentIntentId) return stripePaymentUrl(paymentIntentId);
+  if (sessionId) return stripeSessionUrl(sessionId);
+  return null;
 }
 
 function stripeAccountUrl(accountId: string, env: "test" | "live"): string {
@@ -542,18 +566,23 @@ function RsvpPaymentsTable({ rows }: { rows: RsvpRow[] }) {
                   <StatusPill status={r.paymentStatus} />
                 </td>
                 <td className="px-4 py-3">
-                  {r.stripeCheckoutSessionId ? (
-                    <a
-                      href={stripeSessionUrl(r.stripeCheckoutSessionId)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs font-medium text-forest underline decoration-forest/40 underline-offset-2 hover:text-forest-deep hover:decoration-forest"
-                    >
-                      View →
-                    </a>
-                  ) : (
-                    <span className="text-xs text-ink-subtle">—</span>
-                  )}
+                  {(() => {
+                    const url = bestStripeLink(
+                      r.stripePaymentIntentId,
+                      r.stripeCheckoutSessionId
+                    );
+                    if (!url) return <span className="text-xs text-ink-subtle">—</span>;
+                    return (
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-medium text-forest underline decoration-forest/40 underline-offset-2 hover:text-forest-deep hover:decoration-forest"
+                      >
+                        View →
+                      </a>
+                    );
+                  })()}
                 </td>
               </tr>
             ))
@@ -612,18 +641,23 @@ function SponsorPaymentsTable({ rows }: { rows: SponsorRow[] }) {
                   <StatusPill status={s.paymentStatus} />
                 </td>
                 <td className="px-4 py-3">
-                  {s.stripeCheckoutSessionId ? (
-                    <a
-                      href={stripeSessionUrl(s.stripeCheckoutSessionId)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs font-medium text-forest underline decoration-forest/40 underline-offset-2 hover:text-forest-deep hover:decoration-forest"
-                    >
-                      View →
-                    </a>
-                  ) : (
-                    <span className="text-xs text-ink-subtle">—</span>
-                  )}
+                  {(() => {
+                    const url = bestStripeLink(
+                      s.stripePaymentIntentId,
+                      s.stripeCheckoutSessionId
+                    );
+                    if (!url) return <span className="text-xs text-ink-subtle">—</span>;
+                    return (
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-medium text-forest underline decoration-forest/40 underline-offset-2 hover:text-forest-deep hover:decoration-forest"
+                      >
+                        View →
+                      </a>
+                    );
+                  })()}
                 </td>
               </tr>
             ))

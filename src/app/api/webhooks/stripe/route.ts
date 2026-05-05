@@ -38,6 +38,13 @@ export async function POST(req: NextRequest) {
 
     const posthog = getPostHogClient();
 
+    // session.payment_intent is a string when expanded=false (default),
+    // an object when expanded. We don't expand, so it's the bare id.
+    const paymentIntentId =
+      typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : session.payment_intent?.id ?? null;
+
     if (rsvpId) {
       await db
         .update(rsvps)
@@ -45,6 +52,7 @@ export async function POST(req: NextRequest) {
           paymentStatus: "paid",
           amountPaidCents: session.amount_total || 0,
           donationCents,
+          stripePaymentIntentId: paymentIntentId,
           updatedAt: new Date().toISOString(),
         })
         .where(eq(rsvps.id, rsvpId));
@@ -68,6 +76,7 @@ export async function POST(req: NextRequest) {
         .update(sponsors)
         .set({
           paymentStatus: "paid",
+          stripePaymentIntentId: paymentIntentId,
           updatedAt: new Date().toISOString(),
         })
         .where(eq(sponsors.id, sponsorId));

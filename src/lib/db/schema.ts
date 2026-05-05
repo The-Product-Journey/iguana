@@ -123,6 +123,12 @@ export const rsvps = sqliteTable(
       "online"
     ),
     stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+    // Resulting PaymentIntent id once Stripe completes the session.
+    // Captured on `checkout.session.completed`. Lets the admin UI link
+    // straight at the platform's payment record (which works for
+    // completed payments) instead of the Checkout Session URL (which
+    // bounces around for completed sessions).
+    stripePaymentIntentId: text("stripe_payment_intent_id"),
     paymentStatus: text("payment_status", {
       enum: ["pending", "paid", "failed", "refunded"],
     })
@@ -252,6 +258,10 @@ export const sponsors = sqliteTable("sponsors", {
   displayName: text("display_name"),
   isAnonymous: integer("is_anonymous", { mode: "boolean" }).default(false),
   stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+  // See rsvps.stripePaymentIntentId — same purpose, super-admin
+  // payments view uses this to deep-link at the resolved payment
+  // instead of the soon-to-bounce Checkout Session URL.
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
   paymentStatus: text("payment_status", {
     enum: ["pending", "paid", "failed"],
   })
