@@ -212,7 +212,7 @@ export default async function AdminReunionPage({
 
       <CollapsibleCard
         title="Site Customization"
-        subtitle="Custom domain, favicon, and brand color for the public reunion page."
+        subtitle="Name, custom domain, favicon, and brand color for the public reunion page."
         defaultOpen={
           !reunion.customDomain ||
           !reunion.faviconUrl ||
@@ -221,6 +221,7 @@ export default async function AdminReunionPage({
       >
         <SiteCustomization
           reunionId={reunion.id}
+          initialName={reunion.name}
           initialCustomDomain={reunion.customDomain}
           initialFaviconUrl={reunion.faviconUrl}
           initialBrandColor={reunion.brandColor}

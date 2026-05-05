@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TestTag } from "@/components/test-tag";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import type { InviteStatus } from "@/lib/clerk-invites";
+
+type PendingConfirm = {
+  id: string;
+  email: string;
+  isInviteOnly: boolean;
+} | null;
 
 type ReunionLite = { id: string; name: string; slug: string };
 type AdminRow = {
@@ -160,6 +167,7 @@ function ReunionAdminsTab({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [pending, setPending] = useState<PendingConfirm>(null);
 
   async function add(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -194,13 +202,13 @@ function ReunionAdminsTab({
     }
   }
 
-  async function remove(id: string) {
-    if (!confirm("Remove this admin? They'll lose access immediately.")) return;
+  async function confirmRemove() {
+    if (!pending) return;
     setBusy(true);
     setError(null);
     setNotice(null);
     try {
-      const res = await fetch(`/api/admin/super/admins?id=${id}`, {
+      const res = await fetch(`/api/admin/super/admins?id=${pending.id}`, {
         method: "DELETE",
       });
       if (!res.ok) {
@@ -213,6 +221,7 @@ function ReunionAdminsTab({
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setBusy(false);
+      setPending(null);
     }
   }
 
@@ -298,6 +307,7 @@ function ReunionAdminsTab({
               <ul className="divide-y divide-border-warm rounded-lg border border-border-warm bg-white shadow-sm">
                 {admins.map((a) => {
                   const status = inviteStatus[a.email.toLowerCase()];
+                  const isInviteOnly = status?.kind !== "active";
                   const canResend =
                     !status ||
                     status.kind === "none" ||
@@ -336,11 +346,13 @@ function ReunionAdminsTab({
                         )}
                         <button
                           type="button"
-                          onClick={() => remove(a.id)}
+                          onClick={() =>
+                            setPending({ id: a.id, email: a.email, isInviteOnly })
+                          }
                           disabled={busy}
                           className="text-sm text-danger hover:opacity-80 disabled:opacity-50"
                         >
-                          Remove
+                          {isInviteOnly ? "Revoke" : "Remove"}
                         </button>
                       </div>
                     </li>
@@ -351,6 +363,19 @@ function ReunionAdminsTab({
           </div>
         );
       })}
+      <ConfirmDialog
+        open={pending !== null}
+        title={pending?.isInviteOnly ? "Revoke invite?" : "Remove admin?"}
+        message={
+          pending?.isInviteOnly
+            ? `Revoke the invite for ${pending.email}? Any pending invitation link will stop working and they'll be removed from the allowlist.`
+            : `Remove ${pending?.email} as an admin? They'll lose access immediately.`
+        }
+        confirmLabel={pending?.isInviteOnly ? "Revoke invite" : "Remove admin"}
+        confirmVariant="red"
+        onConfirm={confirmRemove}
+        onCancel={() => setPending(null)}
+      />
     </div>
   );
 }
@@ -373,6 +398,7 @@ function SuperAdminsTab({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [pending, setPending] = useState<PendingConfirm>(null);
   const isLastSuperAdmin = superAdmins.length <= 1;
 
   async function add(e: React.FormEvent<HTMLFormElement>) {
@@ -408,18 +434,13 @@ function SuperAdminsTab({
     }
   }
 
-  async function remove(id: string, targetEmail: string) {
-    if (
-      !confirm(
-        `Remove ${targetEmail} as a super admin? They'll lose super-admin access immediately.`
-      )
-    )
-      return;
+  async function confirmRemove() {
+    if (!pending) return;
     setBusy(true);
     setError(null);
     setNotice(null);
     try {
-      const res = await fetch(`/api/admin/super/super-admins?id=${id}`, {
+      const res = await fetch(`/api/admin/super/super-admins?id=${pending.id}`, {
         method: "DELETE",
       });
       if (!res.ok) {
@@ -432,6 +453,7 @@ function SuperAdminsTab({
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setBusy(false);
+      setPending(null);
     }
   }
 
@@ -506,6 +528,7 @@ function SuperAdminsTab({
               ? "Cannot remove the last super admin"
               : "";
           const status = inviteStatus[a.email.toLowerCase()];
+          const isInviteOnly = status?.kind !== "active";
           const canResend =
             !isSelf &&
             (!status ||
@@ -548,18 +571,35 @@ function SuperAdminsTab({
                 )}
                 <button
                   type="button"
-                  onClick={() => remove(a.id, a.email)}
+                  onClick={() =>
+                    setPending({ id: a.id, email: a.email, isInviteOnly })
+                  }
                   disabled={busy || cannotRemove}
                   title={removeReason}
                   className="text-sm text-danger hover:opacity-80 disabled:cursor-not-allowed disabled:text-ink-subtle"
                 >
-                  Remove
+                  {isInviteOnly ? "Revoke" : "Remove"}
                 </button>
               </div>
             </li>
           );
         })}
       </ul>
+      <ConfirmDialog
+        open={pending !== null}
+        title={pending?.isInviteOnly ? "Revoke invite?" : "Remove super admin?"}
+        message={
+          pending?.isInviteOnly
+            ? `Revoke the invite for ${pending.email}? Any pending invitation link will stop working and they'll be removed from the super-admin allowlist.`
+            : `Remove ${pending?.email} as a super admin? They'll lose super-admin access immediately.`
+        }
+        confirmLabel={
+          pending?.isInviteOnly ? "Revoke invite" : "Remove super admin"
+        }
+        confirmVariant="red"
+        onConfirm={confirmRemove}
+        onCancel={() => setPending(null)}
+      />
     </div>
   );
 }

@@ -49,10 +49,30 @@ export async function POST(req: NextRequest) {
   if (guard instanceof NextResponse) return guard;
 
   const updates: {
+    name?: string;
     customDomain?: string | null;
     faviconUrl?: string | null;
     brandColor?: string | null;
   } = {};
+
+  // name — display name for the site. Trimmed, length-bounded. Empty
+  // is rejected (a site must have a name); we don't allow null here.
+  if (formData.has("name")) {
+    const raw = (formData.get("name") as string).trim();
+    if (raw.length < 2) {
+      return NextResponse.json(
+        { error: "Name must be at least 2 characters." },
+        { status: 400 }
+      );
+    }
+    if (raw.length > 100) {
+      return NextResponse.json(
+        { error: "Name must be 100 characters or fewer." },
+        { status: 400 }
+      );
+    }
+    updates.name = raw;
+  }
 
   // customDomain — text field. Empty string or "null" sentinel clears it.
   if (formData.has("customDomain")) {
