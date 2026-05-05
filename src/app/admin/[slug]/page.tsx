@@ -21,6 +21,7 @@ import { ConnectStatus } from "@/components/connect-status";
 import { LaunchSiteMenu } from "@/components/launch-site-menu";
 import { SiteCustomization } from "@/components/site-customization";
 import { CollapsibleCard } from "@/components/collapsible-card";
+import { BackLink } from "@/components/back-link";
 import { requireReunionAdminPage } from "@/lib/admin-auth";
 import { loadConnectAccount } from "@/lib/stripe";
 
@@ -161,12 +162,7 @@ export default async function AdminReunionPage({
 
   return (
     <div>
-      <Link
-        href="/admin"
-        className="mb-4 inline-block text-sm text-forest hover:text-forest-deep"
-      >
-        &larr; Back to dashboard
-      </Link>
+      <BackLink fallbackHref={`/${slug}`} />
 
       <div className="mb-4 flex items-center gap-2">
         <h2 className="text-2xl font-bold">{reunion.name}</h2>
