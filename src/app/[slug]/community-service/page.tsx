@@ -56,11 +56,11 @@ export default async function CommunityServicePage({
           </p>
         </div>
 
-        <div className="mb-8 rounded-xl border-2 border-tenant-border-soft bg-tenant-tint p-6">
-          <h2 className="mb-3 text-lg font-bold text-tenant-darkest">
+        <div className="mb-8 rounded-xl bg-tenant-primary p-6">
+          <h2 className="mb-3 text-lg font-bold text-white">
             Donate Items via Amazon Wish List
           </h2>
-          <p className="mb-4 text-sm text-tenant-primary-deep">
+          <p className="mb-4 text-sm text-white/90">
             Help fill the backpacks. Buy a few items off the list and Amazon
             ships them straight to us.
           </p>
@@ -69,12 +69,12 @@ export default async function CommunityServicePage({
               href={wishlistUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block rounded-full bg-tenant-primary px-6 py-2 text-sm font-semibold text-white shadow transition hover:bg-tenant-primary-deep"
+              className="inline-block rounded-full bg-white px-6 py-2 text-sm font-semibold text-tenant-primary shadow transition hover:bg-white/90"
             >
               Donate items via Amazon Wish List &rarr;
             </a>
           ) : (
-            <p className="rounded-md border border-tenant-border-soft bg-white px-3 py-2 text-sm text-tenant-primary">
+            <p className="rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white/90">
               Wish list coming soon — check back!
             </p>
           )}
