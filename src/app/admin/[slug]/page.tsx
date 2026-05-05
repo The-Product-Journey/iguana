@@ -18,6 +18,7 @@ import { formatCents } from "@/lib/utils";
 import { SiteModeToggle } from "@/components/site-mode-toggle";
 import { AdminTabs } from "./admin-tabs";
 import { ConnectStatus } from "@/components/connect-status";
+import { InfoTooltip } from "@/components/info-tooltip";
 import { LaunchSiteMenu } from "@/components/launch-site-menu";
 import { SiteCustomization } from "@/components/site-customization";
 import { CollapsibleCard } from "@/components/collapsible-card";
@@ -25,7 +26,7 @@ import { BackLink } from "@/components/back-link";
 import { TestTag } from "@/components/test-tag";
 import { EditableSiteName } from "@/components/editable-site-name";
 import { requireReunionAdminPage } from "@/lib/admin-auth";
-import { loadConnectAccount } from "@/lib/stripe";
+import { loadConnectAccount, getConnectAccountName } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
 
@@ -45,8 +46,9 @@ export default async function AdminReunionPage({
 
   // Per-reunion scope guard. The proxy only enforces "is any admin"; here
   // we ensure a reunion-A admin can't load reunion-B's dashboard by URL.
-  // Super admins always pass.
-  await requireReunionAdminPage(reunion.id);
+  // Super admins always pass. Capture the context so we can pass
+  // role-aware bits down (e.g. super-admin-only Stripe correlation links).
+  const ctx = await requireReunionAdminPage(reunion.id);
 
   // Fetch all data in parallel
   const [
@@ -106,15 +108,43 @@ export default async function AdminReunionPage({
     loadConnectAccount(reunion.id),
   ]);
 
-  // Get event interest counts
+  // Live-resolve the connected account's display name from Stripe so
+  // admins can read it instead of correlating account IDs by hand.
+  // Best-effort: a failure here just renders "name unavailable" in
+  // the info tooltip and doesn't break the page.
+  const connectAccountName = connect?.accountId
+    ? await getConnectAccountName(connect.accountId)
+    : null;
+
+  // Build cross-indexed interest data so both tabs can drill in:
+  //   - Interests tab: click an interest signup's count → list of events
+  //     they marked
+  //   - Events tab: click an event's interest count → list of signups
+  //     interested in that event
+  const eventNameById = new Map(allEvents.map((e) => [e.id, e.name]));
   const interestEventCounts: Record<string, number> = {};
+  const interestEventsBySignup: Record<string, string[]> = {};
+  const interestPeopleByEvent: Record<string, string[]> = {};
   for (const interest of allInterests) {
     const ei = await db
       .select()
       .from(eventInterests)
       .where(eq(eventInterests.interestSignupId, interest.id));
+
+    const displayName =
+      interest.name ||
+      [interest.firstName, interest.lastName].filter(Boolean).join(" ") ||
+      interest.email;
+    const personLabel = `${displayName} <${interest.email}>`;
+
+    interestEventsBySignup[interest.id] = ei
+      .map((e) => eventNameById.get(e.eventId))
+      .filter((n): n is string => !!n);
+
     for (const e of ei) {
       interestEventCounts[e.eventId] = (interestEventCounts[e.eventId] || 0) + 1;
+      if (!interestPeopleByEvent[e.eventId]) interestPeopleByEvent[e.eventId] = [];
+      interestPeopleByEvent[e.eventId].push(personLabel);
     }
   }
 
@@ -199,6 +229,33 @@ export default async function AdminReunionPage({
             : undefined
         }
         defaultOpen={!connect?.chargesEnabled}
+        headerExtra={
+          connect?.accountId ? (
+            <InfoTooltip label="Stripe account info">
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-subtle">
+                Stripe account ID
+              </p>
+              <p className="break-all font-mono text-ink">
+                {connect.accountId}
+              </p>
+              <p className="mt-2 text-[10px] font-semibold uppercase tracking-wider text-ink-subtle">
+                Account name
+              </p>
+              <p className="break-words text-ink">
+                {connectAccountName ?? (
+                  <span className="text-ink-subtle">
+                    Name unavailable — couldn&apos;t reach Stripe.
+                  </span>
+                )}
+              </p>
+              <p className="mt-2 text-ink-muted">
+                For reference — use this to correlate this reunion with
+                records in the Stripe dashboard, support tickets, or
+                webhook logs.
+              </p>
+            </InfoTooltip>
+          ) : undefined
+        }
       >
         <ConnectStatus
           reunionId={reunion.id}
@@ -208,6 +265,9 @@ export default async function AdminReunionPage({
           initialOnboardingComplete={!!connect?.detailsSubmitted}
           initialChargesEnabled={!!connect?.chargesEnabled}
           initialPayoutsEnabled={!!connect?.payoutsEnabled}
+          requireDisconnectPassword={
+            !!process.env.STRIPE_DISCONNECT_PASSWORD
+          }
         />
       </CollapsibleCard>
 
@@ -256,6 +316,7 @@ export default async function AdminReunionPage({
 
       <AdminTabs
         slug={slug}
+        isSuper={ctx.isSuper}
         rsvps={allRsvps}
         interests={allInterests}
         sponsors={allSponsors}
@@ -264,6 +325,8 @@ export default async function AdminReunionPage({
         events={allEvents}
         messages={messages}
         interestEventCounts={interestEventCounts}
+        interestEventsBySignup={interestEventsBySignup}
+        interestPeopleByEvent={interestPeopleByEvent}
         regEventCounts={regEventCounts}
         categoryLabels={CATEGORY_LABELS}
       />

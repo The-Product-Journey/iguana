@@ -67,9 +67,11 @@ export default async function Home() {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <CreateSiteCard />
-          {sites.map((site) => (
-            <SiteCard key={site.id} site={site} />
-          ))}
+          {sites.map((site) => {
+            const canAdmin =
+              !!ctx?.isSuper || (ctx?.reunionIds.includes(site.id) ?? false);
+            return <SiteCard key={site.id} site={site} canAdmin={canAdmin} />;
+          })}
         </div>
       </main>
     </div>

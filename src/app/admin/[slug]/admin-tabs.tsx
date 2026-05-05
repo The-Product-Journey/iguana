@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCents } from "@/lib/utils";
 import { getSponsorTierLabel } from "@/lib/constants";
@@ -24,6 +24,115 @@ type ContactMessage = {
   createdAt: string;
 };
 
+/**
+ * Renders a count number. Zero shows as plain text. Non-zero shows as
+ * an underlined link with two affordances:
+ *   - hover: a small tooltip popover previews the list inline
+ *   - click: full dialog with scrollable list (better when there are
+ *     many items, on touch devices, or when you want to copy text)
+ */
+function CountLinkDialog({
+  count,
+  title,
+  items,
+}: {
+  count: number;
+  title: string;
+  items: string[];
+}) {
+  const [open, setOpen] = useState(false);
+  const [hover, setHover] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [placement, setPlacement] = useState<"top" | "bottom">("bottom");
+
+  // Decide which side to drop the tooltip on by measuring the trigger
+  // against the viewport. Re-measures whenever hover starts (or the
+  // dialog opens). Estimated max tooltip height is conservative — long
+  // lists wrap inside max-width and clip with the viewport edge in
+  // either direction, but flipping above gives us a better chance of
+  // staying on-screen near table footers.
+  useEffect(() => {
+    if (!hover) return;
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const ESTIMATED_HEIGHT = 240;
+    if (spaceBelow < ESTIMATED_HEIGHT && spaceAbove > spaceBelow) {
+      setPlacement("top");
+    } else {
+      setPlacement("bottom");
+    }
+  }, [hover]);
+
+  if (count === 0) {
+    return <span className="text-ink-subtle">0</span>;
+  }
+  return (
+    <span className="relative inline-block">
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setOpen(true)}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        onFocus={() => setHover(true)}
+        onBlur={() => setHover(false)}
+        className="font-medium text-forest underline decoration-forest/40 underline-offset-2 hover:text-forest-deep hover:decoration-forest"
+      >
+        {count}
+      </button>
+      {hover && !open && (
+        <div
+          role="tooltip"
+          className={`pointer-events-none absolute left-0 z-30 w-max max-w-xs rounded-md border border-border-warm bg-white px-3 py-2 text-xs text-ink-muted shadow-lg ${
+            placement === "top" ? "bottom-full mb-1" : "top-full mt-1"
+          }`}
+        >
+          <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-subtle">
+            {title}
+          </div>
+          <ul className="space-y-0.5">
+            {items.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="mb-3 text-lg font-semibold text-ink">{title}</h2>
+            <ul className="max-h-96 space-y-1 overflow-auto text-sm text-ink-muted">
+              {items.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded-md border border-border-strong bg-white px-3 py-1.5 text-sm font-medium text-ink-muted transition hover:bg-bg-subtle"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </span>
+  );
+}
+
 type ProfileWithRsvp = {
   profile: Profile;
   firstName: string;
@@ -44,6 +153,7 @@ const TABS = [
 
 export function AdminTabs({
   slug,
+  isSuper = false,
   rsvps,
   interests,
   sponsors,
@@ -52,10 +162,13 @@ export function AdminTabs({
   events,
   messages,
   interestEventCounts,
+  interestEventsBySignup,
+  interestPeopleByEvent,
   regEventCounts,
   categoryLabels,
 }: {
   slug: string;
+  isSuper?: boolean;
   rsvps: Rsvp[];
   interests: InterestSignup[];
   sponsors: Sponsor[];
@@ -64,6 +177,8 @@ export function AdminTabs({
   events: Event[];
   messages: ContactMessage[];
   interestEventCounts: Record<string, number>;
+  interestEventsBySignup: Record<string, string[]>;
+  interestPeopleByEvent: Record<string, string[]>;
   regEventCounts: Record<string, { confirmed: number; pending: number }>;
   categoryLabels: Record<string, string>;
 }) {
@@ -98,8 +213,15 @@ export function AdminTabs({
       </div>
 
       {tab === "RSVPs" && <RsvpsTab rsvps={rsvps} />}
-      {tab === "Interests" && <InterestsTab interests={interests} />}
-      {tab === "Sponsors" && <SponsorsTab sponsors={sponsors} />}
+      {tab === "Interests" && (
+        <InterestsTab
+          interests={interests}
+          eventsBySignup={interestEventsBySignup}
+        />
+      )}
+      {tab === "Sponsors" && (
+        <SponsorsTab sponsors={sponsors} isSuper={isSuper} />
+      )}
       {tab === "Memorials" && (
         <MemorialsTab memorials={memorials} slug={slug} />
       )}
@@ -110,6 +232,7 @@ export function AdminTabs({
         <EventsTab
           events={events}
           interestCounts={interestEventCounts}
+          interestPeopleByEvent={interestPeopleByEvent}
           regCounts={regEventCounts}
         />
       )}
@@ -173,7 +296,13 @@ function RsvpsTab({ rsvps }: { rsvps: Rsvp[] }) {
   );
 }
 
-function InterestsTab({ interests }: { interests: InterestSignup[] }) {
+function InterestsTab({
+  interests,
+  eventsBySignup,
+}: {
+  interests: InterestSignup[];
+  eventsBySignup: Record<string, string[]>;
+}) {
   return (
     <div className="overflow-x-auto rounded-xl border border-border-warm bg-white shadow-sm">
       <table className="w-full text-left text-sm">
@@ -181,13 +310,16 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
           <tr>
             <th className="px-4 py-3 font-medium text-ink-muted">Email</th>
             <th className="px-4 py-3 font-medium text-ink-muted">Name</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">
+              Interested in
+            </th>
             <th className="px-4 py-3 font-medium text-ink-muted">Date</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border-warm">
           {interests.length === 0 ? (
             <tr>
-              <td colSpan={3} className="px-4 py-8 text-center text-ink-subtle">
+              <td colSpan={4} className="px-4 py-8 text-center text-ink-subtle">
                 No interest signups yet.
               </td>
             </tr>
@@ -197,6 +329,7 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
                 i.name ||
                 [i.firstName, i.lastName].filter(Boolean).join(" ") ||
                 "—";
+              const eventNames = eventsBySignup[i.id] ?? [];
               return (
                 <tr key={i.id} className="hover:bg-bg-subtle">
                   <td className="px-4 py-3 text-ink-muted">{i.email}</td>
@@ -207,6 +340,13 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
                         (née {i.maidenName})
                       </span>
                     )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <CountLinkDialog
+                      count={eventNames.length}
+                      title={`Events ${displayName} is interested in`}
+                      items={eventNames}
+                    />
                   </td>
                   <td className="px-4 py-3 text-ink-subtle">
                     {new Date(i.createdAt).toLocaleDateString()}
@@ -221,7 +361,24 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
   );
 }
 
-function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
+/**
+ * Build a Stripe Dashboard URL for a checkout session. The session ID
+ * prefix (`cs_test_` vs `cs_live_`) decides whether the URL points
+ * at the test or live dashboard, so this works correctly regardless
+ * of which Stripe environment the row was created in.
+ */
+function stripeSessionUrl(sessionId: string): string {
+  const isTest = sessionId.startsWith("cs_test_");
+  return `https://dashboard.stripe.com/${isTest ? "test/" : ""}checkout/sessions/${sessionId}`;
+}
+
+function SponsorsTab({
+  sponsors,
+  isSuper,
+}: {
+  sponsors: Sponsor[];
+  isSuper: boolean;
+}) {
   const router = useRouter();
   const [toggling, setToggling] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<string | null>(null);
@@ -322,7 +479,7 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <StatusBadge status={s.paymentStatus} />
                     {s.stripeCheckoutSessionId && (
                       <button
@@ -333,6 +490,17 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                       >
                         {refreshing === s.id ? "Syncing…" : "Refresh"}
                       </button>
+                    )}
+                    {isSuper && s.stripeCheckoutSessionId && (
+                      <a
+                        href={stripeSessionUrl(s.stripeCheckoutSessionId)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Open the corresponding Checkout Session in the Stripe dashboard"
+                        className="text-xs font-medium text-forest underline decoration-forest/40 underline-offset-2 hover:text-forest-deep hover:decoration-forest"
+                      >
+                        View in Stripe →
+                      </a>
                     )}
                   </div>
                 </td>
@@ -568,10 +736,12 @@ function ProfilesTab({
 function EventsTab({
   events,
   interestCounts,
+  interestPeopleByEvent,
   regCounts,
 }: {
   events: Event[];
   interestCounts: Record<string, number>;
+  interestPeopleByEvent: Record<string, string[]>;
   regCounts: Record<string, { confirmed: number; pending: number }>;
 }) {
   return (
@@ -607,7 +777,11 @@ function EventsTab({
                 </span>
               </td>
               <td className="px-4 py-3">
-                {interestCounts[event.id] || 0}
+                <CountLinkDialog
+                  count={interestCounts[event.id] || 0}
+                  title={`People interested in ${event.name}`}
+                  items={interestPeopleByEvent[event.id] ?? []}
+                />
               </td>
               <td className="px-4 py-3">
                 <span className="text-success">

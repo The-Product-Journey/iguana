@@ -143,6 +143,35 @@ export async function refreshConnectAccount(
 }
 
 /**
+ * Look up the human-friendly display name for a connected Stripe
+ * account. Falls back through Stripe's various "what should we call
+ * this account" fields (business profile name → dashboard display
+ * name → email) and returns null on any error so callers can render
+ * "name unavailable" without breaking the page.
+ *
+ * Used purely for display in the admin UI — never as authority.
+ */
+export async function getConnectAccountName(
+  accountId: string
+): Promise<string | null> {
+  try {
+    const account = await getStripe().accounts.retrieve(accountId);
+    return (
+      account.business_profile?.name ||
+      account.settings?.dashboard?.display_name ||
+      account.email ||
+      null
+    );
+  } catch (err) {
+    console.error("[stripe] getConnectAccountName failed", {
+      accountId,
+      err,
+    });
+    return null;
+  }
+}
+
+/**
  * Resolve the base URL we hand to Stripe for return/refresh URLs, Checkout
  * success/cancel URLs, etc. — always derived from the incoming request's
  * origin so that redirects land back on whatever domain the user came in on.

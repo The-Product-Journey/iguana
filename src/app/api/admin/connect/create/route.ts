@@ -68,6 +68,12 @@ export async function POST(req: NextRequest) {
     const account = await stripe.accounts.create({
       type: "express",
       country: "US",
+      // Pre-fill the connected account's email with the admin who's
+      // initiating onboarding. Stripe surfaces this in the Express
+      // onboarding flow so the organizer doesn't have to type it.
+      // They can change it on the next screen if their Stripe contact
+      // email differs from their admin login.
+      email: guard.email,
       capabilities: {
         card_payments: { requested: true },
         transfers: { requested: true },
