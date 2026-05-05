@@ -21,12 +21,11 @@ import { requireReunionAdmin } from "@/lib/admin-auth";
  * verbatim so the admin knows why and can resolve it (e.g. drain the
  * balance or contact Stripe).
  *
- * Live-Stripe gate: when stripeEnvironment() === "live", the caller
- * MUST supply a `password` in the body that matches the
- * STRIPE_DISCONNECT_PASSWORD env var. This is a defense-in-depth
- * step on top of Stripe's own activity check — to make it harder to
- * accidentally tear down a real organizer's connected account. Test
- * env disconnects don't require a password.
+ * Password gate: if STRIPE_DISCONNECT_PASSWORD is set in the
+ * environment, the caller MUST supply a matching `password` in the
+ * body. If the env var isn't set, no password is required. This
+ * lets the operator decide per-deploy whether to gate disconnects —
+ * typically set on production, leave unset on dev/staging.
  *
  * The DB row is only removed AFTER Stripe accepts the delete — if
  * Stripe says no, we leave the local mapping intact so the admin
@@ -53,19 +52,12 @@ export async function POST(req: NextRequest) {
 
   const env = stripeEnvironment();
 
-  // Live-Stripe disconnect requires the platform-level password.
-  if (env === "live") {
-    const expected = process.env.STRIPE_DISCONNECT_PASSWORD;
-    if (!expected) {
-      return NextResponse.json(
-        {
-          error:
-            "Live Stripe disconnect is disabled — STRIPE_DISCONNECT_PASSWORD is not configured. Contact ops.",
-        },
-        { status: 503 }
-      );
-    }
-    if (!body.password || body.password !== expected) {
+  // Password gate (when configured). Server-side check against the
+  // STRIPE_DISCONNECT_PASSWORD env var. If not set, no password is
+  // required and we proceed.
+  const expectedPassword = process.env.STRIPE_DISCONNECT_PASSWORD;
+  if (expectedPassword) {
+    if (!body.password || body.password !== expectedPassword) {
       return NextResponse.json(
         { error: "Incorrect password. Disconnect aborted." },
         { status: 401 }

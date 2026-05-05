@@ -19,7 +19,7 @@ export function ConnectStatus({
   initialOnboardingComplete,
   initialChargesEnabled,
   initialPayoutsEnabled,
-  isLiveStripe = false,
+  requireDisconnectPassword = false,
 }: {
   reunionId: string;
   slug: string;
@@ -29,10 +29,12 @@ export function ConnectStatus({
   initialChargesEnabled: boolean;
   initialPayoutsEnabled: boolean;
   /**
-   * True when this admin page is running against the live Stripe key
-   * set. Disconnect requires an extra password gate in that case.
+   * True when STRIPE_DISCONNECT_PASSWORD is set on the deploy. Shows a
+   * password field in the disconnect dialog; the server validates it.
+   * False (default) → no password field, no server-side password
+   * check.
    */
-  isLiveStripe?: boolean;
+  requireDisconnectPassword?: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -243,7 +245,7 @@ export function ConnectStatus({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           reunionId,
-          ...(isLiveStripe ? { password: disconnectPassword } : {}),
+          ...(requireDisconnectPassword ? { password: disconnectPassword } : {}),
         }),
       });
       const data = await res.json();
@@ -456,13 +458,13 @@ export function ConnectStatus({
               you&apos;d need to handle that first. Reconnecting later means
               starting onboarding from scratch.
             </p>
-            {isLiveStripe && (
+            {requireDisconnectPassword && (
               <div className="mb-4 rounded-md border border-danger/30 bg-danger/10 p-3">
                 <p className="mb-2 text-sm font-medium text-danger">
-                  Live Stripe — extra confirmation required.
+                  Extra confirmation required.
                 </p>
                 <label className="block text-xs font-medium text-ink-muted">
-                  Production disconnect password
+                  Disconnect password
                 </label>
                 <input
                   type="password"
@@ -492,7 +494,7 @@ export function ConnectStatus({
                 onClick={handleDisconnect}
                 disabled={
                   busyDisconnect ||
-                  (isLiveStripe && disconnectPassword.length === 0)
+                  (requireDisconnectPassword && disconnectPassword.length === 0)
                 }
                 className="rounded-md bg-[var(--color-danger)] px-3 py-1.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
               >

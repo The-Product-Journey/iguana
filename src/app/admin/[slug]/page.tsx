@@ -26,7 +26,7 @@ import { BackLink } from "@/components/back-link";
 import { TestTag } from "@/components/test-tag";
 import { EditableSiteName } from "@/components/editable-site-name";
 import { requireReunionAdminPage } from "@/lib/admin-auth";
-import { loadConnectAccount, stripeEnvironment } from "@/lib/stripe";
+import { loadConnectAccount } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
 
@@ -46,8 +46,9 @@ export default async function AdminReunionPage({
 
   // Per-reunion scope guard. The proxy only enforces "is any admin"; here
   // we ensure a reunion-A admin can't load reunion-B's dashboard by URL.
-  // Super admins always pass.
-  await requireReunionAdminPage(reunion.id);
+  // Super admins always pass. Capture the context so we can pass
+  // role-aware bits down (e.g. super-admin-only Stripe correlation links).
+  const ctx = await requireReunionAdminPage(reunion.id);
 
   // Fetch all data in parallel
   const [
@@ -246,7 +247,9 @@ export default async function AdminReunionPage({
           initialOnboardingComplete={!!connect?.detailsSubmitted}
           initialChargesEnabled={!!connect?.chargesEnabled}
           initialPayoutsEnabled={!!connect?.payoutsEnabled}
-          isLiveStripe={stripeEnvironment() === "live"}
+          requireDisconnectPassword={
+            !!process.env.STRIPE_DISCONNECT_PASSWORD
+          }
         />
       </CollapsibleCard>
 
