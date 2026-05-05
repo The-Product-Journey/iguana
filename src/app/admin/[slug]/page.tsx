@@ -106,13 +106,20 @@ export default async function AdminReunionPage({
     loadConnectAccount(reunion.id),
   ]);
 
-  // Get event interest counts
+  // Get event interest counts AND the per-signup list of event names so
+  // the Interests tab can show what each person actually expressed
+  // interest in (not just an overall count).
+  const eventNameById = new Map(allEvents.map((e) => [e.id, e.name]));
   const interestEventCounts: Record<string, number> = {};
+  const interestEventsBySignup: Record<string, string[]> = {};
   for (const interest of allInterests) {
     const ei = await db
       .select()
       .from(eventInterests)
       .where(eq(eventInterests.interestSignupId, interest.id));
+    interestEventsBySignup[interest.id] = ei
+      .map((e) => eventNameById.get(e.eventId))
+      .filter((n): n is string => !!n);
     for (const e of ei) {
       interestEventCounts[e.eventId] = (interestEventCounts[e.eventId] || 0) + 1;
     }
@@ -264,6 +271,7 @@ export default async function AdminReunionPage({
         events={allEvents}
         messages={messages}
         interestEventCounts={interestEventCounts}
+        interestEventsBySignup={interestEventsBySignup}
         regEventCounts={regEventCounts}
         categoryLabels={CATEGORY_LABELS}
       />

@@ -52,6 +52,7 @@ export function AdminTabs({
   events,
   messages,
   interestEventCounts,
+  interestEventsBySignup,
   regEventCounts,
   categoryLabels,
 }: {
@@ -64,6 +65,7 @@ export function AdminTabs({
   events: Event[];
   messages: ContactMessage[];
   interestEventCounts: Record<string, number>;
+  interestEventsBySignup: Record<string, string[]>;
   regEventCounts: Record<string, { confirmed: number; pending: number }>;
   categoryLabels: Record<string, string>;
 }) {
@@ -98,7 +100,12 @@ export function AdminTabs({
       </div>
 
       {tab === "RSVPs" && <RsvpsTab rsvps={rsvps} />}
-      {tab === "Interests" && <InterestsTab interests={interests} />}
+      {tab === "Interests" && (
+        <InterestsTab
+          interests={interests}
+          eventsBySignup={interestEventsBySignup}
+        />
+      )}
       {tab === "Sponsors" && <SponsorsTab sponsors={sponsors} />}
       {tab === "Memorials" && (
         <MemorialsTab memorials={memorials} slug={slug} />
@@ -173,7 +180,13 @@ function RsvpsTab({ rsvps }: { rsvps: Rsvp[] }) {
   );
 }
 
-function InterestsTab({ interests }: { interests: InterestSignup[] }) {
+function InterestsTab({
+  interests,
+  eventsBySignup,
+}: {
+  interests: InterestSignup[];
+  eventsBySignup: Record<string, string[]>;
+}) {
   return (
     <div className="overflow-x-auto rounded-xl border border-border-warm bg-white shadow-sm">
       <table className="w-full text-left text-sm">
@@ -181,13 +194,16 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
           <tr>
             <th className="px-4 py-3 font-medium text-ink-muted">Email</th>
             <th className="px-4 py-3 font-medium text-ink-muted">Name</th>
+            <th className="px-4 py-3 font-medium text-ink-muted">
+              Interested in
+            </th>
             <th className="px-4 py-3 font-medium text-ink-muted">Date</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border-warm">
           {interests.length === 0 ? (
             <tr>
-              <td colSpan={3} className="px-4 py-8 text-center text-ink-subtle">
+              <td colSpan={4} className="px-4 py-8 text-center text-ink-subtle">
                 No interest signups yet.
               </td>
             </tr>
@@ -197,6 +213,7 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
                 i.name ||
                 [i.firstName, i.lastName].filter(Boolean).join(" ") ||
                 "—";
+              const eventNames = eventsBySignup[i.id] ?? [];
               return (
                 <tr key={i.id} className="hover:bg-bg-subtle">
                   <td className="px-4 py-3 text-ink-muted">{i.email}</td>
@@ -206,6 +223,22 @@ function InterestsTab({ interests }: { interests: InterestSignup[] }) {
                       <span className="ml-1 text-xs text-ink-subtle">
                         (née {i.maidenName})
                       </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {eventNames.length === 0 ? (
+                      <span className="text-ink-subtle">—</span>
+                    ) : (
+                      <div className="flex flex-wrap gap-1">
+                        {eventNames.map((name) => (
+                          <span
+                            key={name}
+                            className="rounded-full bg-bg-subtle px-2 py-0.5 text-xs text-ink-muted"
+                          >
+                            {name}
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </td>
                   <td className="px-4 py-3 text-ink-subtle">
