@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCents } from "@/lib/utils";
 import { getSponsorTierLabel } from "@/lib/constants";
@@ -42,12 +42,37 @@ function CountLinkDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [placement, setPlacement] = useState<"top" | "bottom">("bottom");
+
+  // Decide which side to drop the tooltip on by measuring the trigger
+  // against the viewport. Re-measures whenever hover starts (or the
+  // dialog opens). Estimated max tooltip height is conservative — long
+  // lists wrap inside max-width and clip with the viewport edge in
+  // either direction, but flipping above gives us a better chance of
+  // staying on-screen near table footers.
+  useEffect(() => {
+    if (!hover) return;
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const ESTIMATED_HEIGHT = 240;
+    if (spaceBelow < ESTIMATED_HEIGHT && spaceAbove > spaceBelow) {
+      setPlacement("top");
+    } else {
+      setPlacement("bottom");
+    }
+  }, [hover]);
+
   if (count === 0) {
     return <span className="text-ink-subtle">0</span>;
   }
   return (
     <span className="relative inline-block">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen(true)}
         onMouseEnter={() => setHover(true)}
@@ -61,7 +86,9 @@ function CountLinkDialog({
       {hover && !open && (
         <div
           role="tooltip"
-          className="pointer-events-none absolute left-0 top-full z-30 mt-1 w-max max-w-xs rounded-md border border-border-warm bg-white px-3 py-2 text-xs text-ink-muted shadow-lg"
+          className={`pointer-events-none absolute left-0 z-30 w-max max-w-xs rounded-md border border-border-warm bg-white px-3 py-2 text-xs text-ink-muted shadow-lg ${
+            placement === "top" ? "bottom-full mb-1" : "top-full mt-1"
+          }`}
         >
           <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-subtle">
             {title}

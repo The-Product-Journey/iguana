@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /**
  * Small "i" info button that reveals a popover with reference content.
- * Hover to peek; click to pin (so the user can copy text from inside).
- * Click anywhere outside the button toggles it back off — handled
- * implicitly by the hover/blur lifecycle.
+ * Hover to peek; click to pin (so the user can mouse into the popover
+ * and copy text from inside).
+ *
+ * The popover auto-flips above the trigger when there isn't enough
+ * room below — measured against the viewport on hover/pin.
  *
  * Sits well in CollapsibleCard's `headerExtra` slot or anywhere a
  * disclosure-style "for reference" affordance is useful.
@@ -23,12 +25,30 @@ export function InfoTooltip({
 }) {
   const [open, setOpen] = useState(false);
   const [pinned, setPinned] = useState(false);
+  const [placement, setPlacement] = useState<"top" | "bottom">("bottom");
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const visible = open || pinned;
   const alignClass = align === "left" ? "left-0" : "right-0";
+
+  useEffect(() => {
+    if (!visible) return;
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const ESTIMATED_HEIGHT = 200;
+    if (spaceBelow < ESTIMATED_HEIGHT && spaceAbove > spaceBelow) {
+      setPlacement("top");
+    } else {
+      setPlacement("bottom");
+    }
+  }, [visible]);
 
   return (
     <span className="relative inline-block">
       <button
+        ref={triggerRef}
         type="button"
         aria-label={label}
         title={label}
@@ -52,7 +72,9 @@ export function InfoTooltip({
       {visible && (
         <div
           role="tooltip"
-          className={`absolute top-full z-30 mt-2 w-72 rounded-md border border-border-warm bg-white p-3 text-xs text-ink-muted shadow-lg ${alignClass}`}
+          className={`absolute z-30 w-72 rounded-md border border-border-warm bg-white p-3 text-xs text-ink-muted shadow-lg ${alignClass} ${
+            placement === "top" ? "bottom-full mb-2" : "top-full mt-2"
+          }`}
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
         >
