@@ -37,6 +37,11 @@ export type InviteStatus =
  * revoking any prior pending invite first if needed (use
  * revokePendingInvite). On Clerk failure this throws — callers wrap so
  * a Clerk outage doesn't block the DB-allowlist write.
+ *
+ * The redirectUrl is the page the user lands on AFTER completing
+ * sign-up via Clerk's Account Portal. The Account Portal handles the
+ * __clerk_ticket query param itself (we don't host a SignUp component
+ * locally), so we can just pass the final admin destination here.
  */
 export async function sendAdminInvite(
   email: string,
