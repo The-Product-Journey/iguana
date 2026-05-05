@@ -58,10 +58,10 @@ export default async function SuperAdminAdminsPage() {
   return (
     <div>
       <Link
-        href="/admin/super"
+        href="/admin"
         className="mb-4 inline-block text-sm font-medium text-forest hover:text-forest-deep"
       >
-        &larr; Back to super admin
+        &larr; Back to admin
       </Link>
 
       <h2 className="mb-8 text-3xl font-semibold text-ink">Manage admins</h2>

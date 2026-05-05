@@ -19,7 +19,7 @@ export function UserMenu({ isSuper }: { isSuper: boolean }) {
           <UserButton.Link
             label="Super Admin"
             labelIcon={<ShieldIcon />}
-            href="/admin/super"
+            href="/admin"
           />
         </UserButton.MenuItems>
       )}

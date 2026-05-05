@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
   let inviteError: string | null = null;
   let inviteStatus: "sent" | "user-exists" | null = null;
   try {
-    const result = await sendAdminInvite(email, "/admin/super");
+    const result = await sendAdminInvite(email, "/admin");
     inviteStatus = result.kind;
     if (result.kind === "user-exists") {
       await db
