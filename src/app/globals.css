@@ -107,7 +107,7 @@
 [data-theme="tenant"] {
   --color-tenant-primary-deep: color-mix(in oklch, var(--color-tenant-primary) 80%, black);
   --color-tenant-darkest: color-mix(in oklch, var(--color-tenant-primary) 50%, black);
-  --color-tenant-tint: color-mix(in oklch, var(--color-tenant-primary) 8%, white);
+  --color-tenant-tint: color-mix(in oklch, var(--color-tenant-primary) 5%, white);
   --color-tenant-tint-strong: color-mix(in oklch, var(--color-tenant-primary) 18%, white);
   --color-tenant-border-soft: color-mix(in oklch, var(--color-tenant-primary) 35%, white);
   --color-tenant-on-dark: color-mix(in oklch, var(--color-tenant-primary) 30%, white);
