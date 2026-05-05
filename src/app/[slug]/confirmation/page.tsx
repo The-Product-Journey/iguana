@@ -102,7 +102,7 @@ export default async function ConfirmationPage({
               </p>
             )}
             {(rsvp.donationCents || 0) > 0 && (
-              <p className="text-red-700">
+              <p className="text-tenant-primary">
                 Thanks for covering {formatCents(rsvp.donationCents!)} in
                 processing fees!
               </p>
@@ -137,21 +137,21 @@ export default async function ConfirmationPage({
 
         {/* Yearbook profile CTA */}
         {editToken && (
-          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-6 text-left">
-            <h3 className="mb-2 font-semibold text-red-900">
+          <div className="mb-6 rounded-xl border border-tenant-border-soft bg-tenant-tint p-6 text-left">
+            <h3 className="mb-2 font-semibold text-tenant-darkest">
               Be in the Digital Yearbook!
             </h3>
-            <p className="mb-3 text-sm text-red-800">
+            <p className="mb-3 text-sm text-tenant-primary-deep">
               Share what you&apos;ve been up to since &apos;96. Your classmates
               would love to hear from you.
             </p>
             <Link
               href={`/${slug}/profile/${editToken}`}
-              className="inline-block rounded-full bg-red-700 px-5 py-2 text-sm font-semibold text-white transition hover:bg-red-800"
+              className="inline-block rounded-full bg-tenant-primary px-5 py-2 text-sm font-semibold text-white transition hover:bg-tenant-primary-deep"
             >
               Fill Out Your Profile
             </Link>
-            <p className="mt-2 text-xs text-red-600">
+            <p className="mt-2 text-xs text-tenant-primary">
               You can always come back to this later — bookmark this page!
             </p>
           </div>
@@ -173,7 +173,7 @@ export default async function ConfirmationPage({
           Questions? Email{" "}
           <a
             href="mailto:parkhill1996reunion@gmail.com"
-            className="text-red-700 underline hover:text-red-800"
+            className="text-tenant-primary underline hover:text-tenant-primary-deep"
           >
             parkhill1996reunion@gmail.com
           </a>
@@ -181,7 +181,7 @@ export default async function ConfirmationPage({
 
         <Link
           href={`/${slug}`}
-          className="mt-4 inline-block text-red-700 hover:text-red-800"
+          className="mt-4 inline-block text-tenant-primary hover:text-tenant-primary-deep"
         >
           &larr; Back to event page
         </Link>

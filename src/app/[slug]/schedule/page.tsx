@@ -61,7 +61,7 @@ export default async function SchedulePage({
       <div className="mx-auto max-w-3xl px-6">
         <Link
           href={`/${slug}`}
-          className="mb-6 inline-block text-sm text-red-700 hover:text-red-800"
+          className="mb-6 inline-block text-sm text-tenant-primary hover:text-tenant-primary-deep"
         >
           &larr; Back to event
         </Link>
@@ -85,7 +85,7 @@ export default async function SchedulePage({
         <div className="space-y-10">
           {Array.from(eventsByDate.entries()).map(([date, dayEvents]) => (
             <div key={date}>
-              <h2 className="mb-4 text-lg font-semibold text-red-800">
+              <h2 className="mb-4 text-lg font-semibold text-tenant-primary-deep">
                 {new Date(date + "T12:00:00").toLocaleDateString("en-US", {
                   weekday: "long",
                   month: "long",
@@ -119,7 +119,7 @@ export default async function SchedulePage({
                       <span
                         className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
                           event.type === "paid"
-                            ? "bg-red-100 text-red-700"
+                            ? "bg-tenant-tint-strong text-tenant-primary"
                             : "bg-green-100 text-green-700"
                         }`}
                       >
@@ -145,7 +145,7 @@ export default async function SchedulePage({
         <div className="mt-12 text-center">
           <Link
             href={`/${slug}/rsvp`}
-            className="inline-block rounded-full bg-red-700 px-8 py-3 text-lg font-semibold text-white shadow transition hover:bg-red-800"
+            className="inline-block rounded-full bg-tenant-primary px-8 py-3 text-lg font-semibold text-white shadow transition hover:bg-tenant-primary-deep"
           >
             Register Now
           </Link>

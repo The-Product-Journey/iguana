@@ -42,7 +42,7 @@ export default async function SponsorsPage({
       <div className="mx-auto max-w-3xl px-6">
         <Link
           href={`/${slug}`}
-          className="mb-6 inline-block text-sm text-red-700 hover:text-red-800"
+          className="mb-6 inline-block text-sm text-tenant-primary hover:text-tenant-primary-deep"
         >
           &larr; Back to event
         </Link>
@@ -61,7 +61,7 @@ export default async function SponsorsPage({
             <p className="text-gray-500">No sponsors yet — be the first!</p>
             <Link
               href={`/${slug}/sponsor`}
-              className="mt-4 inline-block rounded-full bg-red-700 px-6 py-2 font-semibold text-white transition hover:bg-red-800"
+              className="mt-4 inline-block rounded-full bg-tenant-primary px-6 py-2 font-semibold text-white transition hover:bg-tenant-primary-deep"
             >
               Become a Sponsor
             </Link>
@@ -71,7 +71,7 @@ export default async function SponsorsPage({
             {/* Trojan Sponsors */}
             {topSponsors.length > 0 && (
               <div className="mb-10">
-                <h2 className="mb-4 text-lg font-semibold text-red-800 uppercase tracking-wide">
+                <h2 className="mb-4 text-lg font-semibold text-tenant-primary-deep uppercase tracking-wide">
                   Trojan Sponsors
                 </h2>
                 <div className="grid gap-6 sm:grid-cols-2">
@@ -83,7 +83,7 @@ export default async function SponsorsPage({
                     return (
                       <div
                         key={sponsor.id}
-                        className="rounded-xl border-2 border-red-200 bg-white p-6 shadow-sm"
+                        className="rounded-xl border-2 border-tenant-border-soft bg-white p-6 shadow-sm"
                       >
                         {showLogo && (
                           <div className="mb-4 flex h-24 items-center justify-center">
@@ -102,7 +102,7 @@ export default async function SponsorsPage({
                               href={sponsor.websiteUrl!}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="hover:text-red-700"
+                              className="hover:text-tenant-primary"
                             >
                               {displayName}
                             </a>
@@ -156,7 +156,7 @@ export default async function SponsorsPage({
                               href={sponsor.websiteUrl!}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="hover:text-red-700"
+                              className="hover:text-tenant-primary"
                             >
                               {displayName}
                             </a>
@@ -178,7 +178,7 @@ export default async function SponsorsPage({
           <div className="mt-12 text-center">
             <Link
               href={`/${slug}/sponsor`}
-              className="inline-block rounded-full bg-red-700 px-6 py-2 font-semibold text-white transition hover:bg-red-800"
+              className="inline-block rounded-full bg-tenant-primary px-6 py-2 font-semibold text-white transition hover:bg-tenant-primary-deep"
             >
               Become a Sponsor
             </Link>

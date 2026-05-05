@@ -94,7 +94,7 @@ export function InterestForm({
             </p>
             <button
               onClick={onClose}
-              className="rounded-full bg-red-700 px-6 py-2 font-semibold text-white transition hover:bg-red-800"
+              className="rounded-full bg-tenant-primary px-6 py-2 font-semibold text-white transition hover:bg-tenant-primary-deep"
             >
               Close
             </button>
@@ -108,7 +108,7 @@ export function InterestForm({
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
+                <div className="rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">{error}</div>
               )}
 
               <div>
@@ -122,7 +122,7 @@ export function InterestForm({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 />
               </div>
 
@@ -136,7 +136,7 @@ export function InterestForm({
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 />
               </div>
 
@@ -150,7 +150,7 @@ export function InterestForm({
                   value={maidenName}
                   onChange={(e) => setMaidenName(e.target.value)}
                   placeholder="So classmates can find you"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 />
               </div>
 
@@ -188,9 +188,9 @@ export function InterestForm({
                                   role="radio"
                                   aria-checked={active}
                                   onClick={() => setResponse(event.id, opt.value)}
-                                  className={`px-3 py-1 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                                  className={`px-3 py-1 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-tenant-primary ${
                                     active
-                                      ? "bg-red-700 text-white"
+                                      ? "bg-tenant-primary text-white"
                                       : "bg-white text-gray-700 hover:bg-gray-50"
                                   } ${opt.value !== "yes" ? "border-l border-gray-300" : ""}`}
                                 >
@@ -209,7 +209,7 @@ export function InterestForm({
               <button
                 type="submit"
                 disabled={loading || !formReady}
-                className="w-full rounded-lg bg-red-700 px-4 py-3 font-semibold text-white shadow transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-lg bg-tenant-primary px-4 py-3 font-semibold text-white shadow transition hover:bg-tenant-primary-deep disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? "Saving..." : "Submit"}
               </button>

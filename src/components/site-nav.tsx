@@ -51,7 +51,7 @@ export function SiteNav({
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
         <Link
           href={`/${slug}`}
-          className="text-lg font-bold text-red-800 hover:text-red-900"
+          className="text-lg font-bold text-tenant-primary-deep hover:text-tenant-darkest"
         >
           PHHS &apos;96
         </Link>
@@ -62,7 +62,7 @@ export function SiteNav({
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-gray-600 transition hover:text-red-700"
+              className="text-sm font-medium text-gray-600 transition hover:text-tenant-primary"
             >
               {link.label}
             </Link>
@@ -70,7 +70,7 @@ export function SiteNav({
           {siteMode === "open" && (
             <Link
               href={`/${slug}/rsvp`}
-              className="rounded-full bg-red-700 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-red-800"
+              className="rounded-full bg-tenant-primary px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-tenant-primary-deep"
             >
               Register
             </Link>
@@ -117,7 +117,7 @@ export function SiteNav({
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-gray-600 hover:text-red-700"
+                className="text-sm font-medium text-gray-600 hover:text-tenant-primary"
                 onClick={() => setOpen(false)}
               >
                 {link.label}
@@ -126,7 +126,7 @@ export function SiteNav({
             {siteMode === "open" && (
               <Link
                 href={`/${slug}/rsvp`}
-                className="mt-2 rounded-full bg-red-700 px-4 py-2 text-center text-sm font-semibold text-white"
+                className="mt-2 rounded-full bg-tenant-primary px-4 py-2 text-center text-sm font-semibold text-white"
                 onClick={() => setOpen(false)}
               >
                 Register

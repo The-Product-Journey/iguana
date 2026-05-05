@@ -36,7 +36,7 @@ export default async function MemorialReviewPage({
           </p>
           <a
             href={`/${slug}/memorial`}
-            className="mt-6 inline-block text-red-700 hover:text-red-800"
+            className="mt-6 inline-block text-tenant-primary hover:text-tenant-primary-deep"
           >
             &larr; View memorials
           </a>

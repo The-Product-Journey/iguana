@@ -67,7 +67,7 @@ export function SponsorForm({
       className="space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-sm"
     >
       {(error || belowMinimum) && (
-        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">
           {error || "Minimum sponsorship is $10.00"}
         </div>
       )}
@@ -86,7 +86,7 @@ export function SponsorForm({
             required
             value={contactName}
             onChange={(e) => setContactName(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
         <div>
@@ -103,7 +103,7 @@ export function SponsorForm({
             required
             value={contactEmail}
             onChange={(e) => setContactEmail(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       </div>
@@ -119,7 +119,7 @@ export function SponsorForm({
           id="contactPhone"
           name="contactPhone"
           type="tel"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
@@ -134,7 +134,7 @@ export function SponsorForm({
           <input
             id="companyName"
             name="companyName"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
         <div>
@@ -149,7 +149,7 @@ export function SponsorForm({
             name="websiteUrl"
             type="url"
             placeholder="https://"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       </div>
@@ -170,15 +170,15 @@ export function SponsorForm({
               }}
               className={`rounded-lg border py-2.5 text-sm font-semibold transition ${
                 selectedPreset === amt
-                  ? "border-red-700 bg-red-700 text-white"
-                  : "border-gray-300 bg-white text-gray-700 hover:border-red-300 hover:bg-red-50"
+                  ? "border-tenant-primary bg-tenant-primary text-white"
+                  : "border-gray-300 bg-white text-gray-700 hover:border-tenant-border-soft hover:bg-tenant-tint"
               }`}
             >
               ${amt.toLocaleString()}
             </button>
           ))}
         </div>
-        <div className="relative mt-3 rounded-lg border border-gray-300 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500">
+        <div className="relative mt-3 rounded-lg border border-gray-300 focus-within:border-tenant-primary focus-within:ring-1 focus-within:ring-tenant-primary">
           <div className="absolute left-4 top-1/2 -translate-y-1/2">
             <span className="block text-lg font-semibold text-gray-800">$</span>
             <span className="block text-xs text-gray-400">USD</span>
@@ -224,7 +224,7 @@ export function SponsorForm({
           name="message"
           rows={3}
           placeholder="A note about your sponsorship or a message for the class"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
@@ -235,7 +235,7 @@ export function SponsorForm({
       <button
         type="submit"
         disabled={loading || !formReady}
-        className="w-full rounded-lg bg-red-700 px-4 py-3 text-lg font-semibold text-white shadow transition hover:bg-red-800 disabled:opacity-50"
+        className="w-full rounded-lg bg-tenant-primary px-4 py-3 text-lg font-semibold text-white shadow transition hover:bg-tenant-primary-deep disabled:opacity-50"
       >
         {loading
           ? "Redirecting to payment..."

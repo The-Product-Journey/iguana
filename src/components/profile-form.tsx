@@ -77,7 +77,7 @@ export function ProfileForm({
       className="space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-sm"
     >
       {error && (
-        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">
           {error}
         </div>
       )}
@@ -106,7 +106,7 @@ export function ProfileForm({
           type="file"
           accept="image/*"
           onChange={handlePhotoChange}
-          className="w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-red-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-red-700 hover:file:bg-red-100"
+          className="w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-tenant-tint file:px-4 file:py-2 file:text-sm file:font-semibold file:text-tenant-primary hover:file:bg-tenant-tint-strong"
         />
       </div>
 
@@ -122,7 +122,7 @@ export function ProfileForm({
           name="currentCity"
           defaultValue={existingProfile?.currentCity || ""}
           placeholder="e.g., Denver, CO"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
@@ -138,7 +138,7 @@ export function ProfileForm({
           name="occupation"
           defaultValue={existingProfile?.occupation || ""}
           placeholder="e.g., Software engineer at Acme Corp"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
@@ -155,7 +155,7 @@ export function ProfileForm({
           rows={2}
           defaultValue={existingProfile?.family || ""}
           placeholder="e.g., Married with 2 kids, a dog named Barkley..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
@@ -172,7 +172,7 @@ export function ProfileForm({
           rows={3}
           defaultValue={existingProfile?.favoritePHMemory || ""}
           placeholder="That time in Mr. Johnson's class when..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
@@ -189,7 +189,7 @@ export function ProfileForm({
           rows={4}
           defaultValue={existingProfile?.beenUpTo || ""}
           placeholder="The highlights of the last 30 years..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
@@ -205,14 +205,14 @@ export function ProfileForm({
           name="funFact"
           defaultValue={existingProfile?.funFact || ""}
           placeholder="e.g., I've visited 47 states, I can juggle flaming torches..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-red-700 px-4 py-3 text-lg font-semibold text-white shadow transition hover:bg-red-800 disabled:opacity-50"
+        className="w-full rounded-lg bg-tenant-primary px-4 py-3 text-lg font-semibold text-white shadow transition hover:bg-tenant-primary-deep disabled:opacity-50"
       >
         {loading ? "Saving..." : "Save Profile"}
       </button>

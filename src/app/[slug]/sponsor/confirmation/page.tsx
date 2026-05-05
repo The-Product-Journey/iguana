@@ -45,13 +45,13 @@ export default async function SponsorConfirmationPage({
           <div className="flex flex-col gap-3">
             <Link
               href={`/${slug}/sponsors`}
-              className="inline-block rounded-full bg-red-700 px-6 py-2 font-semibold text-white transition hover:bg-red-800"
+              className="inline-block rounded-full bg-tenant-primary px-6 py-2 font-semibold text-white transition hover:bg-tenant-primary-deep"
             >
               View Sponsors
             </Link>
             <Link
               href={`/${slug}`}
-              className="text-sm text-red-700 hover:text-red-800"
+              className="text-sm text-tenant-primary hover:text-tenant-primary-deep"
             >
               &larr; Back to event page
             </Link>

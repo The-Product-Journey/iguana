@@ -72,21 +72,31 @@ export default async function ReunionLayout({
 
   // `data-theme="tenant"` opts this subtree out of the platform's
   // persimmon focus ring (set globally in app/globals.css). Tenant
-  // forms have their own red focus styles; we don't want a second
-  // persimmon outline stacked on top.
+  // forms have their own brand-red focus styles via Tailwind ring
+  // utilities resolving to --color-tenant-primary.
+  //
+  // The tenant brand color is injected here as `--color-tenant-primary`.
+  // The `tenant-primary` Tailwind token resolves to it, and CSS-derived
+  // shades (deep, darkest, tint, border-soft, on-dark) auto-update.
+  // Falls back to the platform default (PHHS red) when reunion.brandColor
+  // is NULL — preserves visual identity for reunions that never
+  // configured a brand color.
+  //
   // The tenant font stack is set via inline styles to override the
   // platform's --font-sans (Bricolage Grotesque) on the public reunion
   // site. We use the same Geist + system stack the site shipped with
   // pre-rebrand so it reads as a normal consumer site, not as platform
-  // chrome. Brand identity here is the PHHS red, not the type.
+  // chrome.
+  const tenantStyle: React.CSSProperties & Record<string, string> = {
+    fontFamily:
+      'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+  };
+  if (reunion.brandColor) {
+    tenantStyle["--color-tenant-primary"] = reunion.brandColor;
+  }
+
   return (
-    <div
-      data-theme="tenant"
-      style={{
-        fontFamily:
-          'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-      }}
-    >
+    <div data-theme="tenant" style={tenantStyle}>
       {showPreviewBanner && (
         <AdminPreviewBanner
           previewMode={previewState.previewMode!}

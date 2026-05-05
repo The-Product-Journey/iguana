@@ -133,7 +133,7 @@ export function RegistrationForm({
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
       {error && (
-        <div className="mb-6 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <div className="mb-6 rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">
           {error}
         </div>
       )}
@@ -145,7 +145,7 @@ export function RegistrationForm({
             key={s}
             className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
               step >= s
-                ? "bg-red-700 text-white"
+                ? "bg-tenant-primary text-white"
                 : "bg-gray-200 text-gray-500"
             }`}
           >
@@ -176,7 +176,7 @@ export function RegistrationForm({
                 required
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
               />
             </div>
             <div>
@@ -188,7 +188,7 @@ export function RegistrationForm({
                 required
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
               />
             </div>
           </div>
@@ -203,7 +203,7 @@ export function RegistrationForm({
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
             />
           </div>
 
@@ -216,7 +216,7 @@ export function RegistrationForm({
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
             />
           </div>
 
@@ -228,7 +228,7 @@ export function RegistrationForm({
               id="guestCount"
               value={guestCount}
               onChange={(e) => setGuestCount(parseInt(e.target.value))}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
             >
               {[1, 2, 3, 4, 5].map((n) => (
                 <option key={n} value={n}>
@@ -247,7 +247,7 @@ export function RegistrationForm({
               value={dietaryNotes}
               onChange={(e) => setDietaryNotes(e.target.value)}
               placeholder="e.g., vegetarian, gluten-free"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
             />
           </div>
 
@@ -261,13 +261,13 @@ export function RegistrationForm({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Share what you've been up to since '96!"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-red-700 px-4 py-3 text-lg font-semibold text-white shadow transition hover:bg-red-800"
+            className="w-full rounded-lg bg-tenant-primary px-4 py-3 text-lg font-semibold text-white shadow transition hover:bg-tenant-primary-deep"
           >
             Next — Choose Events
           </button>
@@ -286,7 +286,7 @@ export function RegistrationForm({
                 key={event.id}
                 className={`flex items-start gap-3 rounded-lg border p-4 transition cursor-pointer ${
                   selectedEvents.includes(event.id)
-                    ? "border-red-300 bg-red-50"
+                    ? "border-tenant-border-soft bg-tenant-tint"
                     : "border-gray-200 hover:bg-gray-50"
                 }`}
               >
@@ -294,7 +294,7 @@ export function RegistrationForm({
                   type="checkbox"
                   checked={selectedEvents.includes(event.id)}
                   onChange={() => toggleEvent(event.id)}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 accent-red-700 focus:ring-red-500"
+                  className="mt-1 h-4 w-4 rounded border-gray-300 accent-tenant-primary focus:ring-tenant-primary"
                 />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
@@ -304,7 +304,7 @@ export function RegistrationForm({
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                         event.type === "paid"
-                          ? "bg-red-100 text-red-700"
+                          ? "bg-tenant-tint-strong text-tenant-primary"
                           : "bg-green-100 text-green-700"
                       }`}
                     >
@@ -347,7 +347,7 @@ export function RegistrationForm({
                       type="radio"
                       checked={payNow}
                       onChange={() => setPayNow(true)}
-                      className="h-4 w-4 text-red-600 focus:ring-red-500"
+                      className="h-4 w-4 text-tenant-primary focus:ring-tenant-primary"
                     />
                     <div>
                       <span className="font-medium text-gray-900">
@@ -366,7 +366,7 @@ export function RegistrationForm({
                     type="radio"
                     checked={!payNow}
                     onChange={() => setPayNow(false)}
-                    className="h-4 w-4 text-red-600 focus:ring-red-500"
+                    className="h-4 w-4 text-tenant-primary focus:ring-tenant-primary"
                   />
                   <div>
                     <span className="font-medium text-gray-900">
@@ -378,11 +378,11 @@ export function RegistrationForm({
 
               {/* Fee coverage (only when paying now) */}
               {payNow && (
-                <div className="mt-4 rounded-lg border border-red-100 bg-red-50 p-4">
-                  <p className="mb-1 text-sm font-medium text-red-900">
+                <div className="mt-4 rounded-lg border border-tenant-border-soft bg-tenant-tint p-4">
+                  <p className="mb-1 text-sm font-medium text-tenant-darkest">
                     Help cover processing fees?
                   </p>
-                  <p className="mb-3 text-sm text-red-700">
+                  <p className="mb-3 text-sm text-tenant-primary">
                     Adding a little extra ensures 100% of your registration goes
                     toward the event.
                   </p>
@@ -394,8 +394,8 @@ export function RegistrationForm({
                         onClick={() => setFeePreset(preset.pct)}
                         className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
                           feePreset === preset.pct
-                            ? "bg-red-700 text-white"
-                            : "bg-white text-red-700 border border-red-200 hover:bg-red-50"
+                            ? "bg-tenant-primary text-white"
+                            : "bg-white text-tenant-primary border border-tenant-border-soft hover:bg-tenant-tint"
                         }`}
                       >
                         {preset.label}
@@ -419,7 +419,7 @@ export function RegistrationForm({
                         value={customDollars}
                         onChange={(e) => setCustomDollars(e.target.value)}
                         placeholder="0.00"
-                        className="w-full rounded-lg border border-red-200 py-2 pl-7 pr-3 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                        className="w-full rounded-lg border border-tenant-border-soft py-2 pl-7 pr-3 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                       />
                     </div>
                   )}
@@ -469,7 +469,7 @@ export function RegistrationForm({
               type="button"
               disabled={loading || selectedEvents.length === 0}
               onClick={handleSubmit}
-              className="flex-1 rounded-lg bg-red-700 px-4 py-3 text-lg font-semibold text-white shadow transition hover:bg-red-800 disabled:opacity-50"
+              className="flex-1 rounded-lg bg-tenant-primary px-4 py-3 text-lg font-semibold text-white shadow transition hover:bg-tenant-primary-deep disabled:opacity-50"
             >
               {loading
                 ? "Processing..."

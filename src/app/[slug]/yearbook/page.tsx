@@ -40,7 +40,7 @@ export default async function YearbookPage({
       <div className="mx-auto max-w-4xl px-6">
         <Link
           href={`/${slug}`}
-          className="mb-6 inline-block text-sm text-red-700 hover:text-red-800"
+          className="mb-6 inline-block text-sm text-tenant-primary hover:text-tenant-primary-deep"
         >
           &larr; Back to event
         </Link>
@@ -85,7 +85,7 @@ export default async function YearbookPage({
                     className="mb-4 h-32 w-32 rounded-full object-cover mx-auto"
                   />
                 ) : (
-                  <div className="mb-4 mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-red-100 text-3xl font-bold text-red-600">
+                  <div className="mb-4 mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-tenant-tint-strong text-3xl font-bold text-tenant-primary">
                     {firstName[0]}
                     {lastName[0]}
                   </div>

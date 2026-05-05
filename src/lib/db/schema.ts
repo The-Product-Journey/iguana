@@ -45,6 +45,13 @@ export const reunions = sqliteTable("reunions", {
   // public reunion site. Rendered via generateMetadata in [slug]/layout
   // when set; falls back to the platform's default favicon when NULL.
   faviconUrl: text("favicon_url"),
+  // Optional primary brand color for the public reunion site (hex,
+  // e.g. "#B91C1C"). The `tenant-primary` Tailwind token resolves to
+  // this value via an inline style on /[slug]/layout.tsx; secondary
+  // shades (deep, darkest, tint, border-soft, on-dark) are derived in
+  // CSS via color-mix(in oklch, ...). NULL falls back to the platform
+  // default red so existing reunions don't visually regress.
+  brandColor: text("brand_color"),
   createdAt: text("created_at")
     .notNull()
     .default(sql`(datetime('now'))`),

@@ -57,7 +57,7 @@ export function MemorialReviewClient({
         </p>
         <a
           href={`/${slug}/memorial`}
-          className="mt-4 inline-block text-red-700 hover:text-red-800"
+          className="mt-4 inline-block text-tenant-primary hover:text-tenant-primary-deep"
         >
           View memorials
         </a>
@@ -68,7 +68,7 @@ export function MemorialReviewClient({
   return (
     <div className="space-y-4">
       {error && (
-        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">
           {error}
         </div>
       )}
@@ -112,7 +112,7 @@ export function MemorialReviewClient({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Please describe what should be different..."
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       )}
@@ -122,7 +122,7 @@ export function MemorialReviewClient({
           type="button"
           disabled={loading || (action === "changes" && !notes.trim())}
           onClick={handleSubmit}
-          className="w-full rounded-lg bg-red-700 px-4 py-3 font-semibold text-white shadow transition hover:bg-red-800 disabled:opacity-50"
+          className="w-full rounded-lg bg-tenant-primary px-4 py-3 font-semibold text-white shadow transition hover:bg-tenant-primary-deep disabled:opacity-50"
         >
           {loading ? "Submitting..." : "Submit"}
         </button>

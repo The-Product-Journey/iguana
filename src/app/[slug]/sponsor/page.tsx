@@ -30,7 +30,7 @@ export default async function SponsorPage({
       <div className="mx-auto max-w-2xl px-6">
         <Link
           href={`/${slug}`}
-          className="mb-6 inline-block text-sm text-red-700 hover:text-red-800"
+          className="mb-6 inline-block text-sm text-tenant-primary hover:text-tenant-primary-deep"
         >
           &larr; Back to event
         </Link>
@@ -47,14 +47,14 @@ export default async function SponsorPage({
 
         {/* Tier explanation */}
         <div className="mb-8 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-xl border-2 border-red-200 bg-red-50 p-6">
-            <h3 className="mb-1 text-lg font-bold text-red-900">
+          <div className="rounded-xl border-2 border-tenant-border-soft bg-tenant-tint p-6">
+            <h3 className="mb-1 text-lg font-bold text-tenant-darkest">
               Trojan Sponsor
             </h3>
-            <p className="mb-2 text-sm font-medium text-red-700">
+            <p className="mb-2 text-sm font-medium text-tenant-primary">
               {formatCents(SPONSOR_TIER_THRESHOLD_CENTS)} and above
             </p>
-            <p className="text-sm text-red-800">
+            <p className="text-sm text-tenant-primary-deep">
               Recognized online and on signage at select reunion events. Helps
               offset event costs to keep ticket prices low for everyone.
             </p>
@@ -71,7 +71,7 @@ export default async function SponsorPage({
               project — giving back to Park Hill schools.{" "}
               <Link
                 href={`/${slug}/community-service`}
-                className="font-medium text-red-700 hover:text-red-800"
+                className="font-medium text-tenant-primary hover:text-tenant-primary-deep"
               >
                 Learn more &rarr;
               </Link>

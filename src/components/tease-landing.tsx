@@ -54,11 +54,11 @@ export function TeaseLanding({
   const adminModeHref = useAdminModeHref(reunion.slug);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-red-800 via-red-900 to-red-950 text-white">
+    <div className="relative min-h-screen bg-gradient-to-br from-tenant-primary-deep via-tenant-darkest to-tenant-darkest text-white">
       {!isAdmin && (
         <a
           href={adminModeHref}
-          className="absolute right-4 top-3 text-xs text-red-300 hover:text-white"
+          className="absolute right-4 top-3 text-xs text-tenant-on-dark hover:text-white"
         >
           Admin Mode
         </a>
@@ -75,19 +75,19 @@ export function TeaseLanding({
       )}
       <div className="mx-auto max-w-3xl px-6 py-20 text-center">
         {/* Header */}
-        <p className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-red-300">
+        <p className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-tenant-on-dark">
           Save the Date
         </p>
         <h1 className="mb-3 text-4xl font-bold tracking-tight sm:text-6xl">
           {reunion.name}
         </h1>
-        <p className="mb-2 text-2xl font-semibold text-red-200">
+        <p className="mb-2 text-2xl font-semibold text-tenant-on-dark">
           30 Year Reunion
         </p>
-        <p className="mb-10 text-lg text-red-200">August 28–29, 2026</p>
+        <p className="mb-10 text-lg text-tenant-on-dark">August 28–29, 2026</p>
 
         {reunion.description && (
-          <p className="mx-auto mb-12 max-w-xl text-lg leading-relaxed text-red-100">
+          <p className="mx-auto mb-12 max-w-xl text-lg leading-relaxed text-tenant-on-dark">
             {reunion.description}
           </p>
         )}
@@ -99,7 +99,7 @@ export function TeaseLanding({
               <div className="text-4xl font-bold tabular-nums sm:text-5xl">
                 {countdown[unit]}
               </div>
-              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-red-300">
+              <div className="mt-1 text-xs font-medium uppercase tracking-wider text-tenant-on-dark">
                 {unit}
               </div>
             </div>
@@ -110,7 +110,7 @@ export function TeaseLanding({
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <button
             onClick={() => setShowInterest(true)}
-            className="w-full rounded-full bg-white px-8 py-3 text-lg font-semibold text-red-800 shadow-lg transition hover:bg-red-50 hover:shadow-xl sm:w-auto"
+            className="w-full rounded-full bg-white px-8 py-3 text-lg font-semibold text-tenant-primary-deep shadow-lg transition hover:bg-tenant-tint hover:shadow-xl sm:w-auto"
           >
             I&apos;m Interested
           </button>
@@ -122,7 +122,7 @@ export function TeaseLanding({
           </a>
         </div>
 
-        <p className="mt-6 text-sm text-red-300">
+        <p className="mt-6 text-sm text-tenant-on-dark">
           Registration details coming soon — sign up to be first to know.
         </p>
       </div>

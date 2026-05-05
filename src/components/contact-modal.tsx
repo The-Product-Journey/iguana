@@ -81,7 +81,7 @@ export function ContactModal({
             </p>
             <button
               onClick={handleClose}
-              className="rounded-lg bg-red-700 px-6 py-2 font-medium text-white hover:bg-red-800"
+              className="rounded-lg bg-tenant-primary px-6 py-2 font-medium text-white hover:bg-tenant-primary-deep"
             >
               Close
             </button>
@@ -101,7 +101,7 @@ export function ContactModal({
             </div>
 
             {error && (
-              <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+              <div className="mb-4 rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">
                 {error}
               </div>
             )}
@@ -118,7 +118,7 @@ export function ContactModal({
                   id="contact-name"
                   name="name"
                   required
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 />
               </div>
 
@@ -134,7 +134,7 @@ export function ContactModal({
                   name="email"
                   type="email"
                   required
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 />
               </div>
 
@@ -148,7 +148,7 @@ export function ContactModal({
                 <select
                   id="contact-category"
                   name="category"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 >
                   {CATEGORIES.map((c) => (
                     <option key={c.value} value={c.value}>
@@ -170,14 +170,14 @@ export function ContactModal({
                   name="message"
                   required
                   rows={4}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-lg bg-red-700 px-4 py-2 font-medium text-white hover:bg-red-800 disabled:opacity-50"
+                className="w-full rounded-lg bg-tenant-primary px-4 py-2 font-medium text-white hover:bg-tenant-primary-deep disabled:opacity-50"
               >
                 {loading ? "Sending..." : "Send Message"}
               </button>

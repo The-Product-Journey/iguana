@@ -45,6 +45,26 @@
   --color-success: #2d7a5f;
   --color-warning: #d89535;
   --color-danger: #b23a2a;
+
+  /*
+   * Tenant brand tokens — apply only on the public reunion site
+   * (/[slug]/*). The primary value is overridden per-reunion via an
+   * inline `--color-tenant-primary` style on the [slug]/layout.tsx
+   * wrapping div. Secondary shades derive from primary via color-mix
+   * in OKLCH so a tenant who configures (say) dark teal gets sensible
+   * deep / darkest / tint / border-soft variants without configuring
+   * every shade themselves.
+   *
+   * Defaults reflect the historic PHHS Park Hill red so existing
+   * reunions render identically to before this feature shipped.
+   */
+  --color-tenant-primary: #b91c1c;
+  --color-tenant-primary-deep: color-mix(in oklch, var(--color-tenant-primary) 80%, black);
+  --color-tenant-darkest: color-mix(in oklch, var(--color-tenant-primary) 50%, black);
+  --color-tenant-tint: color-mix(in oklch, var(--color-tenant-primary) 8%, white);
+  --color-tenant-tint-strong: color-mix(in oklch, var(--color-tenant-primary) 18%, white);
+  --color-tenant-border-soft: color-mix(in oklch, var(--color-tenant-primary) 35%, white);
+  --color-tenant-on-dark: color-mix(in oklch, var(--color-tenant-primary) 30%, white);
 }
 
 @theme inline {
@@ -72,13 +92,13 @@
 }
 
 /*
- * Tenant pages drop the platform outline entirely. Form inputs and
- * buttons already carry their own red focus ring via Tailwind's
- * `focus:ring-*` utilities (box-shadow based), so layering an outline
- * on top would either paint blue (browser default) or stack as a
- * second red ring. `outline: none` defers focus styling to the
- * component's own classes — every interactive element on the
- * tenant pages should declare `focus:ring-*` or equivalent.
+ * Tenant pages drop the platform outline. Form inputs and buttons
+ * carry their own brand-colored focus ring via Tailwind's
+ * `focus:ring-*` utilities (box-shadow based, resolves to
+ * `--color-tenant-primary`). Layering an outline on top here would
+ * stack a second ring, so we leave focus styling to the component's
+ * own classes — every interactive element on tenant pages should
+ * declare `focus:ring-tenant-primary` or equivalent.
  */
 [data-theme="tenant"] :focus-visible {
   outline: none;

@@ -27,7 +27,7 @@ export default async function CommunityServicePage({
       <div className="mx-auto max-w-2xl px-6">
         <Link
           href={`/${slug}`}
-          className="mb-6 inline-block text-sm text-red-700 hover:text-red-800"
+          className="mb-6 inline-block text-sm text-tenant-primary hover:text-tenant-primary-deep"
         >
           &larr; Back to event
         </Link>
@@ -56,11 +56,11 @@ export default async function CommunityServicePage({
           </p>
         </div>
 
-        <div className="mb-8 rounded-xl border-2 border-red-200 bg-red-50 p-6">
-          <h2 className="mb-3 text-lg font-bold text-red-900">
+        <div className="mb-8 rounded-xl border-2 border-tenant-border-soft bg-tenant-tint p-6">
+          <h2 className="mb-3 text-lg font-bold text-tenant-darkest">
             Donate Items via Amazon Wish List
           </h2>
-          <p className="mb-4 text-sm text-red-800">
+          <p className="mb-4 text-sm text-tenant-primary-deep">
             Help fill the backpacks. Buy a few items off the list and Amazon
             ships them straight to us.
           </p>
@@ -69,12 +69,12 @@ export default async function CommunityServicePage({
               href={wishlistUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block rounded-full bg-red-700 px-6 py-2 text-sm font-semibold text-white shadow transition hover:bg-red-800"
+              className="inline-block rounded-full bg-tenant-primary px-6 py-2 text-sm font-semibold text-white shadow transition hover:bg-tenant-primary-deep"
             >
               Donate items via Amazon Wish List &rarr;
             </a>
           ) : (
-            <p className="rounded-md border border-red-200 bg-white px-3 py-2 text-sm text-red-700">
+            <p className="rounded-md border border-tenant-border-soft bg-white px-3 py-2 text-sm text-tenant-primary">
               Wish list coming soon — check back!
             </p>
           )}
@@ -95,7 +95,7 @@ export default async function CommunityServicePage({
           </p>
           <Link
             href={`/${slug}/sponsor`}
-            className="inline-block rounded-full bg-red-700 px-6 py-2 text-sm font-semibold text-white shadow transition hover:bg-red-800"
+            className="inline-block rounded-full bg-tenant-primary px-6 py-2 text-sm font-semibold text-white shadow transition hover:bg-tenant-primary-deep"
           >
             Become a Community Service Project Sponsor
           </Link>

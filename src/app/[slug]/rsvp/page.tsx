@@ -42,7 +42,7 @@ export default async function RsvpPage({
         <div className="mx-auto max-w-xl px-6">
           <Link
             href={`/${slug}`}
-            className="mb-6 inline-block text-sm text-red-700 hover:text-red-800"
+            className="mb-6 inline-block text-sm text-tenant-primary hover:text-tenant-primary-deep"
           >
             &larr; Back to event
           </Link>
@@ -71,7 +71,7 @@ export default async function RsvpPage({
       <div className="mx-auto max-w-xl px-6">
         <Link
           href={`/${slug}`}
-          className="mb-6 inline-block text-sm text-red-700 hover:text-red-800"
+          className="mb-6 inline-block text-sm text-tenant-primary hover:text-tenant-primary-deep"
         >
           &larr; Back to event
         </Link>

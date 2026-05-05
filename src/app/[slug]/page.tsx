@@ -67,23 +67,23 @@ export default async function ReunionPage({
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-red-700 to-red-900 text-white">
+      <div className="bg-gradient-to-br from-tenant-primary to-tenant-darkest text-white">
         <div className="mx-auto max-w-3xl px-6 py-24 text-center">
-          <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-red-200">
+          <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-tenant-on-dark">
             You&apos;re Invited
           </p>
           <h1 className="mb-2 text-4xl font-bold tracking-tight sm:text-5xl">
             {reunion.name}
           </h1>
-          <p className="mb-6 text-2xl font-semibold text-red-100">
+          <p className="mb-6 text-2xl font-semibold text-tenant-on-dark">
             30 Year Reunion
           </p>
-          <p className="mx-auto mb-10 max-w-xl text-lg text-red-100">
+          <p className="mx-auto mb-10 max-w-xl text-lg text-tenant-on-dark">
             {reunion.description}
           </p>
           <Link
             href={`/${slug}/rsvp`}
-            className="inline-block rounded-full bg-white px-8 py-3 text-lg font-semibold text-red-700 shadow-lg transition hover:bg-red-50 hover:shadow-xl"
+            className="inline-block rounded-full bg-white px-8 py-3 text-lg font-semibold text-tenant-primary shadow-lg transition hover:bg-tenant-tint hover:shadow-xl"
           >
             {isOpen ? "Register Now" : "Pre-Register"}
           </Link>
@@ -126,8 +126,8 @@ export default async function ReunionPage({
         <HelpSection reunionId={reunion.id} />
 
         {/* Community Service Project */}
-        <div className="mt-12 rounded-2xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-white p-8 shadow-sm">
-          <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-red-700">
+        <div className="mt-12 rounded-2xl border-2 border-tenant-border-soft bg-gradient-to-br from-tenant-tint to-white p-8 shadow-sm">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-tenant-primary">
             Community Service Project
           </p>
           <h3 className="mb-2 text-2xl font-bold text-gray-900">
@@ -139,7 +139,7 @@ export default async function ReunionPage({
           </p>
           <Link
             href={`/${slug}/community-service`}
-            className="inline-block text-sm font-semibold text-red-700 hover:text-red-800"
+            className="inline-block text-sm font-semibold text-tenant-primary hover:text-tenant-primary-deep"
           >
             Learn about 96 Backpacks &rarr;
           </Link>
@@ -148,7 +148,7 @@ export default async function ReunionPage({
         <div className="mt-12 text-center">
           <Link
             href={`/${slug}/rsvp`}
-            className="inline-block rounded-full bg-red-700 px-8 py-3 text-lg font-semibold text-white shadow transition hover:bg-red-800"
+            className="inline-block rounded-full bg-tenant-primary px-8 py-3 text-lg font-semibold text-white shadow transition hover:bg-tenant-primary-deep"
           >
             {isOpen
               ? "Register & Pay"

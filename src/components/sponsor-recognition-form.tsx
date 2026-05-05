@@ -145,7 +145,7 @@ export function SponsorRecognitionForm({
       </p>
 
       {error && (
-        <div className="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <div className="mb-3 rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">
           {error}
         </div>
       )}
@@ -156,7 +156,7 @@ export function SponsorRecognitionForm({
             type="checkbox"
             checked={isAnonymous}
             onChange={(e) => setIsAnonymous(e.target.checked)}
-            className="mt-1 h-4 w-4 rounded border-gray-300 accent-red-700 focus:ring-red-500"
+            className="mt-1 h-4 w-4 rounded border-gray-300 accent-tenant-primary focus:ring-tenant-primary"
           />
           <span>
             <span className="block text-sm font-medium text-gray-900">
@@ -181,7 +181,7 @@ export function SponsorRecognitionForm({
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder={initial.companyName || initial.contactName}
             disabled={isAnonymous}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
           <p className="mt-1 text-xs text-gray-500">
             Leave blank to use {initial.companyName ? `"${initial.companyName}"` : `"${initial.contactName}"`}
@@ -202,7 +202,7 @@ export function SponsorRecognitionForm({
             onChange={(e) => setWebsiteUrl(e.target.value)}
             placeholder="https://"
             disabled={isAnonymous}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
 
@@ -220,7 +220,7 @@ export function SponsorRecognitionForm({
             rows={2}
             disabled={isAnonymous}
             placeholder="A short note shown under your name"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
 
@@ -252,7 +252,7 @@ export function SponsorRecognitionForm({
                 accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
                 onChange={onLogoSelected}
                 disabled={isAnonymous}
-                className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-md file:border-0 file:bg-red-700 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-red-800 disabled:opacity-50"
+                className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-md file:border-0 file:bg-tenant-primary file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-tenant-primary-deep disabled:opacity-50"
               />
               <p className="mt-1 text-xs text-gray-500">
                 PNG, JPG, GIF, WebP, or SVG. Max 2MB.
@@ -326,7 +326,7 @@ export function SponsorRecognitionForm({
         <button
           type="submit"
           disabled={saving}
-          className="rounded-lg bg-red-700 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-red-800 disabled:opacity-50"
+          className="rounded-lg bg-tenant-primary px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-tenant-primary-deep disabled:opacity-50"
         >
           {saving ? "Saving…" : "Save preferences"}
         </button>

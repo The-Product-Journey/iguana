@@ -15,8 +15,8 @@ export function HelpSection({ reunionId }: { reunionId: string }) {
 
   return (
     <>
-      <div className="mt-12 rounded-xl border border-red-200 bg-red-50 p-8">
-        <h2 className="mb-4 text-center text-xl font-bold text-red-900">
+      <div className="mt-12 rounded-xl border border-tenant-border-soft bg-tenant-tint p-8">
+        <h2 className="mb-4 text-center text-xl font-bold text-tenant-darkest">
           We Need Your Help!
         </h2>
         <p className="mb-4 text-center text-gray-700">
@@ -32,7 +32,7 @@ export function HelpSection({ reunionId }: { reunionId: string }) {
         <div className="mt-6 text-center">
           <button
             onClick={() => setContactOpen(true)}
-            className="rounded-full border-2 border-red-700 px-6 py-2 font-semibold text-red-700 transition hover:bg-red-700 hover:text-white"
+            className="rounded-full border-2 border-tenant-primary px-6 py-2 font-semibold text-tenant-primary transition hover:bg-tenant-primary hover:text-white"
           >
             Contact the Committee
           </button>

@@ -57,7 +57,7 @@ export function MemorialForm({
         </p>
         <a
           href={`/${slug}/memorial`}
-          className="inline-block text-red-700 hover:text-red-800"
+          className="inline-block text-tenant-primary hover:text-tenant-primary-deep"
         >
           &larr; Back to memorials
         </a>
@@ -71,7 +71,7 @@ export function MemorialForm({
       className="space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-sm"
     >
       {error && (
-        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">
           {error}
         </div>
       )}
@@ -89,7 +89,7 @@ export function MemorialForm({
             id="deceasedFirstName"
             name="deceasedFirstName"
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
         <div>
@@ -100,7 +100,7 @@ export function MemorialForm({
             id="deceasedLastName"
             name="deceasedLastName"
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       </div>
@@ -114,7 +114,7 @@ export function MemorialForm({
             id="yearOfBirth"
             name="yearOfBirth"
             placeholder="e.g., 1978"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
         <div>
@@ -125,7 +125,7 @@ export function MemorialForm({
             id="yearOfDeath"
             name="yearOfDeath"
             placeholder="e.g., 2023"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       </div>
@@ -138,7 +138,7 @@ export function MemorialForm({
           type="file"
           accept="image/*"
           onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
-          className="w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-red-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-red-700 hover:file:bg-red-100"
+          className="w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-tenant-tint file:px-4 file:py-2 file:text-sm file:font-semibold file:text-tenant-primary hover:file:bg-tenant-tint-strong"
         />
       </div>
 
@@ -152,7 +152,7 @@ export function MemorialForm({
           required
           rows={5}
           placeholder="Share your memories and what this person meant to the class..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
@@ -174,7 +174,7 @@ export function MemorialForm({
             id="submitterName"
             name="submitterName"
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
         <div>
@@ -186,7 +186,7 @@ export function MemorialForm({
             name="submitterEmail"
             type="email"
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       </div>
@@ -200,7 +200,7 @@ export function MemorialForm({
             id="submitterPhone"
             name="submitterPhone"
             type="tel"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
         <div>
@@ -211,7 +211,7 @@ export function MemorialForm({
             id="submitterRelationship"
             name="submitterRelationship"
             placeholder="e.g., classmate, family member, friend"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       </div>
@@ -219,7 +219,7 @@ export function MemorialForm({
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-red-700 px-4 py-3 text-lg font-semibold text-white shadow transition hover:bg-red-800 disabled:opacity-50"
+        className="w-full rounded-lg bg-tenant-primary px-4 py-3 text-lg font-semibold text-white shadow transition hover:bg-tenant-primary-deep disabled:opacity-50"
       >
         {loading ? "Submitting..." : "Submit Memorial"}
       </button>

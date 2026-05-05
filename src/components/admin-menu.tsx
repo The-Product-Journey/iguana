@@ -90,7 +90,7 @@ export function AdminMenu({
 
   const triggerColor =
     variant === "dark"
-      ? "text-red-200 hover:text-white"
+      ? "text-tenant-on-dark hover:text-white"
       : "text-gray-600 hover:text-gray-900";
 
   return (
@@ -136,7 +136,7 @@ export function AdminMenu({
                   onClick={() => setPreview(m.value)}
                   className={`flex w-full items-center justify-between px-3 py-1.5 text-sm ${
                     active
-                      ? "bg-red-50 font-medium text-red-700"
+                      ? "bg-tenant-tint font-medium text-tenant-primary"
                       : "text-gray-700 hover:bg-gray-50"
                   } disabled:opacity-50`}
                 >

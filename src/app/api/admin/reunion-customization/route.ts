@@ -10,6 +10,7 @@ import { invalidateTenantDomainsCache } from "@/lib/tenant-domains";
 // hyphens (not starting/ending with hyphen), TLD ≥ 2 chars. No protocol,
 // no path, no port. Lowercased before validation.
 const HOSTNAME_RE = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/;
+const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
 
 /**
  * Save per-reunion site customization (vanity domain + favicon).
@@ -47,7 +48,11 @@ export async function POST(req: NextRequest) {
   const guard = await requireReunionAdmin(reunionId);
   if (guard instanceof NextResponse) return guard;
 
-  const updates: { customDomain?: string | null; faviconUrl?: string | null } = {};
+  const updates: {
+    customDomain?: string | null;
+    faviconUrl?: string | null;
+    brandColor?: string | null;
+  } = {};
 
   // customDomain — text field. Empty string or "null" sentinel clears it.
   if (formData.has("customDomain")) {
@@ -82,6 +87,22 @@ export async function POST(req: NextRequest) {
         );
       }
       updates.customDomain = raw;
+    }
+  }
+
+  // brandColor — hex value, "" or "null" clears (back to platform default).
+  // Always normalized to uppercase so the DB doesn't store mixed-case dupes.
+  if (formData.has("brandColor")) {
+    const raw = (formData.get("brandColor") as string).trim();
+    if (raw === "" || raw === "null") {
+      updates.brandColor = null;
+    } else if (!HEX_COLOR_RE.test(raw)) {
+      return NextResponse.json(
+        { error: "Invalid color. Use a 6-digit hex value like `#B91C1C`." },
+        { status: 400 }
+      );
+    } else {
+      updates.brandColor = raw.toUpperCase();
     }
   }
 

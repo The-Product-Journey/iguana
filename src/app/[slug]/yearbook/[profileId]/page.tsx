@@ -52,7 +52,7 @@ export default async function ProfileViewPage({
       <div className="mx-auto max-w-2xl px-6">
         <Link
           href={`/${slug}/yearbook`}
-          className="mb-6 inline-block text-sm text-red-700 hover:text-red-800"
+          className="mb-6 inline-block text-sm text-tenant-primary hover:text-tenant-primary-deep"
         >
           &larr; Back to yearbook
         </Link>
@@ -68,7 +68,7 @@ export default async function ProfileViewPage({
                 className="mx-auto mb-4 h-40 w-40 rounded-full object-cover"
               />
             ) : (
-              <div className="mx-auto mb-4 flex h-40 w-40 items-center justify-center rounded-full bg-red-100 text-5xl font-bold text-red-600">
+              <div className="mx-auto mb-4 flex h-40 w-40 items-center justify-center rounded-full bg-tenant-tint-strong text-5xl font-bold text-tenant-primary">
                 {rsvp.firstName[0]}
                 {rsvp.lastName[0]}
               </div>

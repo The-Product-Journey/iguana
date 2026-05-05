@@ -82,7 +82,7 @@ export function InlineInterestForm({
         </p>
         <a
           href={`/${slug}`}
-          className="inline-block text-red-700 hover:text-red-800"
+          className="inline-block text-tenant-primary hover:text-tenant-primary-deep"
         >
           &larr; Back to event page
         </a>
@@ -96,7 +96,7 @@ export function InlineInterestForm({
       className="space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-sm"
     >
       {error && (
-        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">
           {error}
         </div>
       )}
@@ -111,7 +111,7 @@ export function InlineInterestForm({
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
@@ -125,7 +125,7 @@ export function InlineInterestForm({
           value={maidenName}
           onChange={(e) => setMaidenName(e.target.value)}
           placeholder="So classmates can find you"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
@@ -140,7 +140,7 @@ export function InlineInterestForm({
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
@@ -178,9 +178,9 @@ export function InlineInterestForm({
                           role="radio"
                           aria-checked={active}
                           onClick={() => setResponse(event.id, opt.value)}
-                          className={`px-3 py-1 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                          className={`px-3 py-1 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-tenant-primary ${
                             active
-                              ? "bg-red-700 text-white"
+                              ? "bg-tenant-primary text-white"
                               : "bg-white text-gray-700 hover:bg-gray-50"
                           } ${opt.value !== "yes" ? "border-l border-gray-300" : ""}`}
                         >
@@ -199,7 +199,7 @@ export function InlineInterestForm({
       <button
         type="submit"
         disabled={loading || !formReady}
-        className="w-full rounded-lg bg-red-700 px-4 py-3 font-semibold text-white shadow transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-lg bg-tenant-primary px-4 py-3 font-semibold text-white shadow transition hover:bg-tenant-primary-deep disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Saving..." : "Submit"}
       </button>
