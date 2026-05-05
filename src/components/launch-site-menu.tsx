@@ -81,14 +81,14 @@ export function LaunchSiteMenu({
         }}
         aria-haspopup="menu"
         aria-expanded={open}
-        title="Open public site"
         aria-label={`Open ${reunionName} public site`}
         className={
           triggerClassName ??
-          "inline-flex h-6 w-6 items-center justify-center rounded text-ink-subtle transition hover:bg-bg-subtle hover:text-ink-muted"
+          "inline-flex items-center gap-1.5 rounded-lg border border-border-strong bg-white px-3 py-1.5 text-sm font-medium text-ink-muted transition hover:border-ink-muted hover:bg-bg-subtle hover:text-ink"
         }
       >
-        <LaunchIcon className={iconClassName} />
+        <span>Open site</span>
+        <LaunchIcon className={iconClassName ?? "h-3.5 w-3.5"} />
       </button>
 
       {open && (

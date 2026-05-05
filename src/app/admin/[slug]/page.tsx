@@ -23,6 +23,7 @@ import { SiteCustomization } from "@/components/site-customization";
 import { CollapsibleCard } from "@/components/collapsible-card";
 import { BackLink } from "@/components/back-link";
 import { TestTag } from "@/components/test-tag";
+import { EditableSiteName } from "@/components/editable-site-name";
 import { requireReunionAdminPage } from "@/lib/admin-auth";
 import { loadConnectAccount } from "@/lib/stripe";
 
@@ -165,15 +166,15 @@ export default async function AdminReunionPage({
     <div>
       <BackLink fallbackHref={`/${slug}`} />
 
-      <div className="mb-4 flex items-center gap-2">
-        <h2 className="text-2xl font-bold">{reunion.name}</h2>
-        {slug.endsWith("-test") && <TestTag size="md" />}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <EditableSiteName reunionId={reunion.id} initialName={reunion.name} />
+          {slug.endsWith("-test") && <TestTag size="md" />}
+        </div>
         <LaunchSiteMenu
           slug={slug}
           reunionName={reunion.name}
           customDomain={reunion.customDomain}
-          iconClassName="h-5 w-5"
-          triggerClassName="inline-flex h-7 w-7 items-center justify-center rounded text-ink-subtle transition hover:bg-bg-subtle hover:text-ink-muted"
         />
       </div>
 

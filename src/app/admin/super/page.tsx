@@ -43,9 +43,9 @@ export default async function SuperAdminPage() {
         {counts.map(({ reunion, adminCount }) => (
           <li
             key={reunion.id}
-            className="flex items-center justify-between rounded-xl border border-border-warm bg-white p-4 shadow-sm"
+            className="flex items-center justify-between gap-3 rounded-xl border border-border-warm bg-white p-4 shadow-sm"
           >
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <Link
                   href={`/admin/${reunion.slug}`}
@@ -54,20 +54,20 @@ export default async function SuperAdminPage() {
                   {reunion.name}
                 </Link>
                 {reunion.slug.endsWith("-test") && <TestTag />}
-                <LaunchSiteMenu
-                  slug={reunion.slug}
-                  reunionName={reunion.name}
-                  customDomain={reunion.customDomain}
-                  iconClassName="h-4 w-4"
-                  triggerClassName="inline-flex h-5 w-5 items-center justify-center text-ink-subtle hover:text-forest"
-                />
               </div>
               <div className="text-sm text-ink-muted">
                 {reunion.eventDate} · mode: {reunion.siteMode}
               </div>
             </div>
-            <div className="text-sm text-ink-muted">
-              {adminCount} {adminCount === 1 ? "admin" : "admins"}
+            <div className="flex shrink-0 items-center gap-3">
+              <span className="text-sm text-ink-muted">
+                {adminCount} {adminCount === 1 ? "admin" : "admins"}
+              </span>
+              <LaunchSiteMenu
+                slug={reunion.slug}
+                reunionName={reunion.name}
+                customDomain={reunion.customDomain}
+              />
             </div>
           </li>
         ))}

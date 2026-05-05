@@ -16,13 +16,14 @@ const FAVICON_MAX_SIZE = 1 * 1024 * 1024; // 1MB
 const FAVICON_MIN_DIM = 32;
 
 /**
- * Per-reunion site customization: vanity domain + favicon.
+ * Per-reunion site customization: vanity domain + favicon + brand color.
  *
- * Two independent forms in one card so admins can update either without
- * touching the other. Domain has live format validation; favicon does
+ * Independent forms in one card so admins can update each field without
+ * touching the others. Domain has live format validation; favicon does
  * client-side image validation (square + minimum 32×32 + format + size)
- * before uploading. Final upload + persistence go through
- * /api/admin/reunion-customization.
+ * before uploading. Final persistence goes through
+ * /api/admin/reunion-customization. Site name lives in its own
+ * inline-editable header on /admin/[slug] (see EditableSiteName).
  */
 export function SiteCustomization({
   reunionId,
