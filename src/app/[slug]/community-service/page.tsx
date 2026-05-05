@@ -56,7 +56,7 @@ export default async function CommunityServicePage({
           </p>
         </div>
 
-        <div className="mb-8 rounded-xl bg-tenant-primary p-6">
+        <div className="mb-8 rounded-xl bg-tenant-primary-soft p-6">
           <h2 className="mb-3 text-lg font-bold text-white">
             Donate Items via Amazon Wish List
           </h2>

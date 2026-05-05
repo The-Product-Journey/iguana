@@ -92,6 +92,7 @@
    * as a fallback stripe color).
    */
   --color-tenant-primary: #23549a;
+  --color-tenant-primary-soft: #3d68a8;
   --color-tenant-primary-deep: #1c437b;
   --color-tenant-darkest: #122a4d;
   --color-tenant-tint: #f4f6fa;
@@ -108,6 +109,7 @@
  * scope, picking up the tenant's inline override.
  */
 [data-theme="tenant"] {
+  --color-tenant-primary-soft: color-mix(in oklch, var(--color-tenant-primary) 85%, white);
   --color-tenant-primary-deep: color-mix(in oklch, var(--color-tenant-primary) 80%, black);
   --color-tenant-darkest: color-mix(in oklch, var(--color-tenant-primary) 50%, black);
   --color-tenant-tint: color-mix(in oklch, var(--color-tenant-primary) 5%, white);
