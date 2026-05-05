@@ -23,6 +23,7 @@ import { SiteCustomization } from "@/components/site-customization";
 import { CollapsibleCard } from "@/components/collapsible-card";
 import { BackLink } from "@/components/back-link";
 import { TestTag } from "@/components/test-tag";
+import { EditableSiteName } from "@/components/editable-site-name";
 import { requireReunionAdminPage } from "@/lib/admin-auth";
 import { loadConnectAccount } from "@/lib/stripe";
 
@@ -165,8 +166,8 @@ export default async function AdminReunionPage({
     <div>
       <BackLink fallbackHref={`/${slug}`} />
 
-      <div className="mb-4 flex items-center gap-2">
-        <h2 className="text-2xl font-bold">{reunion.name}</h2>
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <EditableSiteName reunionId={reunion.id} initialName={reunion.name} />
         {slug.endsWith("-test") && <TestTag size="md" />}
         <LaunchSiteMenu
           slug={slug}
@@ -212,7 +213,7 @@ export default async function AdminReunionPage({
 
       <CollapsibleCard
         title="Site Customization"
-        subtitle="Name, custom domain, favicon, and brand color for the public reunion page."
+        subtitle="Custom domain, favicon, and brand color for the public reunion page."
         defaultOpen={
           !reunion.customDomain ||
           !reunion.faviconUrl ||
@@ -221,7 +222,6 @@ export default async function AdminReunionPage({
       >
         <SiteCustomization
           reunionId={reunion.id}
-          initialName={reunion.name}
           initialCustomDomain={reunion.customDomain}
           initialFaviconUrl={reunion.faviconUrl}
           initialBrandColor={reunion.brandColor}

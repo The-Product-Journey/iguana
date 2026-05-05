@@ -16,23 +16,22 @@ const FAVICON_MAX_SIZE = 1 * 1024 * 1024; // 1MB
 const FAVICON_MIN_DIM = 32;
 
 /**
- * Per-reunion site customization: name + vanity domain + favicon + brand color.
+ * Per-reunion site customization: vanity domain + favicon + brand color.
  *
  * Independent forms in one card so admins can update each field without
  * touching the others. Domain has live format validation; favicon does
  * client-side image validation (square + minimum 32×32 + format + size)
  * before uploading. Final persistence goes through
- * /api/admin/reunion-customization.
+ * /api/admin/reunion-customization. Site name lives in its own
+ * inline-editable header on /admin/[slug] (see EditableSiteName).
  */
 export function SiteCustomization({
   reunionId,
-  initialName,
   initialCustomDomain,
   initialFaviconUrl,
   initialBrandColor,
 }: {
   reunionId: string;
-  initialName: string;
   initialCustomDomain: string | null;
   initialFaviconUrl: string | null;
   initialBrandColor: string | null;
@@ -41,8 +40,6 @@ export function SiteCustomization({
   // parent admin page. This component renders just the body content.
   return (
     <div className="space-y-6">
-      <NameSection reunionId={reunionId} initialValue={initialName} />
-      <div className="border-t border-border-warm" />
       <DomainSection
         reunionId={reunionId}
         initialValue={initialCustomDomain}
@@ -58,94 +55,6 @@ export function SiteCustomization({
         initialValue={initialBrandColor}
       />
     </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Site name
-// ---------------------------------------------------------------------------
-
-function NameSection({
-  reunionId,
-  initialValue,
-}: {
-  reunionId: string;
-  initialValue: string;
-}) {
-  const router = useRouter();
-  const [value, setValue] = useState(initialValue);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-
-  const trimmed = value.trim();
-  const formatValid = trimmed.length >= 2 && trimmed.length <= 100;
-  const dirty = trimmed !== initialValue;
-
-  async function save(e: React.FormEvent) {
-    e.preventDefault();
-    if (!formatValid || !dirty || busy) return;
-    setBusy(true);
-    setError(null);
-    setSuccess(false);
-    try {
-      const fd = new FormData();
-      fd.set("reunionId", reunionId);
-      fd.set("name", trimmed);
-      const res = await fetch("/api/admin/reunion-customization", {
-        method: "POST",
-        body: fd,
-      });
-      const j = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(j.error || `Failed (${res.status})`);
-      } else {
-        setSuccess(true);
-        router.refresh();
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <form onSubmit={save}>
-      <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-ink-subtle">
-        Site Name
-      </h3>
-      <p className="mb-3 text-xs text-ink-muted">
-        Shown in the page heading, browser title, and emails. URL slug
-        does not change.
-      </p>
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          maxLength={100}
-          disabled={busy}
-          className="flex-1 rounded-lg border border-border-strong px-3 py-2 text-sm"
-        />
-        <button
-          type="submit"
-          disabled={busy || !formatValid || !dirty}
-          className="rounded-lg bg-forest px-4 py-2 text-sm font-medium text-white transition hover:bg-forest-deep disabled:opacity-50"
-        >
-          {busy ? "Saving…" : "Save name"}
-        </button>
-      </div>
-      {!formatValid && trimmed !== "" && (
-        <p className="mt-2 text-xs text-danger">
-          Name must be 2–100 characters.
-        </p>
-      )}
-      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
-      {success && (
-        <p className="mt-2 text-sm text-success">Name updated.</p>
-      )}
-    </form>
   );
 }
 
