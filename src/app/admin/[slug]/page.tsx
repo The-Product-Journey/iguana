@@ -20,6 +20,7 @@ import { AdminTabs } from "./admin-tabs";
 import { ConnectStatus } from "@/components/connect-status";
 import { LaunchSiteMenu } from "@/components/launch-site-menu";
 import { SiteCustomization } from "@/components/site-customization";
+import { CollapsibleCard } from "@/components/collapsible-card";
 import { requireReunionAdminPage } from "@/lib/admin-auth";
 import { loadConnectAccount } from "@/lib/stripe";
 
@@ -188,21 +189,44 @@ export default async function AdminReunionPage({
         initialMode={reunion.siteMode}
       />
 
-      <SiteCustomization
-        reunionId={reunion.id}
-        initialCustomDomain={reunion.customDomain}
-        initialFaviconUrl={reunion.faviconUrl}
-      />
+      {/*
+        Stripe Connect ranks above Site Customization because Connect is
+        what blocks the reunion from taking real money — admin should see
+        it first. When not configured, CollapsibleCard renders it in a
+        warning style and refuses to collapse.
+      */}
+      <CollapsibleCard
+        title="Stripe Connect — Payouts"
+        subtitle={
+          !connect?.chargesEnabled
+            ? "Set up payouts before the reunion can accept payments."
+            : undefined
+        }
+        emphasis={!connect?.chargesEnabled ? "warning" : "default"}
+        defaultOpen={false}
+      >
+        <ConnectStatus
+          reunionId={reunion.id}
+          slug={slug}
+          connectedAccountId={connect?.accountId ?? null}
+          initialHasAccount={!!connect}
+          initialOnboardingComplete={!!connect?.detailsSubmitted}
+          initialChargesEnabled={!!connect?.chargesEnabled}
+          initialPayoutsEnabled={!!connect?.payoutsEnabled}
+        />
+      </CollapsibleCard>
 
-      <ConnectStatus
-        reunionId={reunion.id}
-        slug={slug}
-        connectedAccountId={connect?.accountId ?? null}
-        initialHasAccount={!!connect}
-        initialOnboardingComplete={!!connect?.detailsSubmitted}
-        initialChargesEnabled={!!connect?.chargesEnabled}
-        initialPayoutsEnabled={!!connect?.payoutsEnabled}
-      />
+      <CollapsibleCard
+        title="Site Customization"
+        subtitle="Custom domain and favicon for the public reunion page."
+        defaultOpen={!reunion.customDomain || !reunion.faviconUrl}
+      >
+        <SiteCustomization
+          reunionId={reunion.id}
+          initialCustomDomain={reunion.customDomain}
+          initialFaviconUrl={reunion.faviconUrl}
+        />
+      </CollapsibleCard>
 
       {/* Summary stats */}
       <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-5">

@@ -211,13 +211,13 @@ export function ConnectStatus({
     }
   }
 
+  // Outer card chrome (title, border, padding) is provided by the
+  // CollapsibleCard wrapper in the parent admin page. This component
+  // renders just the body content for whichever state we're in.
   return (
-    <div className="mb-8 rounded-lg border border-border-warm bg-white p-4 shadow-sm">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-ink-muted">
-          Stripe Connect — Payouts
-        </h3>
-        {state !== "not_connected" && state !== "loading" && (
+    <div>
+      {state !== "not_connected" && state !== "loading" && (
+        <div className="mb-3 flex justify-end">
           <button
             onClick={handleManualRefresh}
             disabled={loading}
@@ -226,8 +226,8 @@ export function ConnectStatus({
           >
             {loading ? "Refreshing…" : "Refresh status"}
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {error && (
         <div className="mb-3 rounded-lg bg-cream p-2 text-sm text-forest">

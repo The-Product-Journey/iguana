@@ -33,28 +33,19 @@ export function SiteCustomization({
   initialCustomDomain: string | null;
   initialFaviconUrl: string | null;
 }) {
+  // Outer card chrome is provided by the CollapsibleCard wrapper in the
+  // parent admin page. This component renders just the body content.
   return (
-    <div className="mb-8 rounded-lg border border-border-warm bg-white shadow-sm">
-      <div className="border-b border-border-warm px-5 py-4">
-        <h3 className="text-lg font-semibold text-ink">
-          Site Customization
-        </h3>
-        <p className="mt-1 text-sm text-ink-subtle">
-          Configure your reunion&apos;s public-facing branding.
-        </p>
-      </div>
-
-      <div className="space-y-6 p-5">
-        <DomainSection
-          reunionId={reunionId}
-          initialValue={initialCustomDomain}
-        />
-        <div className="border-t border-border-warm" />
-        <FaviconSection
-          reunionId={reunionId}
-          initialUrl={initialFaviconUrl}
-        />
-      </div>
+    <div className="space-y-6">
+      <DomainSection
+        reunionId={reunionId}
+        initialValue={initialCustomDomain}
+      />
+      <div className="border-t border-border-warm" />
+      <FaviconSection
+        reunionId={reunionId}
+        initialUrl={initialFaviconUrl}
+      />
     </div>
   );
 }
