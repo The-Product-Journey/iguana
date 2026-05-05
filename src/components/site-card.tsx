@@ -8,7 +8,9 @@ import type { Reunion } from "@/lib/db/schema";
  *
  * The top color stripe uses the reunion's configured brand color so each
  * card carries a small visual cue of the tenant's identity. Without a
- * brand color set, falls back to the platform default tenant token.
+ * brand color set, falls back to brand cream — making the act of picking
+ * a brand color feel like a deliberate, visible product choice rather
+ * than just swapping one default for another.
  *
  * Multiple clickable areas:
  * - The displayed URLs (custom domain when set, plus the platform path)
@@ -26,9 +28,9 @@ export function SiteCard({ site }: { site: Reunion }) {
   const isTest = site.slug.endsWith("-test");
 
   // The brand color stripe at the top. Inline style so each card uses
-  // its own reunion's brand color (rather than a single shared CSS var).
-  // Fallback to the platform default tenant token if brandColor is NULL.
-  const stripeColor = site.brandColor ?? "var(--color-tenant-primary)";
+  // its own reunion's brand color. Cream when the admin hasn't picked a
+  // brand color yet — the stripe lights up the moment they configure one.
+  const stripeColor = site.brandColor ?? "var(--color-cream)";
 
   return (
     <div className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-xl border border-border-warm bg-white transition-all hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md">

@@ -45,9 +45,7 @@ export default async function AdminIndexPage() {
 
   return (
     <div>
-      <h2 className="mb-8 font-serif text-3xl font-light italic text-ink">
-        Choose a reunion
-      </h2>
+      <h2 className="mb-8 text-3xl font-semibold text-ink">Choose a reunion</h2>
       {myReunions.length === 0 ? (
         <p className="text-ink-muted">No reunions assigned yet.</p>
       ) : (

@@ -11,9 +11,10 @@
  * `text-forest-deep`, etc. instead of arbitrary `bg-[var(...)]` classes.
  * Fonts are loaded via next/font in src/app/layout.tsx:
  *   - --font-sans (Bricolage Grotesque) — primary UI typeface
- *   - --font-serif (Fraunces) — italic light, used at moments of warmth
- *     (page headings, empty states). Caveat is logo-only and lives
- *     inside the brand asset PNGs in /public/brand/.
+ *   - --font-serif (Fraunces) — italic light, used sparingly for
+ *     marketing-voice warmth (empty states only — NOT page headings;
+ *     headings are Bricolage Grotesque semibold). Caveat is logo-only
+ *     and lives baked into the wordmark/name-tag SVGs themselves.
  */
 
 @theme {

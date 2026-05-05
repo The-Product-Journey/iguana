@@ -26,9 +26,7 @@ export default async function SuperAdminPage() {
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
-        <h2 className="font-serif text-3xl font-light italic text-ink">
-          Super Admin
-        </h2>
+        <h2 className="text-3xl font-semibold text-ink">Super Admin</h2>
         <Link
           href="/admin/super/admins"
           className="rounded-lg bg-forest px-4 py-2 text-sm font-medium text-on-forest transition hover:bg-forest-deep"

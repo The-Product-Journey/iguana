@@ -4,6 +4,7 @@ import { eq, asc } from "drizzle-orm";
 import { SiteCard } from "@/components/site-card";
 import { CreateSiteCard } from "@/components/create-site-card";
 import { Wordmark } from "@/components/wordmark";
+import { EmptyState } from "@/components/empty-state";
 
 export const dynamic = "force-dynamic";
 
@@ -36,9 +37,15 @@ export default async function Home() {
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-12 sm:px-12">
-        <h1 className="mb-10 font-serif text-4xl font-light italic text-ink">
-          Sites
-        </h1>
+        <h1 className="mb-10 text-3xl font-semibold text-ink">Sites</h1>
+
+        {sites.length === 0 && (
+          <EmptyState
+            intro="Glad you made it."
+            body="Let's set up your first site."
+            className="mb-6"
+          />
+        )}
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <CreateSiteCard />

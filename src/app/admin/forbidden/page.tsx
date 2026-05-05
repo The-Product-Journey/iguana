@@ -5,9 +5,7 @@ export default function AdminForbiddenPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-bg-subtle px-6 py-12">
       <div className="w-full max-w-md rounded-xl border border-border-warm bg-white p-8 shadow-sm">
-        <h1 className="font-serif text-2xl font-light italic text-ink">
-          Not authorized
-        </h1>
+        <h1 className="text-2xl font-semibold text-ink">Not authorized</h1>
         <p className="mt-3 text-sm text-ink-muted">
           You&apos;re signed in, but this email isn&apos;t on the admin
           allowlist for any reunion. If you think this is a mistake, ask
