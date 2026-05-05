@@ -99,7 +99,7 @@ export function SiteModeToggle({
             >
               {m.label}
               {isBlocked && (
-                <span className="ml-1.5 text-warning" aria-hidden="true">
+                <span className="ml-1.5 text-danger" aria-hidden="true">
                   ⚠
                 </span>
               )}
@@ -109,9 +109,9 @@ export function SiteModeToggle({
       </div>
       <p className="mt-3 text-sm text-ink-subtle">{activeDescription}</p>
       {!payoutsReady && (
-        <div className="mt-4 flex items-start gap-2 rounded-lg border border-l-4 border-border-warm border-l-warning bg-bg-subtle px-3 py-2.5 text-sm">
+        <div className="mt-4 flex items-start gap-2 rounded-lg border border-l-4 border-danger/30 border-l-danger bg-danger/10 px-3 py-2.5 text-sm">
           <span
-            className="mt-0.5 shrink-0 text-warning"
+            className="mt-0.5 shrink-0 text-danger"
             aria-hidden="true"
           >
             ⚠
