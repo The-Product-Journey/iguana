@@ -1,5 +1,5 @@
-import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { UserMenu } from "@/components/user-menu";
 
 export default function AdminForbiddenPage() {
   return (
@@ -14,7 +14,7 @@ export default function AdminForbiddenPage() {
           account.
         </p>
         <div className="mt-6 flex items-center justify-between">
-          <UserButton />
+          <UserMenu isSuper={false} />
           <Link
             href="/admin"
             className="text-sm font-medium text-forest hover:text-forest-deep"
