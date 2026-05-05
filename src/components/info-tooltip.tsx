@@ -4,14 +4,17 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /**
  * Small "i" info button that reveals a popover with reference content.
- * Hover to peek; click to pin (so the user can mouse into the popover
- * and copy text from inside).
+ *
+ * UX contract:
+ *   - Hover (or focus) the trigger → peek the popover
+ *   - Click the trigger → pin the popover open. Stays open on blur,
+ *     window switch, mouse leave — until the user explicitly closes it
+ *     (click trigger again or click the × inside the popover).
+ *   - Mouse over the popover itself keeps it open even when not pinned,
+ *     so users can move into it to copy text.
  *
  * The popover auto-flips above the trigger when there isn't enough
  * room below — measured against the viewport on hover/pin.
- *
- * Sits well in CollapsibleCard's `headerExtra` slot or anywhere a
- * disclosure-style "for reference" affordance is useful.
  */
 export function InfoTooltip({
   children,
@@ -45,6 +48,11 @@ export function InfoTooltip({
     }
   }, [visible]);
 
+  function close() {
+    setOpen(false);
+    setPinned(false);
+  }
+
   return (
     <span className="relative inline-block">
       <button
@@ -55,13 +63,10 @@ export function InfoTooltip({
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         onFocus={() => setOpen(true)}
-        onBlur={() => {
-          setOpen(false);
-          setPinned(false);
-        }}
+        onBlur={() => setOpen(false)}
         onClick={(e) => {
-          // Pin so the user can mouse INTO the popover and select text
-          // without it disappearing. Click again to unpin.
+          // Pin so the popover survives hover-out, blur, and window
+          // switches. Click again to unpin.
           e.preventDefault();
           setPinned((p) => !p);
         }}
@@ -72,12 +77,22 @@ export function InfoTooltip({
       {visible && (
         <div
           role="tooltip"
-          className={`absolute z-30 w-72 rounded-md border border-border-warm bg-white p-3 text-xs text-ink-muted shadow-lg ${alignClass} ${
+          className={`absolute z-30 w-72 rounded-md border border-border-warm bg-white p-3 pr-7 text-xs text-ink-muted shadow-lg ${alignClass} ${
             placement === "top" ? "bottom-full mb-2" : "top-full mt-2"
           }`}
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
         >
+          {pinned && (
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={close}
+              className="absolute right-1 top-1 inline-flex h-5 w-5 items-center justify-center rounded text-sm leading-none text-ink-subtle hover:bg-bg-subtle hover:text-ink"
+            >
+              ×
+            </button>
+          )}
           {children}
         </div>
       )}

@@ -26,7 +26,7 @@ import { BackLink } from "@/components/back-link";
 import { TestTag } from "@/components/test-tag";
 import { EditableSiteName } from "@/components/editable-site-name";
 import { requireReunionAdminPage } from "@/lib/admin-auth";
-import { loadConnectAccount } from "@/lib/stripe";
+import { loadConnectAccount, getConnectAccountName } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
 
@@ -107,6 +107,14 @@ export default async function AdminReunionPage({
       .orderBy(events.sortOrder),
     loadConnectAccount(reunion.id),
   ]);
+
+  // Live-resolve the connected account's display name from Stripe so
+  // admins can read it instead of correlating account IDs by hand.
+  // Best-effort: a failure here just renders "name unavailable" in
+  // the info tooltip and doesn't break the page.
+  const connectAccountName = connect?.accountId
+    ? await getConnectAccountName(connect.accountId)
+    : null;
 
   // Build cross-indexed interest data so both tabs can drill in:
   //   - Interests tab: click an interest signup's count → list of events
@@ -230,8 +238,18 @@ export default async function AdminReunionPage({
               <p className="break-all font-mono text-ink">
                 {connect.accountId}
               </p>
+              <p className="mt-2 text-[10px] font-semibold uppercase tracking-wider text-ink-subtle">
+                Account name
+              </p>
+              <p className="break-words text-ink">
+                {connectAccountName ?? (
+                  <span className="text-ink-subtle">
+                    Name unavailable — couldn&apos;t reach Stripe.
+                  </span>
+                )}
+              </p>
               <p className="mt-2 text-ink-muted">
-                For reference — use this ID to correlate this reunion with
+                For reference — use this to correlate this reunion with
                 records in the Stripe dashboard, support tickets, or
                 webhook logs.
               </p>
