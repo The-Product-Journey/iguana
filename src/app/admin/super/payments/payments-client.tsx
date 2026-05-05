@@ -224,18 +224,23 @@ function ConnectedAccountsSection({
   const [pending, setPending] = useState<PendingAction>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // True after a Stripe-then-db attempt was rejected by Stripe, so the
+  // dialog can offer an explicit "Clear local row anyway" step.
+  const [dbOnlyOffered, setDbOnlyOffered] = useState(false);
   const [password, setPassword] = useState("");
 
   function open(mode: DisconnectMode, row: AccountRow) {
     setPending({ kind: mode, row });
     setPassword("");
     setError(null);
+    setDbOnlyOffered(false);
   }
 
   function close() {
     setPending(null);
     setPassword("");
     setError(null);
+    setDbOnlyOffered(false);
     setBusy(false);
   }
 
@@ -248,10 +253,20 @@ function ConnectedAccountsSection({
         pending.kind === "stripe"
           ? "/api/admin/connect/disconnect"
           : "/api/admin/connect/force-delete";
+      // For force-delete: first attempt always tries Stripe. If Stripe
+      // rejected on the previous click, the dialog is now in
+      // "dbOnlyOffered" state and this click is the explicit override.
       const body =
         pending.kind === "stripe"
-          ? { reunionId: pending.row.reunionId, ...(passwordRequired ? { password } : {}) }
-          : { id: pending.row.id, ...(passwordRequired ? { password } : {}) };
+          ? {
+              reunionId: pending.row.reunionId,
+              ...(passwordRequired ? { password } : {}),
+            }
+          : {
+              id: pending.row.id,
+              attempt: dbOnlyOffered ? "db-only" : "stripe-then-db",
+              ...(passwordRequired ? { password } : {}),
+            };
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -260,6 +275,16 @@ function ConnectedAccountsSection({
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data.error || `Failed (${res.status})`);
+        // If the server says "can force db-only", flip the dialog
+        // into the second-step confirmation. Don't dismiss — the
+        // operator decides whether to proceed.
+        if (
+          pending.kind === "force" &&
+          !dbOnlyOffered &&
+          data.canForceDbOnly
+        ) {
+          setDbOnlyOffered(true);
+        }
         setBusy(false);
         return;
       }
@@ -384,6 +409,7 @@ function ConnectedAccountsSection({
                           type="button"
                           onClick={() => open("force", a)}
                           disabled={busy}
+                          title="Try Stripe's Delete API; if Stripe rejects, optionally clear our local row anyway"
                           className="rounded border border-danger px-2 py-0.5 text-xs font-medium text-danger transition hover:bg-danger/10 disabled:opacity-50"
                         >
                           Force delete
@@ -412,7 +438,9 @@ function ConnectedAccountsSection({
             <h2 className="mb-2 text-lg font-semibold text-ink">
               {pending.kind === "stripe"
                 ? "Disconnect Stripe?"
-                : "Force delete (DB only)?"}
+                : dbOnlyOffered
+                  ? "Clear our local row anyway?"
+                  : "Force delete?"}
             </h2>
             <p className="mb-4 text-sm text-ink-muted">
               {pending.kind === "stripe" ? (
@@ -422,13 +450,24 @@ function ConnectedAccountsSection({
                   and clears the local mapping. Stripe rejects deletion if there&apos;s
                   recent activity or a live balance — that error is surfaced here.
                 </>
+              ) : dbOnlyOffered ? (
+                <>
+                  Stripe wouldn&apos;t accept the delete. You can still
+                  remove the local row so this reunion is decoupled from
+                  the connected account. The Stripe-side account on{" "}
+                  <span className="font-mono text-xs">{pending.row.accountId}</span>{" "}
+                  will <strong>remain</strong> — clean up via the Stripe
+                  dashboard or support if you want it fully gone.
+                </>
               ) : (
                 <>
-                  Removes the local row only. Stripe is{" "}
-                  <strong>not</strong> notified — the connected account on
-                  Stripe&apos;s side stays intact. Use this when Stripe&apos;s
-                  delete is stuck and you need to decouple our DB from a
-                  ghosted account. The Stripe-side cleanup is your problem.
+                  Tries Stripe&apos;s Delete API on{" "}
+                  <span className="font-mono text-xs">{pending.row.accountId}</span>.
+                  If Stripe accepts, both Stripe and our local row are
+                  removed. If Stripe rejects (active balance, disputes,
+                  etc.), nothing is removed — you&apos;ll be asked
+                  whether to clear our local row anyway as a separate
+                  step.
                 </>
               )}
             </p>
@@ -484,10 +523,14 @@ function ConnectedAccountsSection({
                 {busy
                   ? pending.kind === "stripe"
                     ? "Disconnecting…"
-                    : "Force deleting…"
+                    : dbOnlyOffered
+                      ? "Clearing local row…"
+                      : "Trying Stripe delete…"
                   : pending.kind === "stripe"
                     ? "Disconnect"
-                    : "Force delete"}
+                    : dbOnlyOffered
+                      ? "Clear local row"
+                      : "Try Stripe delete"}
               </button>
             </div>
           </div>
