@@ -91,7 +91,7 @@ export function PreRegisterForm({
       className="space-y-6 rounded-xl border border-border-warm bg-white p-8 shadow-sm"
     >
       {error && (
-        <div className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
+        <div className="rounded-lg bg-site-danger-tint p-3 text-sm text-site-danger">
           {error}
         </div>
       )}

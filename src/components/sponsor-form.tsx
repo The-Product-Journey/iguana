@@ -75,7 +75,7 @@ export function SponsorForm({
       className="space-y-6 rounded-xl border border-border-warm bg-white p-8 shadow-sm"
     >
       {(error || belowMinimum) && (
-        <div className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
+        <div className="rounded-lg bg-site-danger-tint p-3 text-sm text-site-danger">
           {error || "Minimum sponsorship is $10.00"}
         </div>
       )}
@@ -236,7 +236,7 @@ export function SponsorForm({
         />
       </div>
 
-      <div className="rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-sm text-ink">
+      <div className="rounded-md border border-site-warning/30 bg-site-warning-tint px-3 py-2 text-sm text-site-warning">
         {REFUND_POLICY_TEXT}
       </div>
 

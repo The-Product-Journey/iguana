@@ -133,7 +133,7 @@ export function RegistrationForm({
   return (
     <div className="rounded-xl border border-border-warm bg-white p-8 shadow-sm">
       {error && (
-        <div className="mb-6 rounded-lg bg-danger/10 p-3 text-sm text-danger">
+        <div className="mb-6 rounded-lg bg-site-danger-tint p-3 text-sm text-site-danger">
           {error}
         </div>
       )}
@@ -305,7 +305,7 @@ export function RegistrationForm({
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                         event.type === "paid"
                           ? "bg-tenant-tint-strong text-tenant-primary"
-                          : "bg-success/10 text-success"
+                          : "bg-site-success-tint text-site-success"
                       }`}
                     >
                       {event.type === "paid"
@@ -335,7 +335,7 @@ export function RegistrationForm({
               </h3>
 
               {!chargesEnabled && (
-                <div className="mb-3 rounded-lg bg-warning/10 border border-warning/30 p-3 text-sm text-ink">
+                <div className="mb-3 rounded-lg bg-site-warning-tint border border-site-warning/30 p-3 text-sm text-site-warning">
                   Online payment will be available soon. You can register now and pay at the door.
                 </div>
               )}
@@ -354,7 +354,7 @@ export function RegistrationForm({
                         Pay now — {formatCents(unitPrice)}/person
                       </span>
                       {isEarlyBird && (
-                        <span className="ml-2 rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success">
+                        <span className="ml-2 rounded-full bg-site-success-tint px-2 py-0.5 text-xs font-medium text-site-success">
                           Early bird saves {formatCents(standardPrice - unitPrice)}
                         </span>
                       )}
@@ -452,7 +452,7 @@ export function RegistrationForm({
           )}
 
           {hasPaidEvent && payNow && chargesEnabled && (
-            <div className="rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-sm text-ink">
+            <div className="rounded-md border border-site-warning/30 bg-site-warning-tint px-3 py-2 text-sm text-site-warning">
               {REFUND_POLICY_TEXT}
             </div>
           )}

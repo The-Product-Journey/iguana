@@ -331,7 +331,7 @@ export function SponsorRecognitionForm({
           {saving ? "Saving…" : "Save preferences"}
         </button>
         {savedAt && !saving && (
-          <span className="text-xs text-success">Saved ✓</span>
+          <span className="text-xs text-site-success">Saved ✓</span>
         )}
       </div>
     </form>

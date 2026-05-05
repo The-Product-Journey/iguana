@@ -79,7 +79,7 @@ export default async function SponsorPage({
           </div>
         </div>
 
-        <div className="mb-6 rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-ink">
+        <div className="mb-6 rounded-lg border border-site-warning/30 bg-site-warning-tint p-4 text-sm text-site-warning">
           <strong>Note:</strong> This is not a tax-deductible donation. Sponsor
           contributions are sent directly to the reunion organizers via
           Stripe. You will receive a receipt from Stripe for your records.
@@ -88,11 +88,11 @@ export default async function SponsorPage({
         {canTakePayments ? (
           <SponsorForm reunionId={reunion.id} slug={slug} />
         ) : (
-          <div className="rounded-xl border border-warning/30 bg-warning/10 p-8 text-center">
-            <p className="text-lg font-semibold text-ink">
+          <div className="rounded-xl border border-site-warning/30 bg-site-warning-tint p-8 text-center">
+            <p className="text-lg font-semibold text-site-warning">
               Sponsorships coming soon
             </p>
-            <p className="mt-2 text-sm text-ink-muted">
+            <p className="mt-2 text-sm text-site-warning">
               Online payments are being set up. Check back shortly to submit your sponsorship.
             </p>
           </div>

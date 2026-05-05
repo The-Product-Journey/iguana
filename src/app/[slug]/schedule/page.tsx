@@ -76,7 +76,7 @@ export default async function SchedulePage({
         </div>
 
         {detailsFinalizing && (
-          <div className="mb-8 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-ink">
+          <div className="mb-8 rounded-lg border border-site-warning/30 bg-site-warning-tint px-4 py-3 text-sm text-site-warning">
             Details for these events are still being finalized — check back as
             we lock in the schedule.
           </div>
@@ -120,7 +120,7 @@ export default async function SchedulePage({
                         className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
                           event.type === "paid"
                             ? "bg-tenant-tint-strong text-tenant-primary"
-                            : "bg-success/10 text-success"
+                            : "bg-site-success-tint text-site-success"
                         }`}
                       >
                         {event.type === "paid"

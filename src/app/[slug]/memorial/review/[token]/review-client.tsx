@@ -79,7 +79,7 @@ export function MemorialReviewClient({
           onClick={() => setAction("approved")}
           className={`flex-1 rounded-lg border-2 px-4 py-3 font-semibold transition ${
             action === "approved"
-              ? "border-success bg-success/10 text-success"
+              ? "border-site-success bg-site-success-tint text-site-success"
               : "border-border-warm text-ink-muted hover:bg-tenant-tint"
           }`}
         >
@@ -90,7 +90,7 @@ export function MemorialReviewClient({
           onClick={() => setAction("changes")}
           className={`flex-1 rounded-lg border-2 px-4 py-3 font-semibold transition ${
             action === "changes"
-              ? "border-warning bg-warning/10 text-warning"
+              ? "border-site-warning bg-site-warning-tint text-site-warning"
               : "border-border-warm text-ink-muted hover:bg-tenant-tint"
           }`}
         >

@@ -42,10 +42,30 @@
   --color-on-forest: #f4ecda;
   --color-on-persimmon: #2b5747;
 
-  /* Status — harmonized with the brand */
+  /* Status — harmonized with the brand. Used on PLATFORM surfaces
+   * (admin pages, homepage, admin chrome that overlays tenant pages
+   * like AdminPreviewBanner). NOT for status panels rendered inside
+   * a public reunion site — those use the site-* palette below. */
   --color-success: #2d7a5f;
   --color-warning: #d89535;
   --color-danger: #b23a2a;
+
+  /*
+   * Tenant-site status palette — permanent, NOT customizable per tenant.
+   * Deliberately decoupled from the platform brand tokens above so the
+   * platform's persimmon-adjacent warning doesn't bleed onto a tenant's
+   * site. Classic web amber/green/red picked to harmonize with any
+   * tenant primary color and to pass WCAG AA at body sizes (the dark
+   * shade on its tint surface).
+   *
+   * Pattern: panels use border-site-X/30 + bg-site-X-tint + text-site-X.
+   */
+  --color-site-success: #15803d;       /* green-700 */
+  --color-site-success-tint: #f0fdf4;  /* green-50 */
+  --color-site-warning: #b45309;       /* amber-700 */
+  --color-site-warning-tint: #fffbeb;  /* amber-50 */
+  --color-site-danger: #b91c1c;        /* red-700 */
+  --color-site-danger-tint: #fef2f2;   /* red-50 */
 
   /*
    * Tenant brand tokens — apply only on the public reunion site

@@ -83,12 +83,12 @@ export function ProfileForm({
       className="space-y-6 rounded-xl border border-border-warm bg-white p-8 shadow-sm"
     >
       {error && (
-        <div className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
+        <div className="rounded-lg bg-site-danger-tint p-3 text-sm text-site-danger">
           {error}
         </div>
       )}
       {success && (
-        <div className="rounded-lg bg-success/10 p-3 text-sm text-success">
+        <div className="rounded-lg bg-site-success-tint p-3 text-sm text-site-success">
           Profile saved!
         </div>
       )}
