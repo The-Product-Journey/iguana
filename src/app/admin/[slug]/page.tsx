@@ -18,6 +18,7 @@ import { formatCents } from "@/lib/utils";
 import { SiteModeToggle } from "@/components/site-mode-toggle";
 import { AdminTabs } from "./admin-tabs";
 import { ConnectStatus } from "@/components/connect-status";
+import { InfoTooltip } from "@/components/info-tooltip";
 import { LaunchSiteMenu } from "@/components/launch-site-menu";
 import { SiteCustomization } from "@/components/site-customization";
 import { CollapsibleCard } from "@/components/collapsible-card";
@@ -219,6 +220,23 @@ export default async function AdminReunionPage({
             : undefined
         }
         defaultOpen={!connect?.chargesEnabled}
+        headerExtra={
+          connect?.accountId ? (
+            <InfoTooltip label="Stripe account info">
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-subtle">
+                Stripe account ID
+              </p>
+              <p className="break-all font-mono text-ink">
+                {connect.accountId}
+              </p>
+              <p className="mt-2 text-ink-muted">
+                For reference — use this ID to correlate this reunion with
+                records in the Stripe dashboard, support tickets, or
+                webhook logs.
+              </p>
+            </InfoTooltip>
+          ) : undefined
+        }
       >
         <ConnectStatus
           reunionId={reunion.id}
