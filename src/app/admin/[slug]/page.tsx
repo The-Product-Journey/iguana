@@ -316,6 +316,7 @@ export default async function AdminReunionPage({
 
       <AdminTabs
         slug={slug}
+        isSuper={ctx.isSuper}
         rsvps={allRsvps}
         interests={allInterests}
         sponsors={allSponsors}

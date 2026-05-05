@@ -153,6 +153,7 @@ const TABS = [
 
 export function AdminTabs({
   slug,
+  isSuper = false,
   rsvps,
   interests,
   sponsors,
@@ -167,6 +168,7 @@ export function AdminTabs({
   categoryLabels,
 }: {
   slug: string;
+  isSuper?: boolean;
   rsvps: Rsvp[];
   interests: InterestSignup[];
   sponsors: Sponsor[];
@@ -217,7 +219,9 @@ export function AdminTabs({
           eventsBySignup={interestEventsBySignup}
         />
       )}
-      {tab === "Sponsors" && <SponsorsTab sponsors={sponsors} />}
+      {tab === "Sponsors" && (
+        <SponsorsTab sponsors={sponsors} isSuper={isSuper} />
+      )}
       {tab === "Memorials" && (
         <MemorialsTab memorials={memorials} slug={slug} />
       )}
@@ -357,7 +361,24 @@ function InterestsTab({
   );
 }
 
-function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
+/**
+ * Build a Stripe Dashboard URL for a checkout session. The session ID
+ * prefix (`cs_test_` vs `cs_live_`) decides whether the URL points
+ * at the test or live dashboard, so this works correctly regardless
+ * of which Stripe environment the row was created in.
+ */
+function stripeSessionUrl(sessionId: string): string {
+  const isTest = sessionId.startsWith("cs_test_");
+  return `https://dashboard.stripe.com/${isTest ? "test/" : ""}checkout/sessions/${sessionId}`;
+}
+
+function SponsorsTab({
+  sponsors,
+  isSuper,
+}: {
+  sponsors: Sponsor[];
+  isSuper: boolean;
+}) {
   const router = useRouter();
   const [toggling, setToggling] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<string | null>(null);
@@ -458,7 +479,7 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <StatusBadge status={s.paymentStatus} />
                     {s.stripeCheckoutSessionId && (
                       <button
@@ -469,6 +490,17 @@ function SponsorsTab({ sponsors }: { sponsors: Sponsor[] }) {
                       >
                         {refreshing === s.id ? "Syncing…" : "Refresh"}
                       </button>
+                    )}
+                    {isSuper && s.stripeCheckoutSessionId && (
+                      <a
+                        href={stripeSessionUrl(s.stripeCheckoutSessionId)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Open the corresponding Checkout Session in the Stripe dashboard"
+                        className="text-xs font-medium text-forest underline decoration-forest/40 underline-offset-2 hover:text-forest-deep hover:decoration-forest"
+                      >
+                        View in Stripe →
+                      </a>
                     )}
                   </div>
                 </td>
