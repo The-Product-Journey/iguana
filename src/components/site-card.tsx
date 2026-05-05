@@ -9,18 +9,17 @@ import type { Reunion } from "@/lib/db/schema";
  * configured, otherwise the canonical /[slug] path.
  */
 export function SiteCard({ site }: { site: Reunion }) {
-  const href = site.customDomain
-    ? `https://${site.customDomain}`
-    : `/${site.slug}`;
+  // Always link to the platform path (relative). Using the configured
+  // custom domain here would force admins testing locally / on staging
+  // to bounce to the production vanity URL — confusing and breaks the
+  // "see the site as it lives in this environment" expectation.
+  const href = `/${site.slug}`;
   const displayDomain = site.customDomain ?? `/${site.slug}`;
   const faviconUrl = site.faviconUrl ?? "/favicon.svg";
-  const isExternal = !!site.customDomain;
 
   return (
     <a
       href={href}
-      target={isExternal ? "_blank" : undefined}
-      rel={isExternal ? "noopener noreferrer" : undefined}
       className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-xl border border-border-warm bg-white transition-all hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md"
       aria-label={`Open ${site.name}`}
     >
