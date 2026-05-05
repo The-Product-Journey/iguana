@@ -47,11 +47,14 @@ export default async function SponsorPage({
 
         {/* Tier explanation */}
         <div className="mb-8 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-xl border-2 border-tenant-primary bg-white p-6 shadow-sm">
-            <h3 className="mb-1 text-lg font-bold text-tenant-darkest">
+          <div className="relative rounded-xl border border-border-warm bg-white p-6">
+            <span className="absolute right-3 top-3 rounded-md bg-tenant-primary px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-white">
+              Marquee
+            </span>
+            <h3 className="mb-1 pr-20 text-lg font-bold text-ink">
               Trojan Sponsor
             </h3>
-            <p className="mb-2 text-sm font-medium text-tenant-primary">
+            <p className="mb-2 text-sm font-medium text-ink-subtle">
               {formatCents(SPONSOR_TIER_THRESHOLD_CENTS)} and above
             </p>
             <p className="text-sm text-ink-muted">
