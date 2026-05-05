@@ -97,7 +97,7 @@ export default async function CommunityServicePage({
             href={`/${slug}/sponsor`}
             className="inline-block rounded-full bg-tenant-primary px-6 py-2 text-sm font-semibold text-white shadow transition hover:bg-tenant-primary-deep"
           >
-            Become a Community Service Project Sponsor
+            Become a Community Project Sponsor
           </Link>
         </div>
       </div>

@@ -64,7 +64,7 @@ export default async function SponsorPage({
           </div>
           <div className="rounded-xl border border-tenant-primary bg-white p-6">
             <h3 className="mb-1 text-lg font-bold text-ink">
-              Community Service Project Sponsor
+              Community Project Sponsor
             </h3>
             <p className="mb-2 text-sm font-medium text-ink-subtle">
               Under {formatCents(SPONSOR_TIER_THRESHOLD_CENTS)}

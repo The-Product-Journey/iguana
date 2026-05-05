@@ -122,11 +122,11 @@ export default async function SponsorsPage({
               </div>
             )}
 
-            {/* Community Service Project Sponsors */}
+            {/* Community Project Sponsors */}
             {communitySponsors.length > 0 && (
               <div>
                 <h2 className="mb-4 text-lg font-semibold text-ink-muted uppercase tracking-wide">
-                  Community Service Project Sponsors
+                  Community Project Sponsors
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-3">
                   {communitySponsors.map((sponsor) => {
