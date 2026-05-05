@@ -189,7 +189,7 @@ export function PublishSponsorDialog({
           <div className="mt-4">
             <p className="mb-1 text-xs font-medium text-ink-muted">Logo</p>
             {removeLogo ? (
-              <p className="text-xs text-warning">
+              <p className="text-xs text-ink-muted">
                 Logo will be removed on save.{" "}
                 <button
                   type="button"

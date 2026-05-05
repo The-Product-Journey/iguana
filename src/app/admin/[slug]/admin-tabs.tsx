@@ -435,7 +435,7 @@ function MemorialsTab({
                     {m.status}
                   </span>
                   {m.reviewNotes && (
-                    <p className="mt-1 text-xs text-warning max-w-xs truncate">
+                    <p className="mt-1 text-xs text-ink-muted max-w-xs truncate">
                       Notes: {m.reviewNotes}
                     </p>
                   )}

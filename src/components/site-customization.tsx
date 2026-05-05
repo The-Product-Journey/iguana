@@ -524,11 +524,12 @@ function BrandColorSection({
         </p>
       )}
       {formatValid && lowContrast && (
-        <p className="mt-2 text-xs text-warning">
-          ⚠ This color may be hard to read on white backgrounds (contrast
-          ratio {contrastVsWhite!.toFixed(1)}:1, below WCAG AA 4.5:1).
-          Visitors may have trouble seeing buttons and links. You can save
-          anyway if it&apos;s your brand.
+        <p className="mt-2 text-xs text-ink">
+          <span className="text-warning" aria-hidden="true">⚠</span> This color
+          may be hard to read on white backgrounds (contrast ratio{" "}
+          {contrastVsWhite!.toFixed(1)}:1, below WCAG AA 4.5:1). Visitors may
+          have trouble seeing buttons and links. You can save anyway if
+          it&apos;s your brand.
         </p>
       )}
       {error && <p className="mt-2 text-sm text-danger">{error}</p>}

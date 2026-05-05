@@ -277,7 +277,7 @@ export function SponsorRecognitionForm({
                   </button>
                 )}
                 {removeLogo && (
-                  <span className="text-warning">
+                  <span className="text-ink-muted">
                     Logo will be removed on save.{" "}
                     <button
                       type="button"

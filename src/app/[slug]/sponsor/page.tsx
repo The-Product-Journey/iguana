@@ -79,7 +79,7 @@ export default async function SponsorPage({
           </div>
         </div>
 
-        <div className="mb-6 rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-warning">
+        <div className="mb-6 rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-ink">
           <strong>Note:</strong> This is not a tax-deductible donation. Sponsor
           contributions are sent directly to the reunion organizers via
           Stripe. You will receive a receipt from Stripe for your records.
