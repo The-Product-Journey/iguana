@@ -187,23 +187,24 @@ export default async function AdminReunionPage({
       <SiteModeToggle
         reunionId={reunion.id}
         initialMode={reunion.siteMode}
+        payoutsReady={!!connect?.chargesEnabled}
       />
 
       {/*
-        Stripe Connect ranks above Site Customization because Connect is
-        what blocks the reunion from taking real money — admin should see
-        it first. When not configured, CollapsibleCard renders it in a
-        warning style and refuses to collapse.
+        Stripe Connect lives below Site Customization but auto-expands when
+        not configured. The "you must set this up" emphasis lives on Site
+        Mode (Open is gated on payouts) so the admin sees one clear path:
+        try to switch to Open → SiteModeToggle tells them to configure
+        payouts → they expand the Stripe Connect section right below.
       */}
       <CollapsibleCard
         title="Stripe Connect — Payouts"
         subtitle={
           !connect?.chargesEnabled
-            ? "Set up payouts before the reunion can accept payments."
+            ? "Required before the reunion can accept payments."
             : undefined
         }
-        emphasis={!connect?.chargesEnabled ? "warning" : "default"}
-        defaultOpen={false}
+        defaultOpen={!connect?.chargesEnabled}
       >
         <ConnectStatus
           reunionId={reunion.id}
