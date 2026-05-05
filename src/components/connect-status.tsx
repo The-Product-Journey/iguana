@@ -258,8 +258,8 @@ export function ConnectStatus({
       {state === "onboarding_incomplete" && (
         <div>
           <div className="mb-3 flex items-center gap-2">
-            <span className="inline-block h-2 w-2 rounded-full bg-amber-400" />
-            <span className="text-sm font-medium text-amber-700">
+            <span className="inline-block h-2 w-2 rounded-full bg-warning" />
+            <span className="text-sm font-medium text-warning">
               Onboarding incomplete
             </span>
           </div>
@@ -280,8 +280,8 @@ export function ConnectStatus({
       {state === "verification_pending" && (
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-block h-2 w-2 rounded-full bg-amber-400" />
-            <span className="text-sm font-medium text-amber-700">
+            <span className="inline-block h-2 w-2 rounded-full bg-warning" />
+            <span className="text-sm font-medium text-warning">
               Verification pending
             </span>
             <span className="text-sm text-ink-subtle">
@@ -313,8 +313,8 @@ export function ConnectStatus({
       {state === "bank_verification_pending" && (
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-block h-2 w-2 rounded-full bg-amber-400" />
-            <span className="text-sm font-medium text-amber-700">
+            <span className="inline-block h-2 w-2 rounded-full bg-warning" />
+            <span className="text-sm font-medium text-warning">
               Bank verification pending
             </span>
             <span className="text-sm text-ink-subtle">

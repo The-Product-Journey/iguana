@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { TestTag } from "@/components/test-tag";
 
 type ReunionLite = { id: string; name: string; slug: string };
 type AdminRow = {
@@ -198,11 +199,7 @@ function ReunionAdminsTab({
           <div key={r.id}>
             <h3 className="mb-2 flex items-center gap-2 text-base font-semibold">
               {r.name}
-              {r.slug.endsWith("-test") && (
-                <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-800">
-                  Test
-                </span>
-              )}
+              {r.slug.endsWith("-test") && <TestTag />}
             </h3>
             {admins.length === 0 ? (
               <p className="text-sm text-ink-subtle">No admins yet.</p>

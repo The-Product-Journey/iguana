@@ -158,7 +158,7 @@ function DomainSection({
       </div>
       {error && <p className="mt-2 text-sm text-danger">{error}</p>}
       {success && (
-        <p className="mt-2 text-sm text-green-700">
+        <p className="mt-2 text-sm text-success">
           Saved. Some manual setup is required before the new domain serves
           traffic.
         </p>

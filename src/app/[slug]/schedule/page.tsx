@@ -120,7 +120,7 @@ export default async function SchedulePage({
                         className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
                           event.type === "paid"
                             ? "bg-tenant-tint-strong text-tenant-primary"
-                            : "bg-green-100 text-green-700"
+                            : "bg-success/10 text-success"
                         }`}
                       >
                         {event.type === "paid"

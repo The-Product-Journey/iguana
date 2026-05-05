@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requireAnyAdminPage } from "@/lib/admin-auth";
 import { LaunchSiteMenu } from "@/components/launch-site-menu";
+import { TestTag } from "@/components/test-tag";
 
 export const dynamic = "force-dynamic";
 
@@ -60,11 +61,7 @@ export default async function AdminIndexPage() {
                   >
                     {r.name}
                   </Link>
-                  {r.slug.endsWith("-test") && (
-                    <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-800">
-                      Test
-                    </span>
-                  )}
+                  {r.slug.endsWith("-test") && <TestTag />}
                   <LaunchSiteMenu
                     slug={r.slug}
                     reunionName={r.name}

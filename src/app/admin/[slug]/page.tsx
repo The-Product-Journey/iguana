@@ -22,6 +22,7 @@ import { LaunchSiteMenu } from "@/components/launch-site-menu";
 import { SiteCustomization } from "@/components/site-customization";
 import { CollapsibleCard } from "@/components/collapsible-card";
 import { BackLink } from "@/components/back-link";
+import { TestTag } from "@/components/test-tag";
 import { requireReunionAdminPage } from "@/lib/admin-auth";
 import { loadConnectAccount } from "@/lib/stripe";
 
@@ -166,11 +167,7 @@ export default async function AdminReunionPage({
 
       <div className="mb-4 flex items-center gap-2">
         <h2 className="text-2xl font-bold">{reunion.name}</h2>
-        {slug.endsWith("-test") && (
-          <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-amber-800">
-            Test
-          </span>
-        )}
+        {slug.endsWith("-test") && <TestTag size="md" />}
         <LaunchSiteMenu
           slug={slug}
           reunionName={reunion.name}

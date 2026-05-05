@@ -79,41 +79,41 @@ export function RsvpForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-sm"
+      className="space-y-6 rounded-xl border border-border-warm bg-white p-8 shadow-sm"
     >
       {error && (
-        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
           {error}
         </div>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="firstName" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="firstName" className="mb-1 block text-sm font-medium text-ink-muted">
             First Name *
           </label>
           <input
             id="firstName"
             name="firstName"
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
         <div>
-          <label htmlFor="lastName" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="lastName" className="mb-1 block text-sm font-medium text-ink-muted">
             Last Name *
           </label>
           <input
             id="lastName"
             name="lastName"
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="mb-1 block text-sm font-medium text-ink-muted">
           Email *
         </label>
         <input
@@ -121,31 +121,31 @@ export function RsvpForm({
           name="email"
           type="email"
           required
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
       <div>
-        <label htmlFor="phone" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="phone" className="mb-1 block text-sm font-medium text-ink-muted">
           Phone
         </label>
         <input
           id="phone"
           name="phone"
           type="tel"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
       <div>
-        <label htmlFor="guestCount" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="guestCount" className="mb-1 block text-sm font-medium text-ink-muted">
           Number of Guests (including yourself) *
         </label>
         <select
           id="guestCount"
           value={guestCount}
           onChange={(e) => setGuestCount(parseInt(e.target.value))}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         >
           {[1, 2, 3, 4, 5].map((n) => (
             <option key={n} value={n}>
@@ -156,19 +156,19 @@ export function RsvpForm({
       </div>
 
       <div>
-        <label htmlFor="dietaryNotes" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="dietaryNotes" className="mb-1 block text-sm font-medium text-ink-muted">
           Dietary Restrictions
         </label>
         <input
           id="dietaryNotes"
           name="dietaryNotes"
           placeholder="e.g., vegetarian, gluten-free"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
       <div>
-        <label htmlFor="message" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="message" className="mb-1 block text-sm font-medium text-ink-muted">
           Message for the Class
         </label>
         <textarea
@@ -176,16 +176,16 @@ export function RsvpForm({
           name="message"
           rows={3}
           placeholder="Share what you've been up to since '96!"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
       {/* Cover the fees */}
-      <div className="rounded-lg border border-red-100 bg-red-50 p-4">
-        <p className="mb-1 text-sm font-medium text-red-900">
+      <div className="rounded-lg border border-tenant-tint-strong bg-tenant-tint p-4">
+        <p className="mb-1 text-sm font-medium text-tenant-darkest">
           Help cover processing fees?
         </p>
-        <p className="mb-3 text-sm text-red-700">
+        <p className="mb-3 text-sm text-tenant-primary-deep">
           Payment processing costs eat into the reunion budget. Adding a little
           extra ensures 100% of your registration goes toward the event.
         </p>
@@ -197,8 +197,8 @@ export function RsvpForm({
               onClick={() => setFeePreset(preset.pct)}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
                 feePreset === preset.pct
-                  ? "bg-red-700 text-white"
-                  : "bg-white text-red-700 border border-red-200 hover:bg-red-50"
+                  ? "bg-tenant-primary text-white"
+                  : "bg-white text-tenant-primary border border-tenant-border-soft hover:bg-tenant-tint"
               }`}
             >
               {preset.label}
@@ -212,7 +212,7 @@ export function RsvpForm({
         </div>
         {feePreset === -1 && (
           <div className="relative mt-3">
-            <span className="absolute left-3 top-2 text-gray-500">$</span>
+            <span className="absolute left-3 top-2 text-ink-subtle">$</span>
             <input
               type="number"
               min="0"
@@ -220,27 +220,27 @@ export function RsvpForm({
               value={customDollars}
               onChange={(e) => setCustomDollars(e.target.value)}
               placeholder="0.00"
-              className="w-full rounded-lg border border-red-200 py-2 pl-7 pr-3 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+              className="w-full rounded-lg border border-tenant-border-soft py-2 pl-7 pr-3 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
             />
           </div>
         )}
       </div>
 
       {/* Total */}
-      <div className="rounded-lg bg-gray-50 p-4">
-        <div className="flex justify-between text-sm text-gray-600">
+      <div className="rounded-lg bg-bg-subtle p-4">
+        <div className="flex justify-between text-sm text-ink-muted">
           <span>
             Registration ({guestCount} {guestCount === 1 ? "person" : "people"})
           </span>
           <span>{formatCents(registrationTotal)}</span>
         </div>
         {donationCents > 0 && (
-          <div className="mt-1 flex justify-between text-sm text-gray-600">
+          <div className="mt-1 flex justify-between text-sm text-ink-muted">
             <span>Cover fees</span>
             <span>{formatCents(donationCents)}</span>
           </div>
         )}
-        <div className="mt-2 flex justify-between border-t border-gray-200 pt-2 text-lg font-semibold">
+        <div className="mt-2 flex justify-between border-t border-border-warm pt-2 text-lg font-semibold">
           <span>Total</span>
           <span>{formatCents(grandTotal)}</span>
         </div>
@@ -249,7 +249,7 @@ export function RsvpForm({
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-red-700 px-4 py-3 text-lg font-semibold text-white shadow transition hover:bg-red-800 disabled:opacity-50"
+        className="w-full rounded-lg bg-tenant-primary px-4 py-3 text-lg font-semibold text-white shadow transition hover:bg-tenant-primary-deep disabled:opacity-50"
       >
         {loading ? "Redirecting to payment..." : `Pay ${formatCents(grandTotal)} & RSVP`}
       </button>
