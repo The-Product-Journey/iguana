@@ -58,12 +58,20 @@ export default async function AdminLandingPage() {
           {ctx.isSuper ? "Super Admin" : "Admin"}
         </h2>
         {ctx.isSuper && (
-          <Link
-            href="/admin/super/admins"
-            className="rounded-lg bg-forest px-4 py-2 text-sm font-medium text-on-forest transition hover:bg-forest-deep"
-          >
-            Manage admins →
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/admin/super/payments"
+              className="rounded-lg border border-forest px-4 py-2 text-sm font-medium text-forest transition hover:bg-cream"
+            >
+              Manage payments →
+            </Link>
+            <Link
+              href="/admin/super/admins"
+              className="rounded-lg bg-forest px-4 py-2 text-sm font-medium text-on-forest transition hover:bg-forest-deep"
+            >
+              Manage admins →
+            </Link>
+          </div>
         )}
       </div>
 
