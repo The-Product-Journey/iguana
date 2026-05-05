@@ -1,10 +1,14 @@
 import { db } from "@/lib/db";
 import { reunions } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
+import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
 import { SiteCard } from "@/components/site-card";
 import { CreateSiteCard } from "@/components/create-site-card";
 import { Wordmark } from "@/components/wordmark";
 import { EmptyState } from "@/components/empty-state";
+import { UserMenu } from "@/components/user-menu";
+import { getCurrentAdminContext } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -21,18 +25,32 @@ export const dynamic = "force-dynamic";
  * straight to the reunion site.
  */
 export default async function Home() {
-  const sites = await db
-    .select()
-    .from(reunions)
-    .where(eq(reunions.isActive, true))
-    .orderBy(asc(reunions.name))
-    .all();
+  const { userId } = await auth();
+  const [sites, ctx] = await Promise.all([
+    db
+      .select()
+      .from(reunions)
+      .where(eq(reunions.isActive, true))
+      .orderBy(asc(reunions.name))
+      .all(),
+    userId ? getCurrentAdminContext() : Promise.resolve(null),
+  ]);
 
   return (
     <div className="min-h-screen bg-white">
       <header className="border-b border-border-warm bg-white">
-        <div className="mx-auto flex max-w-6xl items-center px-6 py-4 sm:px-12">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 sm:px-12">
           <Wordmark className="h-8 w-auto" />
+          {userId ? (
+            <UserMenu isSuper={!!ctx?.isSuper} />
+          ) : (
+            <Link
+              href="/sign-in"
+              className="text-sm font-medium text-forest hover:text-forest-deep"
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       </header>
 
