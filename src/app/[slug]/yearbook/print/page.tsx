@@ -52,7 +52,7 @@ export default async function YearbookPrintPage({
         }}
       />
 
-      <div className="no-print mb-8 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
+      <div className="no-print mb-8 rounded-lg border border-border-warm bg-tenant-tint p-4 text-sm text-ink-muted">
         Use your browser&apos;s Print function (Ctrl+P / Cmd+P) to save this as
         a PDF.
         <PrintButton />
@@ -60,12 +60,12 @@ export default async function YearbookPrintPage({
 
       {/* Cover */}
       <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold text-gray-900">{reunion.name}</h1>
-        <p className="mt-2 text-xl text-gray-600">
+        <h1 className="text-4xl font-bold text-ink">{reunion.name}</h1>
+        <p className="mt-2 text-xl text-ink-muted">
           30 Year Reunion — Digital Yearbook
         </p>
-        <p className="mt-1 text-gray-500">August 28–29, 2026</p>
-        <p className="mt-4 text-sm text-gray-400">
+        <p className="mt-1 text-ink-subtle">August 28–29, 2026</p>
+        <p className="mt-4 text-sm text-ink-subtle">
           {allProfiles.length} classmates
         </p>
       </div>
@@ -75,7 +75,7 @@ export default async function YearbookPrintPage({
         {allProfiles.map(({ profile, firstName, lastName }) => (
           <div
             key={profile.id}
-            className="profile-entry border-b border-gray-200 pb-6"
+            className="profile-entry border-b border-border-warm pb-6"
           >
             <div className="flex gap-6">
               {profile.photoUrl && (
@@ -87,33 +87,33 @@ export default async function YearbookPrintPage({
                 />
               )}
               <div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-ink">
                   {firstName} {lastName}
                 </h2>
                 {profile.currentCity && (
-                  <p className="text-sm text-gray-500">{profile.currentCity}</p>
+                  <p className="text-sm text-ink-subtle">{profile.currentCity}</p>
                 )}
                 {profile.occupation && (
-                  <p className="text-sm text-gray-600">{profile.occupation}</p>
+                  <p className="text-sm text-ink-muted">{profile.occupation}</p>
                 )}
                 {profile.family && (
-                  <p className="mt-2 text-sm text-gray-700">
+                  <p className="mt-2 text-sm text-ink-muted">
                     <strong>Family:</strong> {profile.family}
                   </p>
                 )}
                 {profile.favoritePHMemory && (
-                  <p className="mt-1 text-sm text-gray-700">
+                  <p className="mt-1 text-sm text-ink-muted">
                     <strong>Favorite Memory:</strong>{" "}
                     {profile.favoritePHMemory}
                   </p>
                 )}
                 {profile.beenUpTo && (
-                  <p className="mt-1 text-sm text-gray-700">
+                  <p className="mt-1 text-sm text-ink-muted">
                     <strong>Since &apos;96:</strong> {profile.beenUpTo}
                   </p>
                 )}
                 {profile.funFact && (
-                  <p className="mt-1 text-sm text-gray-700">
+                  <p className="mt-1 text-sm text-ink-muted">
                     <strong>Fun Fact:</strong> {profile.funFact}
                   </p>
                 )}

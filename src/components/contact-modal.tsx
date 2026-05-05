@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import posthog from "posthog-js";
 
 const CATEGORIES = [
   { value: "volunteer", label: "I want to volunteer to help" },
@@ -50,6 +51,14 @@ export function ContactModal({
         return;
       }
 
+      const email = form.get("email") as string;
+      const name = form.get("name") as string;
+      const category = form.get("category") as string;
+      posthog.identify(email, { name, email });
+      posthog.capture("contact_message_sent", {
+        reunion_id: reunionId,
+        category,
+      });
       setSent(true);
     } catch {
       setError("Something went wrong. Please try again.");
@@ -72,10 +81,10 @@ export function ContactModal({
         {sent ? (
           <div className="text-center">
             <p className="mb-2 text-2xl">✓</p>
-            <h3 className="mb-2 text-lg font-semibold text-gray-900">
+            <h3 className="mb-2 text-lg font-semibold text-ink">
               Message Sent!
             </h3>
-            <p className="mb-6 text-gray-600">
+            <p className="mb-6 text-ink-muted">
               Thanks for reaching out. The reunion committee will get back to
               you soon.
             </p>
@@ -89,12 +98,12 @@ export function ContactModal({
         ) : (
           <>
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-ink">
                 Contact the Reunion Committee
               </h3>
               <button
                 onClick={handleClose}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-ink-subtle hover:text-ink-muted"
               >
                 ✕
               </button>
@@ -110,7 +119,7 @@ export function ContactModal({
               <div>
                 <label
                   htmlFor="contact-name"
-                  className="mb-1 block text-sm font-medium text-gray-700"
+                  className="mb-1 block text-sm font-medium text-ink-muted"
                 >
                   Name *
                 </label>
@@ -118,14 +127,14 @@ export function ContactModal({
                   id="contact-name"
                   name="name"
                   required
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+                  className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="contact-email"
-                  className="mb-1 block text-sm font-medium text-gray-700"
+                  className="mb-1 block text-sm font-medium text-ink-muted"
                 >
                   Email *
                 </label>
@@ -134,21 +143,21 @@ export function ContactModal({
                   name="email"
                   type="email"
                   required
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+                  className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="contact-category"
-                  className="mb-1 block text-sm font-medium text-gray-700"
+                  className="mb-1 block text-sm font-medium text-ink-muted"
                 >
                   I&apos;m reaching out because...
                 </label>
                 <select
                   id="contact-category"
                   name="category"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+                  className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 >
                   {CATEGORIES.map((c) => (
                     <option key={c.value} value={c.value}>
@@ -161,7 +170,7 @@ export function ContactModal({
               <div>
                 <label
                   htmlFor="contact-message"
-                  className="mb-1 block text-sm font-medium text-gray-700"
+                  className="mb-1 block text-sm font-medium text-ink-muted"
                 >
                   Message *
                 </label>
@@ -170,7 +179,7 @@ export function ContactModal({
                   name="message"
                   required
                   rows={4}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+                  className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
                 />
               </div>
 

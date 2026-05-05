@@ -47,3 +47,4 @@ next-env.d.ts
 
 # claude code session state (local agent files, not for VCS)
 /.claude/
+.env.local

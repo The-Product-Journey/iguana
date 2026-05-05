@@ -48,7 +48,7 @@ export default async function ProfileViewPage({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-tenant-tint py-12">
       <div className="mx-auto max-w-2xl px-6">
         <Link
           href={`/${slug}/yearbook`}
@@ -57,7 +57,7 @@ export default async function ProfileViewPage({
           &larr; Back to yearbook
         </Link>
 
-        <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
+        <div className="rounded-xl border border-border-warm bg-white p-8 shadow-sm">
           <div className="mb-6 text-center">
             {profile.photoUrl ? (
               <Image
@@ -73,7 +73,7 @@ export default async function ProfileViewPage({
                 {rsvp.lastName[0]}
               </div>
             )}
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-ink">
               {rsvp.firstName} {rsvp.lastName}
             </h1>
           </div>
@@ -83,10 +83,10 @@ export default async function ProfileViewPage({
               (field) =>
                 field.value && (
                   <div key={field.label}>
-                    <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-gray-500">
+                    <h3 className="mb-1 text-sm font-semibold uppercase tracking-wide text-ink-subtle">
                       {field.label}
                     </h3>
-                    <p className="text-gray-800 whitespace-pre-wrap">
+                    <p className="text-ink whitespace-pre-wrap">
                       {field.value}
                     </p>
                   </div>

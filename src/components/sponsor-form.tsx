@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { getSponsorTier, REFUND_POLICY_TEXT } from "@/lib/constants";
+import posthog from "posthog-js";
 
 export function SponsorForm({
   reunionId,
@@ -54,6 +55,13 @@ export function SponsorForm({
         return;
       }
 
+      posthog.identify(contactEmail, { name: contactName, email: contactEmail });
+      posthog.capture("sponsor_checkout_initiated", {
+        reunion_id: reunionId,
+        slug,
+        amount_cents: amountCents,
+        tier: getSponsorTier(amountCents),
+      });
       window.location.href = data.url;
     } catch {
       setError("Something went wrong. Please try again.");
@@ -64,10 +72,10 @@ export function SponsorForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-sm"
+      className="space-y-6 rounded-xl border border-border-warm bg-white p-8 shadow-sm"
     >
       {(error || belowMinimum) && (
-        <div className="rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">
+        <div className="rounded-lg bg-site-danger-tint p-3 text-sm text-site-danger">
           {error || "Minimum sponsorship is $10.00"}
         </div>
       )}
@@ -76,7 +84,7 @@ export function SponsorForm({
         <div>
           <label
             htmlFor="contactName"
-            className="mb-1 block text-sm font-medium text-gray-700"
+            className="mb-1 block text-sm font-medium text-ink-muted"
           >
             Your Name *
           </label>
@@ -86,13 +94,13 @@ export function SponsorForm({
             required
             value={contactName}
             onChange={(e) => setContactName(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
         <div>
           <label
             htmlFor="contactEmail"
-            className="mb-1 block text-sm font-medium text-gray-700"
+            className="mb-1 block text-sm font-medium text-ink-muted"
           >
             Email *
           </label>
@@ -103,7 +111,7 @@ export function SponsorForm({
             required
             value={contactEmail}
             onChange={(e) => setContactEmail(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       </div>
@@ -111,7 +119,7 @@ export function SponsorForm({
       <div>
         <label
           htmlFor="contactPhone"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-1 block text-sm font-medium text-ink-muted"
         >
           Phone
         </label>
@@ -119,7 +127,7 @@ export function SponsorForm({
           id="contactPhone"
           name="contactPhone"
           type="tel"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
@@ -127,20 +135,20 @@ export function SponsorForm({
         <div>
           <label
             htmlFor="companyName"
-            className="mb-1 block text-sm font-medium text-gray-700"
+            className="mb-1 block text-sm font-medium text-ink-muted"
           >
             Company / Business Name
           </label>
           <input
             id="companyName"
             name="companyName"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
         <div>
           <label
             htmlFor="websiteUrl"
-            className="mb-1 block text-sm font-medium text-gray-700"
+            className="mb-1 block text-sm font-medium text-ink-muted"
           >
             Website
           </label>
@@ -149,14 +157,14 @@ export function SponsorForm({
             name="websiteUrl"
             type="url"
             placeholder="https://"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       </div>
 
       {/* Sponsorship amount */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700">
+        <label className="mb-2 block text-sm font-medium text-ink-muted">
           Sponsorship Amount *
         </label>
         <div className="grid grid-cols-5 gap-2">
@@ -171,17 +179,17 @@ export function SponsorForm({
               className={`rounded-lg border py-2.5 text-sm font-semibold transition ${
                 selectedPreset === amt
                   ? "border-tenant-primary bg-tenant-primary text-white"
-                  : "border-gray-300 bg-white text-gray-700 hover:border-tenant-border-soft hover:bg-tenant-tint"
+                  : "border-border-strong bg-white text-ink-muted hover:border-tenant-border-soft hover:bg-tenant-tint"
               }`}
             >
               ${amt.toLocaleString()}
             </button>
           ))}
         </div>
-        <div className="relative mt-3 rounded-lg border border-gray-300 focus-within:border-tenant-primary focus-within:ring-1 focus-within:ring-tenant-primary">
+        <div className="relative mt-3 rounded-lg border border-border-strong focus-within:border-tenant-primary focus-within:ring-1 focus-within:ring-tenant-primary">
           <div className="absolute left-4 top-1/2 -translate-y-1/2">
-            <span className="block text-lg font-semibold text-gray-800">$</span>
-            <span className="block text-xs text-gray-400">USD</span>
+            <span className="block text-lg font-semibold text-ink">$</span>
+            <span className="block text-xs text-ink-subtle">USD</span>
           </div>
           <input
             ref={amountInputRef}
@@ -206,7 +214,7 @@ export function SponsorForm({
               }
             }}
             placeholder="0.00"
-            className="w-full rounded-lg bg-transparent py-5 pl-14 pr-4 text-right text-3xl font-bold text-gray-900 focus:outline-none"
+            className="w-full rounded-lg bg-transparent py-5 pl-14 pr-4 text-right text-3xl font-bold text-ink focus:outline-none"
           />
         </div>
       </div>
@@ -215,7 +223,7 @@ export function SponsorForm({
       <div>
         <label
           htmlFor="message"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-1 block text-sm font-medium text-ink-muted"
         >
           Message (optional)
         </label>
@@ -224,11 +232,11 @@ export function SponsorForm({
           name="message"
           rows={3}
           placeholder="A note about your sponsorship or a message for the class"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
-      <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-gray-700">
+      <div className="rounded-md border border-site-warning/30 bg-site-warning-tint px-3 py-2 text-sm text-site-warning">
         {REFUND_POLICY_TEXT}
       </div>
 

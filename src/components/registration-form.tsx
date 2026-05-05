@@ -131,9 +131,9 @@ export function RegistrationForm({
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
+    <div className="rounded-xl border border-border-warm bg-white p-8 shadow-sm">
       {error && (
-        <div className="mb-6 rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">
+        <div className="mb-6 rounded-lg bg-site-danger-tint p-3 text-sm text-site-danger">
           {error}
         </div>
       )}
@@ -146,7 +146,7 @@ export function RegistrationForm({
             className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
               step >= s
                 ? "bg-tenant-primary text-white"
-                : "bg-gray-200 text-gray-500"
+                : "bg-border-warm text-ink-subtle"
             }`}
           >
             {s}
@@ -162,13 +162,13 @@ export function RegistrationForm({
           }}
           className="space-y-4"
         >
-          <h2 className="mb-4 text-xl font-bold text-gray-900">
+          <h2 className="mb-4 text-xl font-bold text-ink">
             Your Information
           </h2>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="firstName" className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="firstName" className="mb-1 block text-sm font-medium text-ink-muted">
                 First Name *
               </label>
               <input
@@ -176,11 +176,11 @@ export function RegistrationForm({
                 required
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+                className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
               />
             </div>
             <div>
-              <label htmlFor="lastName" className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="lastName" className="mb-1 block text-sm font-medium text-ink-muted">
                 Last Name *
               </label>
               <input
@@ -188,13 +188,13 @@ export function RegistrationForm({
                 required
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+                className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="mb-1 block text-sm font-medium text-ink-muted">
               Email *
             </label>
             <input
@@ -203,12 +203,12 @@ export function RegistrationForm({
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+              className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
             />
           </div>
 
           <div>
-            <label htmlFor="phone" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="phone" className="mb-1 block text-sm font-medium text-ink-muted">
               Phone
             </label>
             <input
@@ -216,19 +216,19 @@ export function RegistrationForm({
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+              className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
             />
           </div>
 
           <div>
-            <label htmlFor="guestCount" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="guestCount" className="mb-1 block text-sm font-medium text-ink-muted">
               Number of Guests (including yourself) *
             </label>
             <select
               id="guestCount"
               value={guestCount}
               onChange={(e) => setGuestCount(parseInt(e.target.value))}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+              className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
             >
               {[1, 2, 3, 4, 5].map((n) => (
                 <option key={n} value={n}>
@@ -239,7 +239,7 @@ export function RegistrationForm({
           </div>
 
           <div>
-            <label htmlFor="dietaryNotes" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="dietaryNotes" className="mb-1 block text-sm font-medium text-ink-muted">
               Dietary Restrictions
             </label>
             <input
@@ -247,12 +247,12 @@ export function RegistrationForm({
               value={dietaryNotes}
               onChange={(e) => setDietaryNotes(e.target.value)}
               placeholder="e.g., vegetarian, gluten-free"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+              className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
             />
           </div>
 
           <div>
-            <label htmlFor="message" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="message" className="mb-1 block text-sm font-medium text-ink-muted">
               Message for the Class
             </label>
             <textarea
@@ -261,7 +261,7 @@ export function RegistrationForm({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Share what you've been up to since '96!"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+              className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
             />
           </div>
 
@@ -276,7 +276,7 @@ export function RegistrationForm({
 
       {step === 2 && (
         <div className="space-y-6">
-          <h2 className="mb-4 text-xl font-bold text-gray-900">
+          <h2 className="mb-4 text-xl font-bold text-ink">
             Choose Your Events
           </h2>
 
@@ -287,25 +287,25 @@ export function RegistrationForm({
                 className={`flex items-start gap-3 rounded-lg border p-4 transition cursor-pointer ${
                   selectedEvents.includes(event.id)
                     ? "border-tenant-border-soft bg-tenant-tint"
-                    : "border-gray-200 hover:bg-gray-50"
+                    : "border-border-warm hover:bg-bg-subtle"
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={selectedEvents.includes(event.id)}
                   onChange={() => toggleEvent(event.id)}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 accent-tenant-primary focus:ring-tenant-primary"
+                  className="mt-1 h-4 w-4 rounded border-border-strong accent-tenant-primary focus:ring-tenant-primary"
                 />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-ink">
                       {event.name}
                     </span>
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                         event.type === "paid"
                           ? "bg-tenant-tint-strong text-tenant-primary"
-                          : "bg-green-100 text-green-700"
+                          : "bg-site-success-tint text-site-success"
                       }`}
                     >
                       {event.type === "paid"
@@ -313,12 +313,12 @@ export function RegistrationForm({
                         : "Free"}
                     </span>
                   </div>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-1 text-sm text-ink-subtle">
                     {event.eventDate} {event.eventTime && `· ${event.eventTime}`}
                     {event.eventLocation && ` · ${event.eventLocation}`}
                   </p>
                   {event.description && (
-                    <p className="mt-1 text-sm text-gray-600">
+                    <p className="mt-1 text-sm text-ink-muted">
                       {event.description}
                     </p>
                   )}
@@ -329,13 +329,13 @@ export function RegistrationForm({
 
           {/* Payment options for paid event */}
           {hasPaidEvent && (
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-              <h3 className="mb-3 font-semibold text-gray-900">
+            <div className="rounded-lg border border-border-warm bg-bg-subtle p-4">
+              <h3 className="mb-3 font-semibold text-ink">
                 Saturday Banquet Payment
               </h3>
 
               {!chargesEnabled && (
-                <div className="mb-3 rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">
+                <div className="mb-3 rounded-lg bg-site-warning-tint border border-site-warning/30 p-3 text-sm text-site-warning">
                   Online payment will be available soon. You can register now and pay at the door.
                 </div>
               )}
@@ -350,11 +350,11 @@ export function RegistrationForm({
                       className="h-4 w-4 text-tenant-primary focus:ring-tenant-primary"
                     />
                     <div>
-                      <span className="font-medium text-gray-900">
+                      <span className="font-medium text-ink">
                         Pay now — {formatCents(unitPrice)}/person
                       </span>
                       {isEarlyBird && (
-                        <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                        <span className="ml-2 rounded-full bg-site-success-tint px-2 py-0.5 text-xs font-medium text-site-success">
                           Early bird saves {formatCents(standardPrice - unitPrice)}
                         </span>
                       )}
@@ -369,7 +369,7 @@ export function RegistrationForm({
                     className="h-4 w-4 text-tenant-primary focus:ring-tenant-primary"
                   />
                   <div>
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-ink">
                       Pay at the door — {formatCents(standardPrice)}/person
                     </span>
                   </div>
@@ -409,7 +409,7 @@ export function RegistrationForm({
                   </div>
                   {feePreset === -1 && (
                     <div className="relative mt-3">
-                      <span className="absolute left-3 top-2 text-gray-500">
+                      <span className="absolute left-3 top-2 text-ink-subtle">
                         $
                       </span>
                       <input
@@ -430,8 +430,8 @@ export function RegistrationForm({
 
           {/* Order summary */}
           {hasPaidEvent && payNow && (
-            <div className="rounded-lg bg-gray-50 p-4">
-              <div className="flex justify-between text-sm text-gray-600">
+            <div className="rounded-lg bg-bg-subtle p-4">
+              <div className="flex justify-between text-sm text-ink-muted">
                 <span>
                   Banquet ({guestCount}{" "}
                   {guestCount === 1 ? "person" : "people"})
@@ -439,12 +439,12 @@ export function RegistrationForm({
                 <span>{formatCents(registrationTotal)}</span>
               </div>
               {donationCents > 0 && (
-                <div className="mt-1 flex justify-between text-sm text-gray-600">
+                <div className="mt-1 flex justify-between text-sm text-ink-muted">
                   <span>Cover fees</span>
                   <span>{formatCents(donationCents)}</span>
                 </div>
               )}
-              <div className="mt-2 flex justify-between border-t border-gray-200 pt-2 text-lg font-semibold">
+              <div className="mt-2 flex justify-between border-t border-border-warm pt-2 text-lg font-semibold">
                 <span>Total</span>
                 <span>{formatCents(grandTotal)}</span>
               </div>
@@ -452,7 +452,7 @@ export function RegistrationForm({
           )}
 
           {hasPaidEvent && payNow && chargesEnabled && (
-            <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-gray-700">
+            <div className="rounded-md border border-site-warning/30 bg-site-warning-tint px-3 py-2 text-sm text-site-warning">
               {REFUND_POLICY_TEXT}
             </div>
           )}
@@ -461,7 +461,7 @@ export function RegistrationForm({
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="rounded-lg border border-gray-300 px-4 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
+              className="rounded-lg border border-border-strong px-4 py-3 font-semibold text-ink-muted transition hover:bg-bg-subtle"
             >
               Back
             </button>

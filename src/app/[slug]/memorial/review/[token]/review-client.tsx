@@ -46,11 +46,11 @@ export function MemorialReviewClient({
 
   if (done) {
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-        <h2 className="mb-2 text-xl font-bold text-gray-900">
+      <div className="rounded-xl border border-border-warm bg-white p-8 text-center shadow-sm">
+        <h2 className="mb-2 text-xl font-bold text-ink">
           {action === "approved" ? "Memorial Approved" : "Feedback Submitted"}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-ink-muted">
           {action === "approved"
             ? "Thank you. The memorial will now be published."
             : "Thank you for your feedback. The committee will revise the entry."}
@@ -79,8 +79,8 @@ export function MemorialReviewClient({
           onClick={() => setAction("approved")}
           className={`flex-1 rounded-lg border-2 px-4 py-3 font-semibold transition ${
             action === "approved"
-              ? "border-green-600 bg-green-50 text-green-700"
-              : "border-gray-200 text-gray-700 hover:bg-gray-50"
+              ? "border-site-success bg-site-success-tint text-site-success"
+              : "border-border-warm text-ink-muted hover:bg-tenant-tint"
           }`}
         >
           Looks Good — Publish It
@@ -90,8 +90,8 @@ export function MemorialReviewClient({
           onClick={() => setAction("changes")}
           className={`flex-1 rounded-lg border-2 px-4 py-3 font-semibold transition ${
             action === "changes"
-              ? "border-amber-500 bg-amber-50 text-amber-700"
-              : "border-gray-200 text-gray-700 hover:bg-gray-50"
+              ? "border-site-warning bg-site-warning-tint text-site-warning"
+              : "border-border-warm text-ink-muted hover:bg-tenant-tint"
           }`}
         >
           Request Changes
@@ -102,7 +102,7 @@ export function MemorialReviewClient({
         <div>
           <label
             htmlFor="notes"
-            className="mb-1 block text-sm font-medium text-gray-700"
+            className="mb-1 block text-sm font-medium text-ink-muted"
           >
             What would you like changed?
           </label>
@@ -112,7 +112,7 @@ export function MemorialReviewClient({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Please describe what should be different..."
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       )}

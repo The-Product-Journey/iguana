@@ -435,7 +435,7 @@ function MemorialsTab({
                     {m.status}
                   </span>
                   {m.reviewNotes && (
-                    <p className="mt-1 text-xs text-warning max-w-xs truncate">
+                    <p className="mt-1 text-xs text-ink-muted max-w-xs truncate">
                       Notes: {m.reviewNotes}
                     </p>
                   )}
@@ -447,7 +447,7 @@ function MemorialsTab({
                       navigator.clipboard.writeText(url);
                       alert("Review link copied to clipboard!");
                     }}
-                    className="text-xs text-blue-600 hover:text-blue-800"
+                    className="text-xs text-forest hover:text-forest-deep"
                   >
                     Copy Link
                   </button>
@@ -549,7 +549,7 @@ function ProfilesTab({
                           navigator.clipboard.writeText(url);
                           alert("Profile edit link copied!");
                         }}
-                        className="text-xs text-blue-600 hover:text-blue-800"
+                        className="text-xs text-forest hover:text-forest-deep"
                       >
                         Copy Link
                       </button>

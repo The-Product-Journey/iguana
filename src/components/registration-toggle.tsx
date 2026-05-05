@@ -29,10 +29,10 @@ export function RegistrationToggle({
   }
 
   return (
-    <div className="mb-8 flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <div className="mb-8 flex items-center gap-4 rounded-lg border border-border-warm bg-white p-4 shadow-sm">
       <div className="flex-1">
-        <p className="font-medium text-gray-900">Registration Mode</p>
-        <p className="text-sm text-gray-500">
+        <p className="font-medium text-ink">Registration Mode</p>
+        <p className="text-sm text-ink-subtle">
           {open
             ? "Full registration is active — attendees pay when they sign up."
             : "Pre-registration only — attendees reserve a spot without payment."}
@@ -43,8 +43,8 @@ export function RegistrationToggle({
         disabled={loading}
         className={`rounded-lg px-4 py-2 text-sm font-medium transition disabled:opacity-50 ${
           open
-            ? "bg-green-100 text-green-800 hover:bg-green-200"
-            : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+            ? "bg-success/10 text-success hover:bg-success/20"
+            : "bg-warning/10 text-warning hover:bg-warning/20"
         }`}
       >
         {loading

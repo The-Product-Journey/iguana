@@ -35,7 +35,7 @@ export default async function ProfileEditPage({
     .get();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-tenant-tint py-12">
       <div className="mx-auto max-w-xl px-6">
         <Link
           href={`/${slug}`}
@@ -45,10 +45,10 @@ export default async function ProfileEditPage({
         </Link>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-ink">
             Your Digital Yearbook Profile
           </h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-ink-muted">
             Hey {rsvp.firstName}! Tell your classmates what you&apos;ve been up
             to since &apos;96. All fields are optional — fill in as much or as
             little as you&apos;d like.

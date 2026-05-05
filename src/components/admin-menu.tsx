@@ -87,7 +87,7 @@ export function AdminMenu({
   const triggerColor =
     variant === "dark"
       ? "text-tenant-on-dark hover:text-white"
-      : "text-gray-600 hover:text-gray-900";
+      : "text-ink-muted hover:text-ink";
 
   return (
     <div ref={ref} className="relative inline-block text-left">
@@ -114,10 +114,10 @@ export function AdminMenu({
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-full z-50 mt-1 w-48 origin-top-right rounded-md border border-gray-200 bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
+          className="absolute right-0 top-full z-50 mt-1 w-48 origin-top-right rounded-md border border-border-warm bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
         >
           <div className="py-1">
-            <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+            <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-ink-subtle">
               Change mode
             </div>
             {MODES_IN_ORDER.map((m) => {
@@ -133,7 +133,7 @@ export function AdminMenu({
                   className={`flex w-full items-center justify-between px-3 py-1.5 text-sm ${
                     active
                       ? "bg-tenant-tint font-medium text-tenant-primary"
-                      : "text-gray-700 hover:bg-gray-50"
+                      : "text-ink-muted hover:bg-bg-subtle"
                   } disabled:opacity-50`}
                 >
                   <span>{m.label}</span>
@@ -156,12 +156,12 @@ export function AdminMenu({
                 </button>
               );
             })}
-            <div className="my-1 border-t border-gray-100" />
+            <div className="my-1 border-t border-border-warm" />
             <Link
               href={`/admin/${slug}`}
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="block px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+              className="block px-3 py-1.5 text-sm text-ink-muted hover:bg-bg-subtle"
             >
               Site settings
             </Link>
@@ -186,7 +186,7 @@ export function AdminMenu({
                 }
                 await signOut({ redirectUrl: "/" });
               }}
-              className="block w-full px-3 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="block w-full px-3 py-1.5 text-left text-sm text-ink-muted hover:bg-bg-subtle disabled:opacity-50"
             >
               Sign out
             </button>

@@ -32,9 +32,7 @@ export default async function SuperAdminAdminsPage() {
         &larr; Back to super admin
       </Link>
 
-      <h2 className="mb-8 font-serif text-3xl font-light italic text-ink">
-        Manage admins
-      </h2>
+      <h2 className="mb-8 text-3xl font-semibold text-ink">Manage admins</h2>
 
       <ManageAdminsClient
         reunions={allReunions.map((r) => ({

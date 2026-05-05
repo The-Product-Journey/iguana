@@ -11,9 +11,10 @@
  * `text-forest-deep`, etc. instead of arbitrary `bg-[var(...)]` classes.
  * Fonts are loaded via next/font in src/app/layout.tsx:
  *   - --font-sans (Bricolage Grotesque) — primary UI typeface
- *   - --font-serif (Fraunces) — italic light, used at moments of warmth
- *     (page headings, empty states). Caveat is logo-only and lives
- *     inside the brand asset PNGs in /public/brand/.
+ *   - --font-serif (Fraunces) — italic light, used sparingly for
+ *     marketing-voice warmth (empty states only — NOT page headings;
+ *     headings are Bricolage Grotesque semibold). Caveat is logo-only
+ *     and lives baked into the wordmark/name-tag SVGs themselves.
  */
 
 @theme {
@@ -41,10 +42,30 @@
   --color-on-forest: #f4ecda;
   --color-on-persimmon: #2b5747;
 
-  /* Status — harmonized with the brand */
+  /* Status — harmonized with the brand. Used on PLATFORM surfaces
+   * (admin pages, homepage, admin chrome that overlays tenant pages
+   * like AdminPreviewBanner). NOT for status panels rendered inside
+   * a public reunion site — those use the site-* palette below. */
   --color-success: #2d7a5f;
   --color-warning: #d89535;
   --color-danger: #b23a2a;
+
+  /*
+   * Tenant-site status palette — permanent, NOT customizable per tenant.
+   * Deliberately decoupled from the platform brand tokens above so the
+   * platform's persimmon-adjacent warning doesn't bleed onto a tenant's
+   * site. Classic web amber/green/red picked to harmonize with any
+   * tenant primary color and to pass WCAG AA at body sizes (the dark
+   * shade on its tint surface).
+   *
+   * Pattern: panels use border-site-X/30 + bg-site-X-tint + text-site-X.
+   */
+  --color-site-success: #15803d;       /* green-700 */
+  --color-site-success-tint: #f0fdf4;  /* green-50 */
+  --color-site-warning: #b45309;       /* amber-700 */
+  --color-site-warning-tint: #fffbeb;  /* amber-50 */
+  --color-site-danger: #b91c1c;        /* red-700 */
+  --color-site-danger-tint: #fef2f2;   /* red-50 */
 
   /*
    * Tenant brand tokens — apply only on the public reunion site
@@ -56,7 +77,7 @@
    * expressions at BUILD time and outputs static colors. So if the
    * derived shades were declared here, runtime overrides of
    * --color-tenant-primary would only affect the primary — the
-   * derived shades would stay frozen at their build-time PHHS-red
+   * derived shades would stay frozen at their build-time default
    * values. We declare ONLY the primary in @theme (so Tailwind
    * registers all the tenant-* utility class names) and redeclare
    * the derivations inside the [data-theme="tenant"] block below as
@@ -64,16 +85,20 @@
    * expressions and evaluates them at use site against the local
    * --color-tenant-primary override.
    *
-   * Defaults reflect the historic PHHS Park Hill red so existing
-   * reunions render identically to before this feature shipped.
+   * Defaults are a calm, non-platform blue — applied to any reunion that
+   * hasn't picked a brand color yet. Static values below approximate the
+   * runtime color-mix derivations for non-tenant contexts (e.g. site
+   * cards on the platform homepage that use var(--color-tenant-primary)
+   * as a fallback stripe color).
    */
-  --color-tenant-primary: #475569;
-  --color-tenant-primary-deep: #38424f;
-  --color-tenant-darkest: #232a35;
-  --color-tenant-tint: #eef0f2;
-  --color-tenant-tint-strong: #dadde1;
-  --color-tenant-border-soft: #b6bbc1;
-  --color-tenant-on-dark: #c1c5cb;
+  --color-tenant-primary: #23549a;
+  --color-tenant-primary-soft: #3d68a8;
+  --color-tenant-primary-deep: #1c437b;
+  --color-tenant-darkest: #122a4d;
+  --color-tenant-tint: #f4f6fa;
+  --color-tenant-tint-strong: #d8e0ed;
+  --color-tenant-border-soft: #b2c3db;
+  --color-tenant-on-dark: #bdcce0;
 }
 
 /*
@@ -84,9 +109,10 @@
  * scope, picking up the tenant's inline override.
  */
 [data-theme="tenant"] {
+  --color-tenant-primary-soft: color-mix(in oklch, var(--color-tenant-primary) 85%, white);
   --color-tenant-primary-deep: color-mix(in oklch, var(--color-tenant-primary) 80%, black);
   --color-tenant-darkest: color-mix(in oklch, var(--color-tenant-primary) 50%, black);
-  --color-tenant-tint: color-mix(in oklch, var(--color-tenant-primary) 8%, white);
+  --color-tenant-tint: color-mix(in oklch, var(--color-tenant-primary) 5%, white);
   --color-tenant-tint-strong: color-mix(in oklch, var(--color-tenant-primary) 18%, white);
   --color-tenant-border-soft: color-mix(in oklch, var(--color-tenant-primary) 35%, white);
   --color-tenant-on-dark: color-mix(in oklch, var(--color-tenant-primary) 30%, white);

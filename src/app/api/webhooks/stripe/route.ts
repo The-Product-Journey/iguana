@@ -3,6 +3,7 @@ import { getStripe, stripeEnvironment } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { rsvps, sponsors, stripeConnectAccounts } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -35,6 +36,8 @@ export async function POST(req: NextRequest) {
       10
     );
 
+    const posthog = getPostHogClient();
+
     if (rsvpId) {
       await db
         .update(rsvps)
@@ -45,6 +48,19 @@ export async function POST(req: NextRequest) {
           updatedAt: new Date().toISOString(),
         })
         .where(eq(rsvps.id, rsvpId));
+
+      const distinctId = session.customer_email || rsvpId;
+      posthog.capture({
+        distinctId,
+        event: "rsvp_payment_completed",
+        properties: {
+          rsvp_id: rsvpId,
+          reunion_id: session.metadata?.reunion_id,
+          amount_total_cents: session.amount_total || 0,
+          donation_cents: donationCents,
+          stripe_session_id: session.id,
+        },
+      });
     }
 
     if (sponsorId) {
@@ -55,6 +71,18 @@ export async function POST(req: NextRequest) {
           updatedAt: new Date().toISOString(),
         })
         .where(eq(sponsors.id, sponsorId));
+
+      const distinctId = session.customer_email || sponsorId;
+      posthog.capture({
+        distinctId,
+        event: "sponsor_payment_completed",
+        properties: {
+          sponsor_id: sponsorId,
+          reunion_id: session.metadata?.reunion_id,
+          amount_total_cents: session.amount_total || 0,
+          stripe_session_id: session.id,
+        },
+      });
     }
   }
 
@@ -62,6 +90,8 @@ export async function POST(req: NextRequest) {
     const session = event.data.object;
     const rsvpId = session.metadata?.rsvp_id;
     const sponsorId = session.metadata?.sponsor_id;
+
+    const posthog = getPostHogClient();
 
     if (rsvpId) {
       await db
@@ -71,6 +101,17 @@ export async function POST(req: NextRequest) {
           updatedAt: new Date().toISOString(),
         })
         .where(eq(rsvps.id, rsvpId));
+
+      const distinctId = session.customer_email || rsvpId;
+      posthog.capture({
+        distinctId,
+        event: "rsvp_payment_failed",
+        properties: {
+          rsvp_id: rsvpId,
+          reunion_id: session.metadata?.reunion_id,
+          stripe_session_id: session.id,
+        },
+      });
     }
 
     if (sponsorId) {

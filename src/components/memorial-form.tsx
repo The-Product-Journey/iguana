@@ -47,11 +47,11 @@ export function MemorialForm({
 
   if (success) {
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-        <h2 className="mb-2 text-2xl font-bold text-gray-900">
+      <div className="rounded-xl border border-border-warm bg-white p-8 text-center shadow-sm">
+        <h2 className="mb-2 text-2xl font-bold text-ink">
           Thank You
         </h2>
-        <p className="mb-4 text-gray-600">
+        <p className="mb-4 text-ink-muted">
           Your memorial submission has been received. The reunion committee will
           review it carefully and may reach out to you with any questions.
         </p>
@@ -68,7 +68,7 @@ export function MemorialForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-sm"
+      className="space-y-6 rounded-xl border border-border-warm bg-white p-8 shadow-sm"
     >
       {error && (
         <div className="rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">
@@ -76,74 +76,74 @@ export function MemorialForm({
         </div>
       )}
 
-      <h3 className="text-lg font-semibold text-gray-900">
+      <h3 className="text-lg font-semibold text-ink">
         About the Classmate
       </h3>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="deceasedFirstName" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="deceasedFirstName" className="mb-1 block text-sm font-medium text-ink-muted">
             First Name *
           </label>
           <input
             id="deceasedFirstName"
             name="deceasedFirstName"
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
         <div>
-          <label htmlFor="deceasedLastName" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="deceasedLastName" className="mb-1 block text-sm font-medium text-ink-muted">
             Last Name *
           </label>
           <input
             id="deceasedLastName"
             name="deceasedLastName"
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="yearOfBirth" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="yearOfBirth" className="mb-1 block text-sm font-medium text-ink-muted">
             Year of Birth
           </label>
           <input
             id="yearOfBirth"
             name="yearOfBirth"
             placeholder="e.g., 1978"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
         <div>
-          <label htmlFor="yearOfDeath" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="yearOfDeath" className="mb-1 block text-sm font-medium text-ink-muted">
             Year of Death
           </label>
           <input
             id="yearOfDeath"
             name="yearOfDeath"
             placeholder="e.g., 2023"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">
+        <label className="mb-1 block text-sm font-medium text-ink-muted">
           Photo
         </label>
         <input
           type="file"
           accept="image/*"
           onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
-          className="w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-tenant-tint file:px-4 file:py-2 file:text-sm file:font-semibold file:text-tenant-primary hover:file:bg-tenant-tint-strong"
+          className="w-full text-sm text-ink-subtle file:mr-4 file:rounded-full file:border-0 file:bg-tenant-tint file:px-4 file:py-2 file:text-sm file:font-semibold file:text-tenant-primary hover:file:bg-tenant-tint-strong"
         />
       </div>
 
       <div>
-        <label htmlFor="tributeText" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="tributeText" className="mb-1 block text-sm font-medium text-ink-muted">
           Tribute / Remembrance *
         </label>
         <textarea
@@ -152,33 +152,33 @@ export function MemorialForm({
           required
           rows={5}
           placeholder="Share your memories and what this person meant to the class..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
-      <hr className="border-gray-200" />
+      <hr className="border-border-warm" />
 
-      <h3 className="text-lg font-semibold text-gray-900">
+      <h3 className="text-lg font-semibold text-ink">
         Your Contact Information
       </h3>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-ink-subtle">
         For committee use only — we may reach out with questions.
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="submitterName" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="submitterName" className="mb-1 block text-sm font-medium text-ink-muted">
             Your Name *
           </label>
           <input
             id="submitterName"
             name="submitterName"
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
         <div>
-          <label htmlFor="submitterEmail" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="submitterEmail" className="mb-1 block text-sm font-medium text-ink-muted">
             Your Email *
           </label>
           <input
@@ -186,32 +186,32 @@ export function MemorialForm({
             name="submitterEmail"
             type="email"
             required
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="submitterPhone" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="submitterPhone" className="mb-1 block text-sm font-medium text-ink-muted">
             Your Phone
           </label>
           <input
             id="submitterPhone"
             name="submitterPhone"
             type="tel"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
         <div>
-          <label htmlFor="submitterRelationship" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="submitterRelationship" className="mb-1 block text-sm font-medium text-ink-muted">
             Relationship
           </label>
           <input
             id="submitterRelationship"
             name="submitterRelationship"
             placeholder="e.g., classmate, family member, friend"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
       </div>

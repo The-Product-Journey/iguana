@@ -4,6 +4,7 @@ import { sql, eq } from "drizzle-orm";
 import Link from "next/link";
 import { requireSuperAdminPage } from "@/lib/admin-auth";
 import { LaunchSiteMenu } from "@/components/launch-site-menu";
+import { TestTag } from "@/components/test-tag";
 
 export const dynamic = "force-dynamic";
 
@@ -26,9 +27,7 @@ export default async function SuperAdminPage() {
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
-        <h2 className="font-serif text-3xl font-light italic text-ink">
-          Super Admin
-        </h2>
+        <h2 className="text-3xl font-semibold text-ink">Super Admin</h2>
         <Link
           href="/admin/super/admins"
           className="rounded-lg bg-forest px-4 py-2 text-sm font-medium text-on-forest transition hover:bg-forest-deep"
@@ -54,11 +53,7 @@ export default async function SuperAdminPage() {
                 >
                   {reunion.name}
                 </Link>
-                {reunion.slug.endsWith("-test") && (
-                  <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-800">
-                    Test
-                  </span>
-                )}
+                {reunion.slug.endsWith("-test") && <TestTag />}
                 <LaunchSiteMenu
                   slug={reunion.slug}
                   reunionName={reunion.name}

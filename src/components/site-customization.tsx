@@ -158,7 +158,7 @@ function DomainSection({
       </div>
       {error && <p className="mt-2 text-sm text-danger">{error}</p>}
       {success && (
-        <p className="mt-2 text-sm text-green-700">
+        <p className="mt-2 text-sm text-success">
           Saved. Some manual setup is required before the new domain serves
           traffic.
         </p>
@@ -318,7 +318,7 @@ function FaviconSection({
             accept=".svg,.png,.ico,image/svg+xml,image/png,image/x-icon,image/vnd.microsoft.icon"
             disabled={busy}
             onChange={(e) => onFileSelected(e.target.files?.[0] ?? null)}
-            className="text-sm text-ink-muted file:mr-3 file:rounded-md file:border-0 file:bg-bg-subtle file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-ink-muted hover:file:bg-gray-200"
+            className="text-sm text-ink-muted file:mr-3 file:rounded-md file:border-0 file:bg-bg-subtle file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-ink-muted hover:file:bg-border-warm"
           />
           <div className="flex gap-2">
             <button
@@ -353,7 +353,7 @@ function FaviconSection({
 // ---------------------------------------------------------------------------
 
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
-const PLATFORM_DEFAULT_BRAND = "#475569"; // Slate — matches the @theme fallback in globals.css
+const PLATFORM_DEFAULT_BRAND = "#23549a"; // Calm blue — matches the @theme fallback in globals.css
 
 function BrandColorSection({
   reunionId,
@@ -524,11 +524,12 @@ function BrandColorSection({
         </p>
       )}
       {formatValid && lowContrast && (
-        <p className="mt-2 text-xs text-warning">
-          ⚠ This color may be hard to read on white backgrounds (contrast
-          ratio {contrastVsWhite!.toFixed(1)}:1, below WCAG AA 4.5:1).
-          Visitors may have trouble seeing buttons and links. You can save
-          anyway if it&apos;s your brand.
+        <p className="mt-2 text-xs text-ink">
+          <span className="text-warning" aria-hidden="true">⚠</span> This color
+          may be hard to read on white backgrounds (contrast ratio{" "}
+          {contrastVsWhite!.toFixed(1)}:1, below WCAG AA 4.5:1). Visitors may
+          have trouble seeing buttons and links. You can save anyway if
+          it&apos;s your brand.
         </p>
       )}
       {error && <p className="mt-2 text-sm text-danger">{error}</p>}

@@ -38,7 +38,7 @@ export default async function RsvpPage({
   // Pre-register mode — show interest form inline
   if (effectiveMode === "pre_register") {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-tenant-tint py-12">
         <div className="mx-auto max-w-xl px-6">
           <Link
             href={`/${slug}`}
@@ -47,8 +47,8 @@ export default async function RsvpPage({
             &larr; Back to event
           </Link>
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-gray-900">{reunion.name}</h1>
-            <p className="mt-2 text-gray-600">
+            <h1 className="text-3xl font-bold text-ink">{reunion.name}</h1>
+            <p className="mt-2 text-ink-muted">
               Registration isn&apos;t open yet, but you can sign up to be
               notified when it is.
             </p>
@@ -67,7 +67,7 @@ export default async function RsvpPage({
   const connect = await loadConnectAccount(reunion.id);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-tenant-tint py-12">
       <div className="mx-auto max-w-xl px-6">
         <Link
           href={`/${slug}`}
@@ -76,8 +76,8 @@ export default async function RsvpPage({
           &larr; Back to event
         </Link>
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">{reunion.name}</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-ink">{reunion.name}</h1>
+          <p className="mt-2 text-ink-muted">
             Register for the reunion events below.
           </p>
         </div>

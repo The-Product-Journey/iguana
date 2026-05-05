@@ -30,14 +30,14 @@ export default async function SponsorConfirmationPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-6 py-12">
+    <div className="min-h-screen bg-tenant-tint px-6 py-12">
       <div className="mx-auto max-w-md">
-        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+        <div className="rounded-xl border border-border-warm bg-white p-8 text-center shadow-sm">
           <div className="mb-4 text-5xl">🙏</div>
-          <h1 className="mb-2 text-2xl font-bold text-gray-900">
+          <h1 className="mb-2 text-2xl font-bold text-ink">
             Thank You for Your Sponsorship!
           </h1>
-          <p className="mb-6 text-gray-600">
+          <p className="mb-6 text-ink-muted">
             Your generous contribution helps make our 30-year reunion possible.
             Your sponsorship will be featured on our sponsors page once
             reviewed by the reunion committee.
@@ -56,7 +56,7 @@ export default async function SponsorConfirmationPage({
               &larr; Back to event page
             </Link>
           </div>
-          <p className="mt-6 text-xs text-gray-400">{REFUND_POLICY_TEXT}</p>
+          <p className="mt-6 text-xs text-ink-subtle">{REFUND_POLICY_TEXT}</p>
         </div>
 
         {sponsor && session_id && (

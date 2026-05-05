@@ -134,12 +134,12 @@ export function SponsorRecognitionForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="mt-8 rounded-xl border border-gray-200 bg-white p-6 text-left shadow-sm"
+      className="mt-8 rounded-xl border border-border-warm bg-white p-6 text-left shadow-sm"
     >
-      <h2 className="mb-1 text-lg font-semibold text-gray-900">
+      <h2 className="mb-1 text-lg font-semibold text-ink">
         How would you like to be credited?
       </h2>
-      <p className="mb-4 text-sm text-gray-600">
+      <p className="mb-4 text-sm text-ink-muted">
         Optional. The committee will review and publish your sponsorship to the
         public sponsors page. You can leave any field blank to accept defaults.
       </p>
@@ -156,13 +156,13 @@ export function SponsorRecognitionForm({
             type="checkbox"
             checked={isAnonymous}
             onChange={(e) => setIsAnonymous(e.target.checked)}
-            className="mt-1 h-4 w-4 rounded border-gray-300 accent-tenant-primary focus:ring-tenant-primary"
+            className="mt-1 h-4 w-4 rounded border-border-strong accent-tenant-primary focus:ring-tenant-primary"
           />
           <span>
-            <span className="block text-sm font-medium text-gray-900">
+            <span className="block text-sm font-medium text-ink">
               Show me as anonymous
             </span>
-            <span className="block text-xs text-gray-500">
+            <span className="block text-xs text-ink-subtle">
               Hides your name, website, and logo. Shows &ldquo;Anonymous Sponsor&rdquo; on the public page.
             </span>
           </span>
@@ -171,9 +171,9 @@ export function SponsorRecognitionForm({
         <div className={isAnonymous ? "pointer-events-none opacity-50" : ""}>
           <label
             htmlFor="displayName"
-            className="mb-1 block text-sm font-medium text-gray-700"
+            className="mb-1 block text-sm font-medium text-ink-muted"
           >
-            Display name <span className="text-gray-400">(optional)</span>
+            Display name <span className="text-ink-subtle">(optional)</span>
           </label>
           <input
             id="displayName"
@@ -181,9 +181,9 @@ export function SponsorRecognitionForm({
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder={initial.companyName || initial.contactName}
             disabled={isAnonymous}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-ink-subtle">
             Leave blank to use {initial.companyName ? `"${initial.companyName}"` : `"${initial.contactName}"`}
           </p>
         </div>
@@ -191,9 +191,9 @@ export function SponsorRecognitionForm({
         <div className={isAnonymous ? "pointer-events-none opacity-50" : ""}>
           <label
             htmlFor="websiteUrl"
-            className="mb-1 block text-sm font-medium text-gray-700"
+            className="mb-1 block text-sm font-medium text-ink-muted"
           >
-            Website <span className="text-gray-400">(optional)</span>
+            Website <span className="text-ink-subtle">(optional)</span>
           </label>
           <input
             id="websiteUrl"
@@ -202,16 +202,16 @@ export function SponsorRecognitionForm({
             onChange={(e) => setWebsiteUrl(e.target.value)}
             placeholder="https://"
             disabled={isAnonymous}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
 
         <div className={isAnonymous ? "pointer-events-none opacity-50" : ""}>
           <label
             htmlFor="message"
-            className="mb-1 block text-sm font-medium text-gray-700"
+            className="mb-1 block text-sm font-medium text-ink-muted"
           >
-            Tagline / message <span className="text-gray-400">(optional)</span>
+            Tagline / message <span className="text-ink-subtle">(optional)</span>
           </label>
           <textarea
             id="message"
@@ -220,17 +220,17 @@ export function SponsorRecognitionForm({
             rows={2}
             disabled={isAnonymous}
             placeholder="A short note shown under your name"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+            className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
           />
         </div>
 
         <div className={isAnonymous ? "pointer-events-none opacity-50" : ""}>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Logo <span className="text-gray-400">(optional)</span>
+          <label className="mb-1 block text-sm font-medium text-ink-muted">
+            Logo <span className="text-ink-subtle">(optional)</span>
           </label>
           <div className="flex items-start gap-3">
             {previewLogoUrl ? (
-              <div className="flex h-16 w-24 shrink-0 items-center justify-center rounded border border-gray-200 bg-white p-1">
+              <div className="flex h-16 w-24 shrink-0 items-center justify-center rounded border border-border-warm bg-white p-1">
                 <Image
                   src={previewLogoUrl}
                   alt="Logo preview"
@@ -241,7 +241,7 @@ export function SponsorRecognitionForm({
                 />
               </div>
             ) : (
-              <div className="flex h-16 w-24 shrink-0 items-center justify-center rounded border border-dashed border-gray-300 text-xs text-gray-400">
+              <div className="flex h-16 w-24 shrink-0 items-center justify-center rounded border border-dashed border-border-strong text-xs text-ink-subtle">
                 No logo
               </div>
             )}
@@ -252,9 +252,9 @@ export function SponsorRecognitionForm({
                 accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
                 onChange={onLogoSelected}
                 disabled={isAnonymous}
-                className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-md file:border-0 file:bg-tenant-primary file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-tenant-primary-deep disabled:opacity-50"
+                className="block w-full text-sm text-ink-muted file:mr-3 file:rounded-md file:border-0 file:bg-tenant-primary file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-tenant-primary-deep disabled:opacity-50"
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-ink-subtle">
                 PNG, JPG, GIF, WebP, or SVG. Max 2MB.
               </p>
               <div className="mt-1 flex gap-3 text-xs">
@@ -262,7 +262,7 @@ export function SponsorRecognitionForm({
                   <button
                     type="button"
                     onClick={clearPendingLogo}
-                    className="text-gray-500 underline-offset-2 hover:text-gray-700 hover:underline"
+                    className="text-ink-subtle underline-offset-2 hover:text-ink-muted hover:underline"
                   >
                     Cancel selection
                   </button>
@@ -271,13 +271,13 @@ export function SponsorRecognitionForm({
                   <button
                     type="button"
                     onClick={requestRemoveLogo}
-                    className="text-gray-500 underline-offset-2 hover:text-gray-700 hover:underline"
+                    className="text-ink-subtle underline-offset-2 hover:text-ink-muted hover:underline"
                   >
                     Remove logo
                   </button>
                 )}
                 {removeLogo && (
-                  <span className="text-amber-700">
+                  <span className="text-ink-muted">
                     Logo will be removed on save.{" "}
                     <button
                       type="button"
@@ -295,11 +295,11 @@ export function SponsorRecognitionForm({
       </div>
 
       {/* Live preview */}
-      <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+      <div className="mt-6 rounded-lg border border-border-warm bg-bg-subtle p-4">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-subtle">
           Preview
         </p>
-        <div className="rounded border border-gray-200 bg-white p-4">
+        <div className="rounded border border-border-warm bg-white p-4">
           {previewLogoUrl && (
             <div className="mb-3 flex h-20 items-center justify-center">
               <Image
@@ -312,12 +312,12 @@ export function SponsorRecognitionForm({
               />
             </div>
           )}
-          <p className="text-base font-bold text-gray-900">{previewName}</p>
+          <p className="text-base font-bold text-ink">{previewName}</p>
           {!isAnonymous && message.trim() && (
-            <p className="mt-1 text-sm text-gray-600">{message.trim()}</p>
+            <p className="mt-1 text-sm text-ink-muted">{message.trim()}</p>
           )}
           {!isAnonymous && websiteUrl.trim() && (
-            <p className="mt-1 text-xs text-gray-400">{websiteUrl.trim()}</p>
+            <p className="mt-1 text-xs text-ink-subtle">{websiteUrl.trim()}</p>
           )}
         </div>
       </div>
@@ -331,7 +331,7 @@ export function SponsorRecognitionForm({
           {saving ? "Saving…" : "Save preferences"}
         </button>
         {savedAt && !saving && (
-          <span className="text-xs text-green-700">Saved ✓</span>
+          <span className="text-xs text-site-success">Saved ✓</span>
         )}
       </div>
     </form>

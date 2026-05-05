@@ -19,12 +19,12 @@ export function HelpSection({ reunionId }: { reunionId: string }) {
         <h2 className="mb-4 text-center text-xl font-bold text-tenant-darkest">
           We Need Your Help!
         </h2>
-        <p className="mb-4 text-center text-gray-700">
+        <p className="mb-4 text-center text-ink-muted">
           Reach out if any of these apply to you:
         </p>
         <div className="mx-auto grid max-w-lg gap-2 sm:grid-cols-2">
           {REASONS.map((reason) => (
-            <p key={reason} className="text-gray-700">
+            <p key={reason} className="text-ink-muted">
               {reason}
             </p>
           ))}

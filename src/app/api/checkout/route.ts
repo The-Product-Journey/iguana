@@ -4,6 +4,7 @@ import { reunions, rsvps, events, registrationEvents } from "@/lib/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { getStripe, getBaseUrl, Stripe, loadConnectAccount } from "@/lib/stripe";
 import { computeApplicationFeeCents } from "@/lib/constants";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -196,6 +197,23 @@ export async function POST(req: NextRequest) {
       .update(rsvps)
       .set({ stripeCheckoutSessionId: session.id })
       .where(eq(rsvps.id, rsvpId));
+
+    const posthog = getPostHogClient();
+    posthog.identify({ distinctId: email, properties: { name: `${firstName} ${lastName}`, email } });
+    posthog.capture({
+      distinctId: email,
+      event: "rsvp_checkout_created",
+      properties: {
+        reunion_id: reunionId,
+        slug,
+        rsvp_id: rsvpId,
+        guest_count: guestCount,
+        total_cents: totalCents,
+        donation_cents: safeDonation,
+        total_charge_cents: totalChargeCents,
+        stripe_session_id: session.id,
+      },
+    });
 
     return NextResponse.json({ url: session.url });
   } catch (error) {

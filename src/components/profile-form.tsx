@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import posthog from "posthog-js";
 
 type ProfileData = {
   currentCity: string | null;
@@ -62,6 +63,11 @@ export function ProfileForm({
         return;
       }
 
+      posthog.capture("yearbook_profile_saved", {
+        rsvp_id: rsvpId,
+        has_photo: !!photoFile,
+        is_update: !!existingProfile,
+      });
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch {
@@ -74,22 +80,22 @@ export function ProfileForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-sm"
+      className="space-y-6 rounded-xl border border-border-warm bg-white p-8 shadow-sm"
     >
       {error && (
-        <div className="rounded-lg bg-tenant-tint p-3 text-sm text-tenant-primary">
+        <div className="rounded-lg bg-site-danger-tint p-3 text-sm text-site-danger">
           {error}
         </div>
       )}
       {success && (
-        <div className="rounded-lg bg-green-50 p-3 text-sm text-green-700">
+        <div className="rounded-lg bg-site-success-tint p-3 text-sm text-site-success">
           Profile saved!
         </div>
       )}
 
       {/* Photo */}
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">
+        <label className="mb-1 block text-sm font-medium text-ink-muted">
           Photo
         </label>
         {photoPreview && (
@@ -106,14 +112,14 @@ export function ProfileForm({
           type="file"
           accept="image/*"
           onChange={handlePhotoChange}
-          className="w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-tenant-tint file:px-4 file:py-2 file:text-sm file:font-semibold file:text-tenant-primary hover:file:bg-tenant-tint-strong"
+          className="w-full text-sm text-ink-subtle file:mr-4 file:rounded-full file:border-0 file:bg-tenant-tint file:px-4 file:py-2 file:text-sm file:font-semibold file:text-tenant-primary hover:file:bg-tenant-tint-strong"
         />
       </div>
 
       <div>
         <label
           htmlFor="currentCity"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-1 block text-sm font-medium text-ink-muted"
         >
           Where do you live now?
         </label>
@@ -122,14 +128,14 @@ export function ProfileForm({
           name="currentCity"
           defaultValue={existingProfile?.currentCity || ""}
           placeholder="e.g., Denver, CO"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
       <div>
         <label
           htmlFor="occupation"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-1 block text-sm font-medium text-ink-muted"
         >
           What do you do?
         </label>
@@ -138,14 +144,14 @@ export function ProfileForm({
           name="occupation"
           defaultValue={existingProfile?.occupation || ""}
           placeholder="e.g., Software engineer at Acme Corp"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
       <div>
         <label
           htmlFor="family"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-1 block text-sm font-medium text-ink-muted"
         >
           Family
         </label>
@@ -155,14 +161,14 @@ export function ProfileForm({
           rows={2}
           defaultValue={existingProfile?.family || ""}
           placeholder="e.g., Married with 2 kids, a dog named Barkley..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
       <div>
         <label
           htmlFor="favoritePHMemory"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-1 block text-sm font-medium text-ink-muted"
         >
           Favorite Park Hill Memory
         </label>
@@ -172,14 +178,14 @@ export function ProfileForm({
           rows={3}
           defaultValue={existingProfile?.favoritePHMemory || ""}
           placeholder="That time in Mr. Johnson's class when..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
       <div>
         <label
           htmlFor="beenUpTo"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-1 block text-sm font-medium text-ink-muted"
         >
           What have you been up to since &apos;96?
         </label>
@@ -189,14 +195,14 @@ export function ProfileForm({
           rows={4}
           defaultValue={existingProfile?.beenUpTo || ""}
           placeholder="The highlights of the last 30 years..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
       <div>
         <label
           htmlFor="funFact"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-1 block text-sm font-medium text-ink-muted"
         >
           Fun Fact About You
         </label>
@@ -205,7 +211,7 @@ export function ProfileForm({
           name="funFact"
           defaultValue={existingProfile?.funFact || ""}
           placeholder="e.g., I've visited 47 states, I can juggle flaming torches..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
+          className="w-full rounded-lg border border-border-strong px-3 py-2 shadow-sm focus:border-tenant-primary focus:outline-none focus:ring-1 focus:ring-tenant-primary"
         />
       </div>
 
