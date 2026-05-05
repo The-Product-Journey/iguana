@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { reunionAdmins, reunions } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { requireSuperAdmin } from "@/lib/admin-auth";
 import { sendAdminInvite, revokePendingInvite } from "@/lib/clerk-invites";
 
@@ -35,6 +35,38 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Pre-check the foreign key + unique constraints up front so we can
+  // return precise, actionable errors instead of relying on parsing DB
+  // exception strings (libsql/Turso error formatting varies). The DB
+  // catch below is kept as a fallback for race conditions.
+  const reunionExists = await db
+    .select({ id: reunions.id, name: reunions.name })
+    .from(reunions)
+    .where(eq(reunions.id, reunionId))
+    .get();
+  if (!reunionExists) {
+    return NextResponse.json({ error: "Reunion not found." }, { status: 404 });
+  }
+
+  const existing = await db
+    .select({ id: reunionAdmins.id })
+    .from(reunionAdmins)
+    .where(
+      and(
+        eq(reunionAdmins.reunionId, reunionId),
+        eq(reunionAdmins.email, email)
+      )
+    )
+    .get();
+  if (existing) {
+    return NextResponse.json(
+      {
+        error: `${email} is already an admin for ${reunionExists.name}. Scroll to their row below to resend or revoke their invite.`,
+      },
+      { status: 409 }
+    );
+  }
+
   let row;
   try {
     [row] = await db
@@ -47,21 +79,19 @@ export async function POST(req: NextRequest) {
       .returning();
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes("UNIQUE") || msg.includes("idx_reunion_admins")) {
+    // Race fallback: another super admin added the same email between
+    // our pre-check and our insert.
+    if (msg.includes("UNIQUE") || msg.toLowerCase().includes("constraint")) {
       return NextResponse.json(
-        { error: "This email is already an admin for that reunion." },
+        {
+          error: `${email} is already an admin for ${reunionExists.name}.`,
+        },
         { status: 409 }
-      );
-    }
-    if (msg.includes("FOREIGN KEY")) {
-      return NextResponse.json(
-        { error: "Reunion not found." },
-        { status: 404 }
       );
     }
     console.error("[super/admins] insert failed", err);
     return NextResponse.json(
-      { error: "Failed to add admin." },
+      { error: "Couldn't add admin. Please try again." },
       { status: 500 }
     );
   }
