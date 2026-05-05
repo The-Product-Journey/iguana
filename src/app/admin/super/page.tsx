@@ -67,8 +67,6 @@ export default async function SuperAdminPage() {
                 slug={reunion.slug}
                 reunionName={reunion.name}
                 customDomain={reunion.customDomain}
-                iconClassName="h-4 w-4"
-                triggerClassName="inline-flex h-7 w-7 items-center justify-center rounded text-ink-subtle transition hover:bg-bg-subtle hover:text-forest"
               />
             </div>
           </li>
