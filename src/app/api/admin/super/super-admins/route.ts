@@ -34,6 +34,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Pre-check unique constraint so we never rely on parsing DB error
+  // strings (libsql/Turso error formatting varies). The catch below
+  // is kept as a race fallback.
+  const existing = await db
+    .select({ id: superAdmins.id })
+    .from(superAdmins)
+    .where(eq(superAdmins.email, email))
+    .get();
+  if (existing) {
+    return NextResponse.json(
+      {
+        error: `${email} is already a super admin. Find their row below to resend or revoke their invite.`,
+      },
+      { status: 409 }
+    );
+  }
+
   let row;
   try {
     [row] = await db
@@ -42,15 +59,17 @@ export async function POST(req: NextRequest) {
       .returning();
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes("UNIQUE") || msg.includes("idx_super_admins")) {
+    // Race fallback: another super admin added the same email between
+    // our pre-check and our insert.
+    if (msg.includes("UNIQUE") || msg.toLowerCase().includes("constraint")) {
       return NextResponse.json(
-        { error: "This email is already a super admin." },
+        { error: `${email} is already a super admin.` },
         { status: 409 }
       );
     }
     console.error("[super/super-admins] insert failed", err);
     return NextResponse.json(
-      { error: "Failed to add super admin." },
+      { error: "Couldn't add super admin. Please try again." },
       { status: 500 }
     );
   }
