@@ -106,22 +106,35 @@ export default async function AdminReunionPage({
     loadConnectAccount(reunion.id),
   ]);
 
-  // Get event interest counts AND the per-signup list of event names so
-  // the Interests tab can show what each person actually expressed
-  // interest in (not just an overall count).
+  // Build cross-indexed interest data so both tabs can drill in:
+  //   - Interests tab: click an interest signup's count → list of events
+  //     they marked
+  //   - Events tab: click an event's interest count → list of signups
+  //     interested in that event
   const eventNameById = new Map(allEvents.map((e) => [e.id, e.name]));
   const interestEventCounts: Record<string, number> = {};
   const interestEventsBySignup: Record<string, string[]> = {};
+  const interestPeopleByEvent: Record<string, string[]> = {};
   for (const interest of allInterests) {
     const ei = await db
       .select()
       .from(eventInterests)
       .where(eq(eventInterests.interestSignupId, interest.id));
+
+    const displayName =
+      interest.name ||
+      [interest.firstName, interest.lastName].filter(Boolean).join(" ") ||
+      interest.email;
+    const personLabel = `${displayName} <${interest.email}>`;
+
     interestEventsBySignup[interest.id] = ei
       .map((e) => eventNameById.get(e.eventId))
       .filter((n): n is string => !!n);
+
     for (const e of ei) {
       interestEventCounts[e.eventId] = (interestEventCounts[e.eventId] || 0) + 1;
+      if (!interestPeopleByEvent[e.eventId]) interestPeopleByEvent[e.eventId] = [];
+      interestPeopleByEvent[e.eventId].push(personLabel);
     }
   }
 
@@ -272,6 +285,7 @@ export default async function AdminReunionPage({
         messages={messages}
         interestEventCounts={interestEventCounts}
         interestEventsBySignup={interestEventsBySignup}
+        interestPeopleByEvent={interestPeopleByEvent}
         regEventCounts={regEventCounts}
         categoryLabels={CATEGORY_LABELS}
       />

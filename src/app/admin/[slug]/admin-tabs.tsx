@@ -24,6 +24,66 @@ type ContactMessage = {
   createdAt: string;
 };
 
+/**
+ * Renders a count number. Zero shows as plain text. Non-zero shows as
+ * an underlined link that opens a small dialog listing the items
+ * behind the count.
+ */
+function CountLinkDialog({
+  count,
+  title,
+  items,
+}: {
+  count: number;
+  title: string;
+  items: string[];
+}) {
+  const [open, setOpen] = useState(false);
+  if (count === 0) {
+    return <span className="text-ink-subtle">0</span>;
+  }
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="font-medium text-forest underline decoration-forest/40 underline-offset-2 hover:text-forest-deep hover:decoration-forest"
+      >
+        {count}
+      </button>
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="mb-3 text-lg font-semibold text-ink">{title}</h2>
+            <ul className="max-h-96 space-y-1 overflow-auto text-sm text-ink-muted">
+              {items.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded-md border border-border-strong bg-white px-3 py-1.5 text-sm font-medium text-ink-muted transition hover:bg-bg-subtle"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 type ProfileWithRsvp = {
   profile: Profile;
   firstName: string;
@@ -53,6 +113,7 @@ export function AdminTabs({
   messages,
   interestEventCounts,
   interestEventsBySignup,
+  interestPeopleByEvent,
   regEventCounts,
   categoryLabels,
 }: {
@@ -66,6 +127,7 @@ export function AdminTabs({
   messages: ContactMessage[];
   interestEventCounts: Record<string, number>;
   interestEventsBySignup: Record<string, string[]>;
+  interestPeopleByEvent: Record<string, string[]>;
   regEventCounts: Record<string, { confirmed: number; pending: number }>;
   categoryLabels: Record<string, string>;
 }) {
@@ -117,6 +179,7 @@ export function AdminTabs({
         <EventsTab
           events={events}
           interestCounts={interestEventCounts}
+          interestPeopleByEvent={interestPeopleByEvent}
           regCounts={regEventCounts}
         />
       )}
@@ -226,20 +289,11 @@ function InterestsTab({
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    {eventNames.length === 0 ? (
-                      <span className="text-ink-subtle">—</span>
-                    ) : (
-                      <div className="flex flex-wrap gap-1">
-                        {eventNames.map((name) => (
-                          <span
-                            key={name}
-                            className="rounded-full bg-bg-subtle px-2 py-0.5 text-xs text-ink-muted"
-                          >
-                            {name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    <CountLinkDialog
+                      count={eventNames.length}
+                      title={`Events ${displayName} is interested in`}
+                      items={eventNames}
+                    />
                   </td>
                   <td className="px-4 py-3 text-ink-subtle">
                     {new Date(i.createdAt).toLocaleDateString()}
@@ -601,10 +655,12 @@ function ProfilesTab({
 function EventsTab({
   events,
   interestCounts,
+  interestPeopleByEvent,
   regCounts,
 }: {
   events: Event[];
   interestCounts: Record<string, number>;
+  interestPeopleByEvent: Record<string, string[]>;
   regCounts: Record<string, { confirmed: number; pending: number }>;
 }) {
   return (
@@ -640,7 +696,11 @@ function EventsTab({
                 </span>
               </td>
               <td className="px-4 py-3">
-                {interestCounts[event.id] || 0}
+                <CountLinkDialog
+                  count={interestCounts[event.id] || 0}
+                  title={`People interested in ${event.name}`}
+                  items={interestPeopleByEvent[event.id] ?? []}
+                />
               </td>
               <td className="px-4 py-3">
                 <span className="text-success">
