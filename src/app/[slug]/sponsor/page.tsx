@@ -47,7 +47,7 @@ export default async function SponsorPage({
 
         {/* Tier explanation */}
         <div className="mb-8 grid gap-4 sm:grid-cols-2">
-          <div className="relative rounded-xl border border-border-warm bg-white p-6">
+          <div className="relative rounded-xl border border-tenant-primary bg-white p-6">
             <span className="absolute right-3 top-3 rounded-md bg-tenant-primary px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-white">
               Marquee
             </span>
@@ -62,7 +62,7 @@ export default async function SponsorPage({
               offset event costs to keep ticket prices low for everyone.
             </p>
           </div>
-          <div className="rounded-xl border border-border-warm bg-white p-6">
+          <div className="rounded-xl border border-tenant-primary bg-white p-6">
             <h3 className="mb-1 text-lg font-bold text-ink">
               Community Service Project Sponsor
             </h3>
