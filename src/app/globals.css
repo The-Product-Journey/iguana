@@ -67,13 +67,13 @@
    * Defaults reflect the historic PHHS Park Hill red so existing
    * reunions render identically to before this feature shipped.
    */
-  --color-tenant-primary: #b91c1c;
-  --color-tenant-primary-deep: #7a1313;
-  --color-tenant-darkest: #4a0a0a;
-  --color-tenant-tint: #fdf3f3;
-  --color-tenant-tint-strong: #f5d6d6;
-  --color-tenant-border-soft: #d99393;
-  --color-tenant-on-dark: #f0c1c1;
+  --color-tenant-primary: #475569;
+  --color-tenant-primary-deep: #38424f;
+  --color-tenant-darkest: #232a35;
+  --color-tenant-tint: #eef0f2;
+  --color-tenant-tint-strong: #dadde1;
+  --color-tenant-border-soft: #b6bbc1;
+  --color-tenant-on-dark: #c1c5cb;
 }
 
 /*
