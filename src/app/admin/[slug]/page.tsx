@@ -182,6 +182,21 @@ export default async function AdminReunionPage({
           iconClassName="h-5 w-5"
           triggerClassName="inline-flex h-7 w-7 items-center justify-center rounded text-ink-subtle transition hover:bg-bg-subtle hover:text-ink-muted"
         />
+        {/*
+          When the reunion has a vanity domain, surface a one-click way
+          to flip over to the public-facing site on that domain. We only
+          render this when customDomain is set — without one, the public
+          view is just /[slug] on the platform domain (the launch icon
+          above already opens that).
+        */}
+        {reunion.customDomain && (
+          <a
+            href={`https://${reunion.customDomain}`}
+            className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-forest/40 bg-white px-3 py-1 text-xs font-medium text-forest transition hover:border-forest hover:bg-forest hover:text-on-forest"
+          >
+            Switch to public view →
+          </a>
+        )}
       </div>
 
       <SiteModeToggle
