@@ -19,9 +19,11 @@ const MODE_LABELS: Record<SiteMode, string> = {
  * layout puts the AdminMenu somewhere else instead.
  */
 export function AdminPreviewBanner({
+  slug,
   previewMode,
   actualMode,
 }: {
+  slug: string;
   previewMode: SiteMode;
   actualMode: SiteMode;
 }) {
@@ -38,6 +40,7 @@ export function AdminPreviewBanner({
           </span>
         </div>
         <AdminMenu
+          slug={slug}
           actualMode={actualMode}
           previewMode={previewMode}
           variant="light"

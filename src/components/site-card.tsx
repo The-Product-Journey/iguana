@@ -1,54 +1,92 @@
+import Link from "next/link";
 import type { Reunion } from "@/lib/db/schema";
 
 /**
- * Site card on the platform homepage. Renders one reunion's at-a-glance
- * summary (favicon, domain, name, status) with a hover affordance that
- * reveals "Go to site →" — modeled after the Clerk dashboard's apps grid.
+ * Site card on the platform homepage. Shows a reunion's identity at a
+ * glance — favicon, name, status, configured URLs — and routes the
+ * primary CTA to that site's admin settings (deep link to /admin/<slug>).
  *
- * The whole card is a link to the reunion's public URL: vanity domain when
- * configured, otherwise the canonical /[slug] path.
+ * The top color stripe uses the reunion's configured brand color so each
+ * card carries a small visual cue of the tenant's identity. Without a
+ * brand color set, falls back to the platform default tenant token.
+ *
+ * Multiple clickable areas:
+ * - The displayed URLs (custom domain when set, plus the platform path)
+ *   are individual links that open the public site in a new tab.
+ * - The "Site settings →" footer is the primary action: deep-link to the
+ *   per-reunion admin page.
+ *
+ * The card itself is NOT a link wrapper — Site Cards have multiple
+ * distinct interactive children, so wrapping them in a single anchor
+ * would either swallow inner clicks or violate "no anchor inside anchor."
  */
 export function SiteCard({ site }: { site: Reunion }) {
-  // Always link to the platform path (relative). Using the configured
-  // custom domain here would force admins testing locally / on staging
-  // to bounce to the production vanity URL — confusing and breaks the
-  // "see the site as it lives in this environment" expectation.
-  const href = `/${site.slug}`;
-  const displayDomain = site.customDomain ?? `/${site.slug}`;
+  const platformPath = `/${site.slug}`;
   const faviconUrl = site.faviconUrl ?? "/favicon.svg";
+  const isTest = site.slug.endsWith("-test");
+
+  // The brand color stripe at the top. Inline style so each card uses
+  // its own reunion's brand color (rather than a single shared CSS var).
+  // Fallback to the platform default tenant token if brandColor is NULL.
+  const stripeColor = site.brandColor ?? "var(--color-tenant-primary)";
 
   return (
-    <a
-      href={href}
-      className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-xl border border-border-warm bg-white transition-all hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md"
-      aria-label={`Open ${site.name}`}
-    >
-      <div className="h-1.5 bg-gradient-to-r from-red-600 to-red-900" />
+    <div className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-xl border border-border-warm bg-white transition-all hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md">
+      <div
+        className="h-1.5"
+        style={{ backgroundColor: stripeColor }}
+      />
       <div className="flex flex-1 flex-col p-6">
-        <div className="mb-10 flex items-start justify-between gap-4">
+        <div className="mb-8 flex items-start justify-between gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element -- vercel blob URLs vary; <Image> would need explicit whitelist */}
           <img
             src={faviconUrl}
             alt=""
             className="h-10 w-10 rounded-md object-contain"
           />
-          <span className="truncate font-mono text-xs text-ink-muted">
-            {displayDomain}
-          </span>
+          <div className="flex flex-col items-end gap-0.5 truncate text-xs">
+            {site.customDomain && (
+              <a
+                href={`https://${site.customDomain}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="truncate font-mono text-ink hover:text-forest hover:underline"
+              >
+                {site.customDomain}
+              </a>
+            )}
+            <a
+              href={platformPath}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="truncate font-mono text-ink-subtle hover:text-forest hover:underline"
+            >
+              {site.slug}
+            </a>
+          </div>
         </div>
         <div className="mt-auto">
           <h3 className="mb-2 text-lg font-semibold text-ink">{site.name}</h3>
-          <span className="inline-flex items-center gap-1.5 rounded-md bg-success/10 px-2 py-1 text-xs font-medium text-success">
-            <span className="h-1.5 w-1.5 rounded-full bg-success" />
-            Production
-          </span>
+          {isTest ? (
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-warning/10 px-2 py-1 text-xs font-medium text-warning">
+              <span className="h-1.5 w-1.5 rounded-full bg-warning" />
+              Test
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-success/10 px-2 py-1 text-xs font-medium text-success">
+              <span className="h-1.5 w-1.5 rounded-full bg-success" />
+              Production
+            </span>
+          )}
         </div>
       </div>
-      <div className="border-t border-border-warm bg-bg-subtle px-6 py-3">
-        <span className="text-sm font-medium text-ink-subtle transition-colors group-hover:text-forest">
-          Go to site →
-        </span>
-      </div>
-    </a>
+      <Link
+        href={`/admin/${site.slug}`}
+        className="block border-t border-border-warm bg-bg-subtle px-6 py-3 text-sm font-medium text-ink-subtle transition-colors hover:bg-cream hover:text-forest"
+        aria-label={`Settings for ${site.name}`}
+      >
+        Site settings →
+      </Link>
+    </div>
   );
 }

@@ -91,10 +91,10 @@ export function SiteNav({
                 variant="light"
               />
               <AdminMenu
+                slug={slug}
                 actualMode={actualMode}
                 previewMode={previewMode ?? null}
                 variant="light"
-                customDomain={customDomain}
               />
             </>
           )}
