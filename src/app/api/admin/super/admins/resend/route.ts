@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
 
   const row = await db
     .select({
+      id: reunionAdmins.id,
       email: reunionAdmins.email,
       reunionId: reunionAdmins.reunionId,
     })
@@ -54,12 +55,20 @@ export async function POST(req: NextRequest) {
     console.error("[super/admins/resend] revoke failed", err);
   }
 
+  let inviteStatus: "sent" | "user-exists";
   try {
-    await sendAdminInvite(row.email, redirectPath);
+    const result = await sendAdminInvite(row.email, redirectPath);
+    inviteStatus = result.kind;
+    if (result.kind === "user-exists") {
+      await db
+        .update(reunionAdmins)
+        .set({ clerkUserId: result.clerkUserId })
+        .where(eq(reunionAdmins.id, row.id));
+    }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, inviteStatus });
 }

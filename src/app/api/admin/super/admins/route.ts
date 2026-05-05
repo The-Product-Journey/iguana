@@ -102,23 +102,41 @@ export async function POST(req: NextRequest) {
   // UI can offer a Resend action. The fallback "passive" path also
   // still works: the user can sign up manually and getCurrentAdminContext
   // will backfill on first sign-in.
-  const reunion = await db
+  const reunionForRedirect = await db
     .select({ slug: reunions.slug })
     .from(reunions)
     .where(eq(reunions.id, reunionId))
     .get();
-  const redirectPath = reunion ? `/admin/${reunion.slug}` : "/admin";
+  const redirectPath = reunionForRedirect
+    ? `/admin/${reunionForRedirect.slug}`
+    : "/admin";
 
   let inviteError: string | null = null;
+  let inviteStatus: "sent" | "user-exists" | null = null;
   try {
-    await sendAdminInvite(email, redirectPath);
+    const result = await sendAdminInvite(email, redirectPath);
+    inviteStatus = result.kind;
+    if (result.kind === "user-exists") {
+      // Existing Clerk user — skip the invitation and immediately
+      // backfill clerkUserId so this row reads as Active without
+      // waiting for the user's next sign-in.
+      await db
+        .update(reunionAdmins)
+        .set({ clerkUserId: result.clerkUserId })
+        .where(eq(reunionAdmins.id, row.id));
+    }
   } catch (err) {
     inviteError =
       err instanceof Error ? err.message : "Unknown invite error";
     console.error("[super/admins] invite send failed", err);
   }
 
-  return NextResponse.json({ ok: true, admin: row, inviteError });
+  return NextResponse.json({
+    ok: true,
+    admin: row,
+    inviteStatus,
+    inviteError,
+  });
 }
 
 export async function DELETE(req: NextRequest) {

@@ -33,10 +33,30 @@ export type InviteStatus =
   | { kind: "none" }; // no Clerk invitation has ever been sent
 
 /**
+ * Result of attempting to send an invitation. Two outcomes are
+ * meaningful upstream:
+ *   - "sent": Clerk created and emailed an invitation. The caller may
+ *     want to surface a "check your email" message.
+ *   - "user-exists": The email already has a Clerk account. No
+ *     invitation was sent (Clerk would reject it anyway with 422), and
+ *     the caller should backfill clerkUserId on the new admin row so
+ *     it's immediately marked Active.
+ */
+export type SendInviteResult =
+  | { kind: "sent"; invitationId: string }
+  | { kind: "user-exists"; clerkUserId: string };
+
+/**
  * Send a fresh invitation to `email`. Caller is responsible for
  * revoking any prior pending invite first if needed (use
  * revokePendingInvite). On Clerk failure this throws — callers wrap so
  * a Clerk outage doesn't block the DB-allowlist write.
+ *
+ * If the email is already attached to a Clerk user, no invitation is
+ * sent — the email API rejects in that case anyway, and inviting an
+ * existing user makes no semantic sense. The caller gets the user's
+ * clerkUserId back so the new admin row can be marked active right
+ * away.
  *
  * The redirectUrl is the page the user lands on AFTER completing
  * sign-up via Clerk's Account Portal. The Account Portal handles the
@@ -46,15 +66,24 @@ export type InviteStatus =
 export async function sendAdminInvite(
   email: string,
   redirectPath: string = "/admin"
-): Promise<{ id: string }> {
+): Promise<SendInviteResult> {
   const client = await clerkClient();
+
+  const existing = await client.users.getUserList({
+    emailAddress: [email],
+    limit: 1,
+  });
+  if (existing.totalCount > 0) {
+    return { kind: "user-exists", clerkUserId: existing.data[0].id };
+  }
+
   const inv = await client.invitations.createInvitation({
     emailAddress: email,
     redirectUrl: `${redirectOrigin()}${redirectPath}`,
     notify: true,
     ignoreExisting: false,
   });
-  return { id: inv.id };
+  return { kind: "sent", invitationId: inv.id };
 }
 
 /**
