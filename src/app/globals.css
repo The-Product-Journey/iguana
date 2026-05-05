@@ -58,11 +58,17 @@
  * `data-theme="tenant"` on the reunion layout so their own
  * brand-red focus rings on form inputs aren't overlaid with a
  * second persimmon outline.
+ *
+ * Modern browsers (Chromium, Firefox, Safari) automatically follow
+ * the focused element's own `border-radius` when drawing outlines —
+ * so a rounded input gets a rounded outline for free. Don't override
+ * `border-radius` here: doing so would make every focused input
+ * inherit the radius from its parent (often 0), forcing the input
+ * itself to lose its rounded corners on focus.
  */
 :focus-visible {
   outline: 2px solid var(--color-persimmon);
   outline-offset: 2px;
-  border-radius: inherit;
 }
 
 [data-theme="tenant"] :focus-visible {
