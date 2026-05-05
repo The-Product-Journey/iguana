@@ -71,6 +71,15 @@
   outline-offset: 2px;
 }
 
+/*
+ * Tenant pages drop the platform outline entirely. Form inputs and
+ * buttons already carry their own red focus ring via Tailwind's
+ * `focus:ring-*` utilities (box-shadow based), so layering an outline
+ * on top would either paint blue (browser default) or stack as a
+ * second red ring. `outline: none` defers focus styling to the
+ * component's own classes — every interactive element on the
+ * tenant pages should declare `focus:ring-*` or equivalent.
+ */
 [data-theme="tenant"] :focus-visible {
-  outline: revert;
+  outline: none;
 }
