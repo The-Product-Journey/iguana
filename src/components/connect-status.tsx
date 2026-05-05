@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 
 type ConnectState =
   | "loading"
@@ -28,6 +29,7 @@ export function ConnectStatus({
   initialChargesEnabled: boolean;
   initialPayoutsEnabled: boolean;
 }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [state, setState] = useState<ConnectState>(() => {
     const initialState = !initialHasAccount
@@ -57,6 +59,8 @@ export function ConnectStatus({
   });
   const [loading, setLoading] = useState(false);
   const [busyDashboard, setBusyDashboard] = useState(false);
+  const [busyDisconnect, setBusyDisconnect] = useState(false);
+  const [confirmDisconnect, setConfirmDisconnect] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -211,6 +215,34 @@ export function ConnectStatus({
     }
   }
 
+  async function handleDisconnect() {
+    setBusyDisconnect(true);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/connect/disconnect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reunionId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Failed to disconnect");
+        setBusyDisconnect(false);
+        setConfirmDisconnect(false);
+        return;
+      }
+      setState("not_connected");
+      setConfirmDisconnect(false);
+      setBusyDisconnect(false);
+      router.refresh();
+    } catch (e) {
+      console.error("[ConnectStatus] disconnect threw", e);
+      setError("Something went wrong");
+      setBusyDisconnect(false);
+      setConfirmDisconnect(false);
+    }
+  }
+
   // Outer card chrome (title, border, padding) is provided by the
   // CollapsibleCard wrapper in the parent admin page. This component
   // renders just the body content for whichever state we're in.
@@ -357,6 +389,40 @@ export function ConnectStatus({
           )}
         </div>
       )}
+
+      {/* Danger zone: only visible when there IS a connected account.
+          Calls Stripe's Delete API (the dashboard's Remove button is
+          blocked for platforms that own loss liability — see Stripe's
+          "Consider using the Delete API" hint). Stripe rejects if the
+          account has live activity; that error is surfaced. */}
+      {state !== "not_connected" && state !== "loading" && (
+        <div className="mt-6 border-t border-border-warm pt-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="text-xs text-ink-subtle">
+              Disconnect this account from the reunion. Stripe will delete
+              the connected account; the organizer will need to start
+              fresh if they want to receive payments again.
+            </div>
+            <button
+              onClick={() => setConfirmDisconnect(true)}
+              disabled={busyDisconnect}
+              className="rounded-lg border border-danger px-3 py-1.5 text-sm font-medium text-danger transition hover:bg-danger/10 disabled:opacity-50"
+            >
+              Disconnect Stripe
+            </button>
+          </div>
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={confirmDisconnect}
+        title="Disconnect Stripe?"
+        message="This deletes the connected Stripe account. Stripe rejects deletion if there's recent activity or a live balance — you'd need to handle that first. Reconnecting later means starting onboarding from scratch."
+        confirmLabel={busyDisconnect ? "Disconnecting…" : "Disconnect"}
+        confirmVariant="red"
+        onConfirm={handleDisconnect}
+        onCancel={() => setConfirmDisconnect(false)}
+      />
     </div>
   );
 }
