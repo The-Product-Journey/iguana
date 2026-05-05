@@ -17,13 +17,21 @@ import type { Reunion } from "@/lib/db/schema";
  * - The displayed URLs (custom domain when set, plus the platform path)
  *   are individual links that open the public site in a new tab.
  * - The "Site settings →" footer is the primary action: deep-link to the
- *   per-reunion admin page.
+ *   per-reunion admin page. Only rendered when `canAdmin` is true —
+ *   that flag is computed server-side from the current admin context
+ *   (super admin or a reunion-admin row matching this site).
  *
  * The card itself is NOT a link wrapper — Site Cards have multiple
  * distinct interactive children, so wrapping them in a single anchor
  * would either swallow inner clicks or violate "no anchor inside anchor."
  */
-export function SiteCard({ site }: { site: Reunion }) {
+export function SiteCard({
+  site,
+  canAdmin = false,
+}: {
+  site: Reunion;
+  canAdmin?: boolean;
+}) {
   const platformPath = `/${site.slug}`;
   const faviconUrl = site.faviconUrl ?? "/favicon.svg";
   const isTest = site.slug.endsWith("-test");
@@ -86,13 +94,15 @@ export function SiteCard({ site }: { site: Reunion }) {
           )}
         </div>
       </div>
-      <Link
-        href={`/admin/${site.slug}`}
-        className="block border-t border-border-warm bg-bg-subtle px-6 py-3 text-sm font-medium text-ink-subtle transition-colors hover:bg-cream hover:text-forest"
-        aria-label={`Settings for ${site.name}`}
-      >
-        Site settings →
-      </Link>
+      {canAdmin && (
+        <Link
+          href={`/admin/${site.slug}`}
+          className="block border-t border-border-warm bg-bg-subtle px-6 py-3 text-sm font-medium text-ink-subtle transition-colors hover:bg-cream hover:text-forest"
+          aria-label={`Settings for ${site.name}`}
+        >
+          Site settings →
+        </Link>
+      )}
     </div>
   );
 }
