@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { InterestForm } from "@/components/interest-form";
 import { AdminMenu } from "@/components/admin-menu";
+import { SwitchToPublicViewPill } from "@/components/switch-to-public-view-pill";
 import { useAdminModeHref } from "@/lib/use-admin-mode-href";
 import type { Event } from "@/lib/db/schema";
 
@@ -64,7 +65,11 @@ export function TeaseLanding({
         </a>
       )}
       {showAdminMenu && actualMode && (
-        <div className="absolute right-4 top-3 z-30">
+        <div className="absolute right-4 top-3 z-30 flex items-center gap-2">
+          <SwitchToPublicViewPill
+            customDomain={customDomain}
+            variant="dark"
+          />
           <AdminMenu
             actualMode={actualMode}
             previewMode={previewMode ?? null}

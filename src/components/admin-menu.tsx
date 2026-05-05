@@ -169,16 +169,6 @@ export function AdminMenu({
             >
               Admin panel
             </Link>
-            {customDomain && (
-              <a
-                href={`https://${customDomain}`}
-                role="menuitem"
-                onClick={() => setOpen(false)}
-                className="block px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
-              >
-                Switch to public view
-              </a>
-            )}
             <button
               type="button"
               role="menuitem"

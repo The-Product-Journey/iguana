@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AdminMenu } from "./admin-menu";
+import { SwitchToPublicViewPill } from "./switch-to-public-view-pill";
 import { useAdminModeHref } from "@/lib/use-admin-mode-href";
 
 type SiteMode = "tease" | "pre_register" | "open";
@@ -84,12 +85,18 @@ export function SiteNav({
             </a>
           )}
           {showAdminMenu && actualMode && (
-            <AdminMenu
-              actualMode={actualMode}
-              previewMode={previewMode ?? null}
-              variant="light"
-              customDomain={customDomain}
-            />
+            <>
+              <SwitchToPublicViewPill
+                customDomain={customDomain}
+                variant="light"
+              />
+              <AdminMenu
+                actualMode={actualMode}
+                previewMode={previewMode ?? null}
+                variant="light"
+                customDomain={customDomain}
+              />
+            </>
           )}
         </div>
 
