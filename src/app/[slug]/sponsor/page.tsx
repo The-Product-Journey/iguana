@@ -48,7 +48,7 @@ export default async function SponsorPage({
         {/* Tier explanation */}
         <div className="mb-8 grid gap-4 sm:grid-cols-2">
           <div className="relative rounded-xl border border-tenant-primary bg-white p-6">
-            <span className="absolute right-3 top-3 rounded-md bg-tenant-primary px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-white">
+            <span className="absolute -top-3 right-4 rounded-md bg-tenant-primary px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-white shadow-md">
               Marquee
             </span>
             <h3 className="mb-1 pr-20 text-lg font-bold text-ink">
