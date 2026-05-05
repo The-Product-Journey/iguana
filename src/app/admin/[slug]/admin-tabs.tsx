@@ -26,8 +26,10 @@ type ContactMessage = {
 
 /**
  * Renders a count number. Zero shows as plain text. Non-zero shows as
- * an underlined link that opens a small dialog listing the items
- * behind the count.
+ * an underlined link with two affordances:
+ *   - hover: a small tooltip popover previews the list inline
+ *   - click: full dialog with scrollable list (better when there are
+ *     many items, on touch devices, or when you want to copy text)
  */
 function CountLinkDialog({
   count,
@@ -39,18 +41,38 @@ function CountLinkDialog({
   items: string[];
 }) {
   const [open, setOpen] = useState(false);
+  const [hover, setHover] = useState(false);
   if (count === 0) {
     return <span className="text-ink-subtle">0</span>;
   }
   return (
-    <>
+    <span className="relative inline-block">
       <button
         type="button"
         onClick={() => setOpen(true)}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        onFocus={() => setHover(true)}
+        onBlur={() => setHover(false)}
         className="font-medium text-forest underline decoration-forest/40 underline-offset-2 hover:text-forest-deep hover:decoration-forest"
       >
         {count}
       </button>
+      {hover && !open && (
+        <div
+          role="tooltip"
+          className="pointer-events-none absolute left-0 top-full z-30 mt-1 w-max max-w-xs rounded-md border border-border-warm bg-white px-3 py-2 text-xs text-ink-muted shadow-lg"
+        >
+          <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-subtle">
+            {title}
+          </div>
+          <ul className="space-y-0.5">
+            {items.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
@@ -80,7 +102,7 @@ function CountLinkDialog({
           </div>
         </div>
       )}
-    </>
+    </span>
   );
 }
 

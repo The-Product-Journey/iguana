@@ -25,7 +25,7 @@ import { BackLink } from "@/components/back-link";
 import { TestTag } from "@/components/test-tag";
 import { EditableSiteName } from "@/components/editable-site-name";
 import { requireReunionAdminPage } from "@/lib/admin-auth";
-import { loadConnectAccount } from "@/lib/stripe";
+import { loadConnectAccount, stripeEnvironment } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
 
@@ -228,6 +228,7 @@ export default async function AdminReunionPage({
           initialOnboardingComplete={!!connect?.detailsSubmitted}
           initialChargesEnabled={!!connect?.chargesEnabled}
           initialPayoutsEnabled={!!connect?.payoutsEnabled}
+          isLiveStripe={stripeEnvironment() === "live"}
         />
       </CollapsibleCard>
 

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ConfirmDialog } from "@/components/confirm-dialog";
 
 type ConnectState =
   | "loading"
@@ -20,6 +19,7 @@ export function ConnectStatus({
   initialOnboardingComplete,
   initialChargesEnabled,
   initialPayoutsEnabled,
+  isLiveStripe = false,
 }: {
   reunionId: string;
   slug: string;
@@ -28,6 +28,11 @@ export function ConnectStatus({
   initialOnboardingComplete: boolean;
   initialChargesEnabled: boolean;
   initialPayoutsEnabled: boolean;
+  /**
+   * True when this admin page is running against the live Stripe key
+   * set. Disconnect requires an extra password gate in that case.
+   */
+  isLiveStripe?: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -61,6 +66,8 @@ export function ConnectStatus({
   const [busyDashboard, setBusyDashboard] = useState(false);
   const [busyDisconnect, setBusyDisconnect] = useState(false);
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
+  const [disconnectPassword, setDisconnectPassword] = useState("");
+  const [disconnectError, setDisconnectError] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -215,31 +222,46 @@ export function ConnectStatus({
     }
   }
 
+  function openDisconnectDialog() {
+    setDisconnectPassword("");
+    setDisconnectError("");
+    setConfirmDisconnect(true);
+  }
+
+  function closeDisconnectDialog() {
+    setConfirmDisconnect(false);
+    setDisconnectPassword("");
+    setDisconnectError("");
+  }
+
   async function handleDisconnect() {
     setBusyDisconnect(true);
-    setError("");
+    setDisconnectError("");
     try {
       const res = await fetch("/api/admin/connect/disconnect", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reunionId }),
+        body: JSON.stringify({
+          reunionId,
+          ...(isLiveStripe ? { password: disconnectPassword } : {}),
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Failed to disconnect");
+        // Stay in the dialog so the user can read the error and
+        // (for password failures on live) try again.
+        setDisconnectError(data.error || "Failed to disconnect");
         setBusyDisconnect(false);
-        setConfirmDisconnect(false);
         return;
       }
       setState("not_connected");
-      setConfirmDisconnect(false);
       setBusyDisconnect(false);
+      closeDisconnectDialog();
       router.refresh();
     } catch (e) {
       console.error("[ConnectStatus] disconnect threw", e);
-      setError("Something went wrong");
+      setDisconnectError("Something went wrong");
       setBusyDisconnect(false);
-      setConfirmDisconnect(false);
     }
   }
 
@@ -404,7 +426,7 @@ export function ConnectStatus({
               fresh if they want to receive payments again.
             </div>
             <button
-              onClick={() => setConfirmDisconnect(true)}
+              onClick={openDisconnectDialog}
               disabled={busyDisconnect}
               className="rounded-lg border border-danger px-3 py-1.5 text-sm font-medium text-danger transition hover:bg-danger/10 disabled:opacity-50"
             >
@@ -414,15 +436,72 @@ export function ConnectStatus({
         </div>
       )}
 
-      <ConfirmDialog
-        open={confirmDisconnect}
-        title="Disconnect Stripe?"
-        message="This deletes the connected Stripe account. Stripe rejects deletion if there's recent activity or a live balance — you'd need to handle that first. Reconnecting later means starting onboarding from scratch."
-        confirmLabel={busyDisconnect ? "Disconnecting…" : "Disconnect"}
-        confirmVariant="red"
-        onConfirm={handleDisconnect}
-        onCancel={() => setConfirmDisconnect(false)}
-      />
+      {confirmDisconnect && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          onClick={closeDisconnectDialog}
+        >
+          <div
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="mb-2 text-lg font-semibold text-ink">
+              Disconnect Stripe?
+            </h2>
+            <p className="mb-4 text-sm text-ink-muted">
+              This deletes the connected Stripe account. Stripe rejects
+              deletion if there&apos;s recent activity or a live balance —
+              you&apos;d need to handle that first. Reconnecting later means
+              starting onboarding from scratch.
+            </p>
+            {isLiveStripe && (
+              <div className="mb-4 rounded-md border border-danger/30 bg-danger/10 p-3">
+                <p className="mb-2 text-sm font-medium text-danger">
+                  Live Stripe — extra confirmation required.
+                </p>
+                <label className="block text-xs font-medium text-ink-muted">
+                  Production disconnect password
+                </label>
+                <input
+                  type="password"
+                  autoComplete="off"
+                  autoFocus
+                  value={disconnectPassword}
+                  onChange={(e) => setDisconnectPassword(e.target.value)}
+                  disabled={busyDisconnect}
+                  className="mt-1 w-full rounded-md border border-border-strong px-3 py-1.5 text-sm focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/30"
+                />
+              </div>
+            )}
+            {disconnectError && (
+              <p className="mb-3 text-sm text-danger">{disconnectError}</p>
+            )}
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeDisconnectDialog}
+                disabled={busyDisconnect}
+                className="rounded-md border border-border-strong bg-white px-3 py-1.5 text-sm font-medium text-ink-muted transition hover:bg-bg-subtle disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDisconnect}
+                disabled={
+                  busyDisconnect ||
+                  (isLiveStripe && disconnectPassword.length === 0)
+                }
+                className="rounded-md bg-[var(--color-danger)] px-3 py-1.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
+              >
+                {busyDisconnect ? "Disconnecting…" : "Disconnect"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
