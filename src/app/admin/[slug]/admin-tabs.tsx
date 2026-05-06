@@ -153,6 +153,7 @@ const TABS = [
 
 export function AdminTabs({
   slug,
+  reunionId,
   isSuper = false,
   rsvps,
   interests,
@@ -168,6 +169,7 @@ export function AdminTabs({
   categoryLabels,
 }: {
   slug: string;
+  reunionId: string;
   isSuper?: boolean;
   rsvps: Rsvp[];
   interests: InterestSignup[];
@@ -212,7 +214,9 @@ export function AdminTabs({
         ))}
       </div>
 
-      {tab === "RSVPs" && <RsvpsTab rsvps={rsvps} />}
+      {tab === "RSVPs" && (
+        <RsvpsTab rsvps={rsvps} reunionId={reunionId} />
+      )}
       {tab === "Interests" && (
         <InterestsTab
           interests={interests}
@@ -243,55 +247,153 @@ export function AdminTabs({
   );
 }
 
-function RsvpsTab({ rsvps }: { rsvps: Rsvp[] }) {
+function RsvpsTab({
+  rsvps,
+  reunionId,
+}: {
+  rsvps: Rsvp[];
+  reunionId: string;
+}) {
+  const router = useRouter();
+  const [refreshing, setRefreshing] = useState<string | null>(null);
+  const [bulkRefreshing, setBulkRefreshing] = useState(false);
+  const [bulkResult, setBulkResult] = useState<string | null>(null);
+
+  const pendingCount = rsvps.filter(
+    (r) => r.paymentStatus === "pending" && r.stripeCheckoutSessionId
+  ).length;
+
+  async function refreshOne(rsvpId: string) {
+    setRefreshing(rsvpId);
+    setBulkResult(null);
+    try {
+      const res = await fetch("/api/admin/rsvps", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "refreshFromStripe", rsvpId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Failed to sync from Stripe");
+        setRefreshing(null);
+        return;
+      }
+      router.refresh();
+    } catch {
+      alert("Something went wrong syncing from Stripe");
+    } finally {
+      setRefreshing(null);
+    }
+  }
+
+  async function refreshAllPending() {
+    setBulkRefreshing(true);
+    setBulkResult(null);
+    try {
+      const res = await fetch("/api/admin/rsvps", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "refreshAllPending", reunionId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setBulkResult(data.error || "Failed to sync from Stripe");
+        return;
+      }
+      setBulkResult(
+        `Reconciled ${data.total} pending: ${data.updated} updated, ${data.unchanged} unchanged${
+          data.failed ? `, ${data.failed} failed` : ""
+        }.`
+      );
+      router.refresh();
+    } catch {
+      setBulkResult("Something went wrong");
+    } finally {
+      setBulkRefreshing(false);
+    }
+  }
+
   return (
-    <div className="overflow-x-auto rounded-xl border border-border-warm bg-white shadow-sm">
-      <table className="w-full text-left text-sm">
-        <thead className="border-b border-border-warm bg-bg-subtle">
-          <tr>
-            <th className="px-4 py-3 font-medium text-ink-muted">Name</th>
-            <th className="px-4 py-3 font-medium text-ink-muted">Email</th>
-            <th className="px-4 py-3 font-medium text-ink-muted">Guests</th>
-            <th className="px-4 py-3 font-medium text-ink-muted">Method</th>
-            <th className="px-4 py-3 font-medium text-ink-muted">Paid</th>
-            <th className="px-4 py-3 font-medium text-ink-muted">Status</th>
-            <th className="px-4 py-3 font-medium text-ink-muted">Date</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border-warm">
-          {rsvps.length === 0 ? (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-xs text-ink-muted">
+          {pendingCount === 0
+            ? "All RSVPs reconciled with Stripe."
+            : `${pendingCount} pending RSVP${pendingCount === 1 ? "" : "s"} with a Stripe session — sync to pull live status.`}
+        </p>
+        <button
+          type="button"
+          onClick={refreshAllPending}
+          disabled={bulkRefreshing || pendingCount === 0}
+          title="Re-fetch every pending RSVP's session from Stripe and update status accordingly"
+          className="rounded-lg border border-forest px-3 py-1.5 text-xs font-medium text-forest transition hover:bg-cream disabled:opacity-50"
+        >
+          {bulkRefreshing ? "Syncing…" : "Refresh all pending"}
+        </button>
+      </div>
+      {bulkResult && <p className="text-xs text-ink-muted">{bulkResult}</p>}
+
+      <div className="overflow-x-auto rounded-xl border border-border-warm bg-white shadow-sm">
+        <table className="w-full text-left text-sm">
+          <thead className="border-b border-border-warm bg-bg-subtle">
             <tr>
-              <td colSpan={7} className="px-4 py-8 text-center text-ink-subtle">
-                No RSVPs yet.
-              </td>
+              <th className="px-4 py-3 font-medium text-ink-muted">Name</th>
+              <th className="px-4 py-3 font-medium text-ink-muted">Email</th>
+              <th className="px-4 py-3 font-medium text-ink-muted">Guests</th>
+              <th className="px-4 py-3 font-medium text-ink-muted">Method</th>
+              <th className="px-4 py-3 font-medium text-ink-muted">Paid</th>
+              <th className="px-4 py-3 font-medium text-ink-muted">Status</th>
+              <th className="px-4 py-3 font-medium text-ink-muted">Date</th>
             </tr>
-          ) : (
-            rsvps.map((rsvp) => (
-              <tr key={rsvp.id} className="hover:bg-bg-subtle">
-                <td className="px-4 py-3 font-medium">
-                  {rsvp.firstName} {rsvp.lastName}
-                </td>
-                <td className="px-4 py-3 text-ink-muted">{rsvp.email}</td>
-                <td className="px-4 py-3">{rsvp.guestCount}</td>
-                <td className="px-4 py-3">
-                  <span className="text-xs text-ink-subtle">
-                    {rsvp.paymentMethod || "online"}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  {formatCents(rsvp.amountPaidCents || 0)}
-                </td>
-                <td className="px-4 py-3">
-                  <StatusBadge status={rsvp.paymentStatus} />
-                </td>
-                <td className="px-4 py-3 text-ink-subtle">
-                  {new Date(rsvp.createdAt).toLocaleDateString()}
+          </thead>
+          <tbody className="divide-y divide-border-warm">
+            {rsvps.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="px-4 py-8 text-center text-ink-subtle">
+                  No RSVPs yet.
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              rsvps.map((rsvp) => (
+                <tr key={rsvp.id} className="hover:bg-bg-subtle">
+                  <td className="px-4 py-3 font-medium">
+                    {rsvp.firstName} {rsvp.lastName}
+                  </td>
+                  <td className="px-4 py-3 text-ink-muted">{rsvp.email}</td>
+                  <td className="px-4 py-3">{rsvp.guestCount}</td>
+                  <td className="px-4 py-3">
+                    <span className="text-xs text-ink-subtle">
+                      {rsvp.paymentMethod || "online"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatCents(rsvp.amountPaidCents || 0)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <StatusBadge status={rsvp.paymentStatus} />
+                      {rsvp.stripeCheckoutSessionId && (
+                        <button
+                          type="button"
+                          onClick={() => refreshOne(rsvp.id)}
+                          disabled={refreshing === rsvp.id}
+                          title="Sync payment status from Stripe"
+                          className="rounded border border-border-strong px-2 py-0.5 text-xs font-medium text-ink-muted transition hover:bg-bg-subtle disabled:opacity-50"
+                        >
+                          {refreshing === rsvp.id ? "Syncing…" : "Refresh"}
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-ink-subtle">
+                    {new Date(rsvp.createdAt).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
